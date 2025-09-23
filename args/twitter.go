@@ -2,10 +2,22 @@ package args
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
 	teetypes "github.com/masa-finance/tee-types/types"
+)
+
+var (
+	ErrTwitterCountNegative      = errors.New("count must be non-negative")
+	ErrTwitterCountTooLarge      = errors.New("count must be less than or equal to 1000")
+	ErrTwitterMaxResultsTooLarge = errors.New("max_results must be less than or equal to 1000")
+	ErrTwitterMaxResultsNegative = errors.New("max_results must be non-negative")
+)
+
+const (
+	TwitterMaxResults = 1000
 )
 
 // TwitterSearchArguments defines args for Twitter searches
@@ -42,13 +54,17 @@ func (t *TwitterSearchArguments) UnmarshalJSON(data []byte) error {
 // Validate validates the Twitter arguments (general validation)
 func (t *TwitterSearchArguments) Validate() error {
 	// note, query is not required for all capabilities
-
 	if t.Count < 0 {
-		return fmt.Errorf("count must be non-negative, got: %d", t.Count)
+		return fmt.Errorf("%w, got: %d", ErrTwitterCountNegative, t.Count)
 	}
-
+	if t.Count > TwitterMaxResults {
+		return fmt.Errorf("%w, got: %d", ErrTwitterCountTooLarge, t.Count)
+	}
 	if t.MaxResults < 0 {
-		return fmt.Errorf("max_results must be non-negative, got: %d", t.MaxResults)
+		return fmt.Errorf("%w, got: %d", ErrTwitterMaxResultsNegative, t.MaxResults)
+	}
+	if t.MaxResults > TwitterMaxResults {
+		return fmt.Errorf("%w, got: %d", ErrTwitterMaxResultsTooLarge, t.MaxResults)
 	}
 
 	return nil

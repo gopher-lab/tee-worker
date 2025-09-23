@@ -1,13 +1,36 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 	"slices"
+	"time"
 
 	"github.com/masa-finance/tee-types/pkg/util"
 )
 
 type JobType string
+
+type JobArguments map[string]interface{}
+
+func (j JobArguments) Unmarshal(i interface{}) error {
+	d, err := json.Marshal(j)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(d, i)
+}
+
+type Job struct {
+	Type         JobType       `json:"type"`
+	Arguments    JobArguments  `json:"arguments"`
+	UUID         string        `json:"-"`
+	Nonce        string        `json:"quote"`
+	WorkerID     string        `json:"worker_id"`
+	TargetWorker string        `json:"target_worker"`
+	Timeout      time.Duration `json:"timeout"`
+}
+
 type Capability string
 type WorkerCapabilities map[JobType][]Capability
 
