@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	teetypes "github.com/masa-finance/tee-types/types"
 	"github.com/masa-finance/tee-worker/api/types"
 	. "github.com/masa-finance/tee-worker/pkg/client"
 	. "github.com/onsi/ginkgo/v2"
@@ -58,7 +59,7 @@ var _ = Describe("Client", func() {
 
 	Describe("CreateJobSignature", func() {
 		It("should create a job signature successfully", func() {
-			job := types.Job{Type: "test-job"}
+			job := teetypes.Job{Type: "test-job"}
 			signature, err := client.CreateJobSignature(job)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(signature).To(Equal(JobSignature("mock-signature")))
