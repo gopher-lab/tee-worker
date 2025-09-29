@@ -169,6 +169,14 @@ func ReadConfig() JobConfiguration {
 		jc["gemini_api_key"] = ""
 	}
 
+	claudeApiKey := os.Getenv("CLAUDE_API_KEY")
+	if claudeApiKey != "" {
+		logrus.Info("Claude API key found")
+		jc["claude_api_key"] = claudeApiKey
+	} else {
+		jc["claude_api_key"] = ""
+	}
+
 	tikTokLang := os.Getenv("TIKTOK_DEFAULT_LANGUAGE")
 	if tikTokLang == "" {
 		tikTokLang = "eng-US"
