@@ -328,8 +328,7 @@ type LlmConfig struct {
 func (lc LlmConfig) GetModelAndKey() (model string, key string, err error) {
 	if lc.ClaudeApiKey.IsValid() {
 		return teeargs.LLMDefaultClaudeModel, string(lc.ClaudeApiKey), nil
-	}
-	if lc.GeminiApiKey.IsValid() {
+	} else if lc.GeminiApiKey.IsValid() {
 		return teeargs.LLMDefaultGeminiModel, string(lc.GeminiApiKey), nil
 	}
 	return "", "", errors.New("no valid llm api key found")
