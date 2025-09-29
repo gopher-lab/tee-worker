@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	teeargs "github.com/masa-finance/tee-types/args"
 	"github.com/sirupsen/logrus"
 )
 
@@ -311,7 +313,7 @@ func (k LlmApiKey) IsValid() bool {
 	if k == "" {
 		return false
 	}
-	
+
 	// TODO: Add actual Gemini API key validation with a handler
 	// For now, just check if it's not empty
 	return true
@@ -319,6 +321,18 @@ func (k LlmApiKey) IsValid() bool {
 
 type LlmConfig struct {
 	GeminiApiKey LlmApiKey
+	ClaudeApiKey LlmApiKey
+}
+
+// GetModelAndKey returns the first available model and API key based on which keys are valid
+func (lc LlmConfig) GetModelAndKey() (model string, key string, err error) {
+	if lc.ClaudeApiKey.IsValid() {
+		return teeargs.LLMDefaultClaudeModel, string(lc.ClaudeApiKey), nil
+	}
+	if lc.GeminiApiKey.IsValid() {
+		return teeargs.LLMDefaultGeminiModel, string(lc.GeminiApiKey), nil
+	}
+	return "", "", errors.New("no valid llm api key found")
 }
 
 // WebConfig represents the configuration needed for Web scraping via Apify
@@ -333,6 +347,7 @@ func (jc JobConfiguration) GetWebConfig() WebConfig {
 	return WebConfig{
 		LlmConfig: LlmConfig{
 			GeminiApiKey: LlmApiKey(jc.GetString("gemini_api_key", "")),
+			ClaudeApiKey: LlmApiKey(jc.GetString("claude_api_key", "")),
 		},
 		ApifyApiKey: jc.GetString("apify_api_key", ""),
 	}

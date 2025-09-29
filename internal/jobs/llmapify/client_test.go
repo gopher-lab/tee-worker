@@ -89,7 +89,7 @@ var _ = Describe("LLMApifyClient", func() {
 				Expect(request.InputDatasetId).To(Equal("test-dataset-id"))
 				Expect(request.Prompt).To(Equal("test-prompt"))
 				Expect(request.LLMProviderApiKey).To(Equal("test-llm-key"))                                            // should be set from constructor
-				Expect(request.Model).To(Equal(teeargs.LLMDefaultModel))                                               // default model
+				Expect(request.Model).To(Equal(""))                                                                    // default model
 				Expect(request.MultipleColumns).To(Equal(teeargs.LLMDefaultMultipleColumns))                           // default value
 				Expect(request.MaxTokens).To(Equal(teeargs.LLMDefaultMaxTokens))                                       // default value
 				Expect(request.Temperature).To(Equal(strconv.FormatFloat(teeargs.LLMDefaultTemperature, 'f', -1, 64))) // default value
