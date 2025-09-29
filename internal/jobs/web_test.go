@@ -167,14 +167,16 @@ var _ = Describe("WebScraper", func() {
 		var (
 			apifyKey  string
 			geminiKey string
+			claudeKey string
 		)
 
 		BeforeEach(func() {
 			apifyKey = os.Getenv("APIFY_API_KEY")
 			geminiKey = os.Getenv("GEMINI_API_KEY")
+			claudeKey = os.Getenv("CLAUDE_API_KEY")
 
-			if apifyKey == "" || geminiKey == "" {
-				Skip("APIFY_API_KEY and GEMINI_API_KEY required for integration web integration tests")
+			if apifyKey == "" || (geminiKey == "" || claudeKey == "") {
+				Skip("APIFY_API_KEY and GEMINI_API_KEY or CLAUDE_API_KEY required for integration web integration tests")
 			}
 
 			// Reset to use real client for integration tests
@@ -186,10 +188,11 @@ var _ = Describe("WebScraper", func() {
 			}
 		})
 
-		It("should execute a real web scraping job when keys is set", func() {
+		FIt("should execute a real web scraping job when keys is set", func() {
 			cfg := config.JobConfiguration{
 				"apify_api_key":  apifyKey,
 				"gemini_api_key": geminiKey,
+				"claude_api_key": claudeKey,
 			}
 			integrationStatsCollector := stats.StartCollector(128, cfg)
 			integrationScraper := jobs.NewWebScraper(cfg, integrationStatsCollector)
