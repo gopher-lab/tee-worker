@@ -15,7 +15,6 @@ import (
 )
 
 var (
-	ErrProviderKeyRequired  = errors.New("llm provider key is required")
 	ErrFailedToCreateClient = errors.New("failed to create apify client")
 )
 
@@ -38,8 +37,9 @@ func NewClient(apiToken string, llmConfig config.LlmConfig, statsCollector *stat
 		return nil, fmt.Errorf("%w: %v", ErrFailedToCreateClient, err)
 	}
 
-	if !llmConfig.GeminiApiKey.IsValid() && !llmConfig.ClaudeApiKey.IsValid() {
-		return nil, ErrProviderKeyRequired
+	llmErr := llmConfig.HasValidKey()
+	if llmErr != nil {
+		return nil, llmErr
 	}
 
 	return &ApifyClient{

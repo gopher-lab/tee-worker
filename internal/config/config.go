@@ -334,6 +334,13 @@ func (lc LlmConfig) GetModelAndKey() (model string, key string, err error) {
 	return "", "", errors.New("no valid llm api key found")
 }
 
+func (lc LlmConfig) HasValidKey() (err error) {
+	if lc.ClaudeApiKey.IsValid() || lc.GeminiApiKey.IsValid() {
+		return nil
+	}
+	return errors.New("no valid llm api key found")
+}
+
 // WebConfig represents the configuration needed for Web scraping via Apify
 type WebConfig struct {
 	LlmConfig
