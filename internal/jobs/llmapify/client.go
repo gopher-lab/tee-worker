@@ -38,7 +38,7 @@ func NewClient(apiToken string, llmConfig config.LlmConfig, statsCollector *stat
 		return nil, fmt.Errorf("%w: %v", ErrFailedToCreateClient, err)
 	}
 
-	if !llmConfig.GeminiApiKey.IsValid() {
+	if !llmConfig.GeminiApiKey.IsValid() && !llmConfig.ClaudeApiKey.IsValid() {
 		return nil, ErrProviderKeyRequired
 	}
 
