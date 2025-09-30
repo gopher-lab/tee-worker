@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	teeargs "github.com/masa-finance/tee-types/args"
 	"github.com/sirupsen/logrus"
 )
 
@@ -167,6 +169,14 @@ func ReadConfig() JobConfiguration {
 		jc["gemini_api_key"] = ""
 	}
 
+	claudeApiKey := os.Getenv("CLAUDE_API_KEY")
+	if claudeApiKey != "" {
+		logrus.Info("Claude API key found")
+		jc["claude_api_key"] = claudeApiKey
+	} else {
+		jc["claude_api_key"] = ""
+	}
+
 	tikTokLang := os.Getenv("TIKTOK_DEFAULT_LANGUAGE")
 	if tikTokLang == "" {
 		tikTokLang = "eng-US"
@@ -311,7 +321,7 @@ func (k LlmApiKey) IsValid() bool {
 	if k == "" {
 		return false
 	}
-	
+
 	// TODO: Add actual Gemini API key validation with a handler
 	// For now, just check if it's not empty
 	return true
@@ -319,6 +329,24 @@ func (k LlmApiKey) IsValid() bool {
 
 type LlmConfig struct {
 	GeminiApiKey LlmApiKey
+	ClaudeApiKey LlmApiKey
+}
+
+// GetModelAndKey returns the first available model and API key based on which keys are valid
+func (lc LlmConfig) GetModelAndKey() (model string, key string, err error) {
+	if lc.ClaudeApiKey.IsValid() {
+		return teeargs.LLMDefaultClaudeModel, string(lc.ClaudeApiKey), nil
+	} else if lc.GeminiApiKey.IsValid() {
+		return teeargs.LLMDefaultGeminiModel, string(lc.GeminiApiKey), nil
+	}
+	return "", "", errors.New("no valid llm api key found")
+}
+
+func (lc LlmConfig) HasValidKey() (err error) {
+	if lc.ClaudeApiKey.IsValid() || lc.GeminiApiKey.IsValid() {
+		return nil
+	}
+	return errors.New("no valid llm api key found")
 }
 
 // WebConfig represents the configuration needed for Web scraping via Apify
@@ -333,6 +361,7 @@ func (jc JobConfiguration) GetWebConfig() WebConfig {
 	return WebConfig{
 		LlmConfig: LlmConfig{
 			GeminiApiKey: LlmApiKey(jc.GetString("gemini_api_key", "")),
+			ClaudeApiKey: LlmApiKey(jc.GetString("claude_api_key", "")),
 		},
 		ApifyApiKey: jc.GetString("apify_api_key", ""),
 	}

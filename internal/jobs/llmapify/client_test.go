@@ -62,7 +62,7 @@ var _ = Describe("LLMApifyClient", func() {
 			return mockClient, nil
 		}
 		var err error
-		llmClient, err = llmapify.NewClient("test-token", config.LlmConfig{GeminiApiKey: "test-llm-key"}, nil)
+		llmClient, err = llmapify.NewClient("test-token", config.LlmConfig{ClaudeApiKey: "test-claude-llm-key"}, nil)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -88,8 +88,8 @@ var _ = Describe("LLMApifyClient", func() {
 				Expect(ok).To(BeTrue())
 				Expect(request.InputDatasetId).To(Equal("test-dataset-id"))
 				Expect(request.Prompt).To(Equal("test-prompt"))
-				Expect(request.LLMProviderApiKey).To(Equal("test-llm-key"))                                            // should be set from constructor
-				Expect(request.Model).To(Equal(teeargs.LLMDefaultModel))                                               // default model
+				Expect(request.LLMProviderApiKey).To(Equal("test-claude-llm-key"))                                     // should be set from constructor
+				Expect(request.Model).To(Equal(teeargs.LLMDefaultClaudeModel))                                         // default model
 				Expect(request.MultipleColumns).To(Equal(teeargs.LLMDefaultMultipleColumns))                           // default value
 				Expect(request.MaxTokens).To(Equal(teeargs.LLMDefaultMaxTokens))                                       // default value
 				Expect(request.Temperature).To(Equal(strconv.FormatFloat(teeargs.LLMDefaultTemperature, 'f', -1, 64))) // default value
@@ -199,7 +199,7 @@ var _ = Describe("LLMApifyClient", func() {
 				Expect(ok).To(BeTrue())
 				Expect(request.MaxTokens).To(Equal(uint(500)))
 				Expect(request.Temperature).To(Equal("0.5"))
-				Expect(request.LLMProviderApiKey).To(Equal("test-llm-key")) // should be set from constructor
+				Expect(request.LLMProviderApiKey).To(Equal("test-claude-llm-key")) // should be set from constructor
 
 				return &client.DatasetResponse{Data: client.ApifyDatasetData{Items: []json.RawMessage{}}}, "next", nil
 			}

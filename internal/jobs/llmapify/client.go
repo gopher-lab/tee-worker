@@ -15,7 +15,6 @@ import (
 )
 
 var (
-	ErrProviderKeyRequired  = errors.New("llm provider key is required")
 	ErrFailedToCreateClient = errors.New("failed to create apify client")
 )
 
@@ -38,8 +37,9 @@ func NewClient(apiToken string, llmConfig config.LlmConfig, statsCollector *stat
 		return nil, fmt.Errorf("%w: %v", ErrFailedToCreateClient, err)
 	}
 
-	if !llmConfig.GeminiApiKey.IsValid() {
-		return nil, ErrProviderKeyRequired
+	llmErr := llmConfig.HasValidKey()
+	if llmErr != nil {
+		return nil, llmErr
 	}
 
 	return &ApifyClient{
@@ -59,8 +59,15 @@ func (c *ApifyClient) Process(workerID string, args teeargs.LLMProcessorArgument
 		c.statsCollector.Add(workerID, stats.LLMQueries, 1)
 	}
 
-	input := args.ToLLMProcessorRequest()
-	input.LLMProviderApiKey = string(c.llmConfig.GeminiApiKey)
+	model, key, err := c.llmConfig.GetModelAndKey()
+	if err != nil {
+		return nil, client.EmptyCursor, err
+	}
+
+	input, err := args.ToLLMProcessorRequest(model, key)
+	if err != nil {
+		return nil, client.EmptyCursor, err
+	}
 
 	limit := uint(args.Items)
 	dataset, nextCursor, err := c.client.RunActorAndGetResponse(apify.ActorIds.LLMDatasetProcessor, input, cursor, limit)
