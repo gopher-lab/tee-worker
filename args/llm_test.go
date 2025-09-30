@@ -100,13 +100,15 @@ var _ = Describe("LLMProcessorArguments", func() {
 				MaxTokens:   42,
 				Temperature: 0.7,
 			}
-			req := llmArgs.ToLLMProcessorRequest()
+			req, err := llmArgs.ToLLMProcessorRequest(args.LLMDefaultGeminiModel, "api-key")
+			Expect(err).ToNot(HaveOccurred())
 			Expect(req.InputDatasetId).To(Equal("ds1"))
 			Expect(req.Prompt).To(Equal("p"))
 			Expect(req.MaxTokens).To(Equal(uint(42)))
 			Expect(req.Temperature).To(Equal("0.7"))
 			Expect(req.MultipleColumns).To(BeFalse())
-			Expect(req.Model).To(Equal("gemini-1.5-flash-8b"))
+			Expect(req.Model).To(Equal(args.LLMDefaultGeminiModel))
+			Expect(req.LLMProviderApiKey).To(Equal("api-key"))
 		})
 	})
 })

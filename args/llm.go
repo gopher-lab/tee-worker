@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/masa-finance/tee-types/pkg/util"
 	teetypes "github.com/masa-finance/tee-types/types"
 )
 
@@ -18,9 +19,12 @@ const (
 	LLMDefaultMaxTokens       uint    = 300
 	LLMDefaultTemperature     float64 = 0.1
 	LLMDefaultMultipleColumns bool    = false
-	LLMDefaultModel           string  = "gemini-1.5-flash-8b"
+	LLMDefaultGeminiModel     string  = "gemini-1.5-flash-8b"
+	LLMDefaultClaudeModel     string  = "claude-3-5-haiku-latest"
 	LLMDefaultItems           uint    = 1
 )
+
+var SupportedModels = util.NewSet(LLMDefaultGeminiModel, LLMDefaultClaudeModel)
 
 type LLMProcessorArguments struct {
 	DatasetId   string  `json:"dataset_id"`
@@ -71,13 +75,21 @@ func (l *LLMProcessorArguments) Validate() error {
 	return nil
 }
 
-func (l LLMProcessorArguments) ToLLMProcessorRequest() teetypes.LLMProcessorRequest {
-	return teetypes.LLMProcessorRequest{
-		InputDatasetId:  l.DatasetId,
-		Prompt:          l.Prompt,
-		MaxTokens:       l.MaxTokens,
-		Temperature:     strconv.FormatFloat(l.Temperature, 'f', -1, 64),
-		MultipleColumns: LLMDefaultMultipleColumns, // overrides default in actor API
-		Model:           LLMDefaultModel,           // overrides default in actor API
+func (l LLMProcessorArguments) ToLLMProcessorRequest(model string, key string) (teetypes.LLMProcessorRequest, error) {
+	if !SupportedModels.Contains(model) {
+		return teetypes.LLMProcessorRequest{}, fmt.Errorf("model %s is not supported", model)
 	}
+	if key == "" {
+		return teetypes.LLMProcessorRequest{}, fmt.Errorf("key is required")
+	}
+
+	return teetypes.LLMProcessorRequest{
+		InputDatasetId:    l.DatasetId,
+		LLMProviderApiKey: key,
+		Prompt:            l.Prompt,
+		MaxTokens:         l.MaxTokens,
+		Temperature:       strconv.FormatFloat(l.Temperature, 'f', -1, 64),
+		MultipleColumns:   LLMDefaultMultipleColumns, // overrides default in actor API
+		Model:             model,                     // overrides default in actor API
+	}, nil
 }
