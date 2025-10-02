@@ -95,6 +95,29 @@ var _ = Describe("Twitter Scraper", func() {
 		// os.RemoveAll(tempDir)
 	})
 
+	Context("Twitter Scraper Tests with Cookies", func() {
+		It("should scrape tweets with a search query", func() {
+			for i := 0; i < 2; i++ {
+				j := types.Job{
+					Type: teetypes.TwitterCredentialJob,
+					Arguments: map[string]interface{}{
+						"type":        teetypes.CapSearchByQuery,
+						"query":       "from:gopher_ai",
+						"max_results": 1,
+					},
+					Timeout: 10 * time.Second,
+				}
+				res, err := twitterScraper.ExecuteJob(j)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(res.Error).To(BeEmpty())
+				var results []*teetypes.TweetResult
+				err = res.Unmarshal(&results)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(results).ToNot(BeEmpty())
+			}
+		})
+	})
+
 	// --- Tests for specialized job types with specific auth requirements ---
 	Context("Specialized Twitter Scraper Job Types", func() {
 		It("should use credentials for twitter-credential-scraper", func() {

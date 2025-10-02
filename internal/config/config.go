@@ -33,11 +33,6 @@ func ReadConfig() JobConfiguration {
 	// that is needed for the job
 	jc := JobConfiguration{}
 
-	logLevel := os.Getenv("LOG_LEVEL")
-	level := ParseLogLevel(logLevel)
-	jc["log_level"] = level.String()
-	SetLogLevel(level)
-
 	dataDir := os.Getenv("DATA_DIR")
 	if dataDir == "" {
 		dataDir = "/home/masa"
@@ -48,7 +43,7 @@ func ReadConfig() JobConfiguration {
 	}
 	jc["data_dir"] = dataDir
 
-	// Read the env file
+	// Read the env file FIRST before parsing LOG_LEVEL
 	if err := godotenv.Load(filepath.Join(dataDir, ".env")); err != nil {
 		if os.Getenv("OE_SIMULATION") == "" {
 			fmt.Println("Failed reading env file!")
@@ -56,6 +51,12 @@ func ReadConfig() JobConfiguration {
 		}
 		fmt.Println("Failed reading env file. Running in simulation mode, reading from environment variables")
 	}
+
+	// Now parse LOG_LEVEL after .env file is loaded
+	logLevel := os.Getenv("LOG_LEVEL")
+	level := ParseLogLevel(logLevel)
+	jc["log_level"] = level.String()
+	SetLogLevel(level)
 
 	bufSizeStr := os.Getenv("STATS_BUF_SIZE")
 	if bufSizeStr == "" {
@@ -379,7 +380,10 @@ func ParseLogLevel(logLevel string) logrus.Level {
 	case "error":
 		return logrus.ErrorLevel
 	default:
-		logrus.Error("Invalid log level", "level", logLevel, "setting_to", logrus.InfoLevel.String())
+		logrus.WithFields(logrus.Fields{
+			"level":      logLevel,
+			"setting_to": logrus.InfoLevel.String(),
+		}).Error("Invalid log level")
 		return logrus.InfoLevel
 	}
 }
