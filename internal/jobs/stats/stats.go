@@ -6,6 +6,7 @@ import (
 	"time"
 
 	teetypes "github.com/masa-finance/tee-types/types"
+	"github.com/masa-finance/tee-worker/internal/capabilities"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/versioning"
 	"github.com/sirupsen/logrus"
@@ -134,8 +135,9 @@ func (s *StatsCollector) SetJobServer(js WorkerCapabilitiesProvider) {
 	s.Stats.Lock()
 	defer s.Stats.Unlock()
 
-	// Get capabilities from the JobServer directly
-	s.Stats.ReportedCapabilities = js.GetWorkerCapabilities()
+	// Use real capability detection to ensure accurate reporting
+	// This probes actual APIs and actors to verify access
+	s.Stats.ReportedCapabilities = capabilities.DetectCapabilities(s.jobConfiguration, js)
 
-	logrus.Infof("Updated structured capabilities with JobServer: %+v", s.Stats.ReportedCapabilities)
+	logrus.Infof("Updated structured capabilities with real detection: %+v", s.Stats.ReportedCapabilities)
 }

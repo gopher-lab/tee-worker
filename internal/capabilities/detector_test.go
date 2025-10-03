@@ -44,7 +44,7 @@ var _ = Describe("DetectCapabilities", func() {
 			// Compare the sorted slices
 			Expect(gotKeys).To(Equal(expectedKeys))
 		},
-		Entry("With JobServer - gets capabilities from workers",
+		Entry("With JobServer - performs real detection (JobServer ignored)",
 			config.JobConfiguration{},
 			&MockJobServer{
 				capabilities: teetypes.WorkerCapabilities{
@@ -55,10 +55,8 @@ var _ = Describe("DetectCapabilities", func() {
 				},
 			},
 			teetypes.WorkerCapabilities{
-				teetypes.WebJob:       {teetypes.CapScraper},
 				teetypes.TelemetryJob: {teetypes.CapTelemetry},
 				teetypes.TiktokJob:    {teetypes.CapTranscription},
-				teetypes.TwitterJob:   {teetypes.CapSearchByQuery, teetypes.CapGetById, teetypes.CapGetProfileById},
 			},
 		),
 		Entry("Without JobServer - basic capabilities only",
