@@ -43,7 +43,7 @@ func ReadConfig() JobConfiguration {
 	}
 	jc["data_dir"] = dataDir
 
-	// Read the env file FIRST before parsing LOG_LEVEL
+	// Read the env file
 	if err := godotenv.Load(filepath.Join(dataDir, ".env")); err != nil {
 		if os.Getenv("OE_SIMULATION") == "" {
 			fmt.Println("Failed reading env file!")
@@ -52,7 +52,7 @@ func ReadConfig() JobConfiguration {
 		fmt.Println("Failed reading env file. Running in simulation mode, reading from environment variables")
 	}
 
-	// Now parse LOG_LEVEL after .env file is loaded
+	// Parse LOG_LEVEL after .env file is loaded
 	logLevel := os.Getenv("LOG_LEVEL")
 	level := ParseLogLevel(logLevel)
 	jc["log_level"] = level.String()
