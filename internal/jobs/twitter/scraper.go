@@ -14,7 +14,6 @@ func newTwitterScraper() *twitterscraper.Scraper {
 }
 
 // SetBearerToken sets the bearer token via scraper's IsLoggedIn check
-func (s *Scraper) SetBearerToken() bool {
+func (s *Scraper) SetBearerToken() {
 	s.Scraper.IsLoggedIn()
-	return true
 }
