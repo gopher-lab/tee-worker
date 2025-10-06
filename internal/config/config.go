@@ -55,7 +55,7 @@ func ReadConfig() JobConfiguration {
 	// Parse LOG_LEVEL after .env file is loaded
 	logLevel := os.Getenv("LOG_LEVEL")
 	level := ParseLogLevel(logLevel)
-	jc["log_level"] = level.String()
+	jc["log_level"] = level
 	SetLogLevel(level)
 
 	bufSizeStr := os.Getenv("STATS_BUF_SIZE")
@@ -277,6 +277,16 @@ func (jc JobConfiguration) GetBool(key string, def bool) bool {
 		}
 	}
 	return def
+}
+
+// GetLogLevel safely extracts a logrus.Level from JobConfiguration, with a default fallback
+func (jc JobConfiguration) GetLogLevel() logrus.Level {
+	if v, ok := jc["log_level"]; ok {
+		if level, ok := v.(logrus.Level); ok {
+			return level
+		}
+	}
+	return logrus.InfoLevel // default
 }
 
 // TwitterScraperConfig represents the configuration needed for Twitter scraping

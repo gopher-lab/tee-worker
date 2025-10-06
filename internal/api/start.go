@@ -23,8 +23,8 @@ func Start(ctx context.Context, listenAddress, dataDIR string, standalone bool, 
 	e := echo.New()
 
 	// Default loglevel
-	logLevel := jc.GetString("log_level", "info")
-	e.Logger.SetLevel(parseLogLevel(logLevel))
+	level := jc.GetLogLevel()
+	e.Logger.SetLevel(parseLogLevel(level.String()))
 
 	// Jobserver instance
 	maxJobs, _ := jc.GetInt("max_jobs", 10)
@@ -63,7 +63,7 @@ func Start(ctx context.Context, listenAddress, dataDIR string, standalone bool, 
 	debug.PUT("/loglevel", func(c echo.Context) error {
 		levelStr := c.QueryParam("level")
 		if levelStr == "" {
-			levelStr = jc.GetString("log_level", "info")
+			levelStr = jc.GetLogLevel().String()
 		}
 
 		// Set logrus log level
