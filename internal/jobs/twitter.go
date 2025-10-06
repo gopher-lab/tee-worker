@@ -117,9 +117,8 @@ func (ts *TwitterScraper) getCredentialScraper(j types.Job, baseDir string) (*tw
 	}
 
 	authConfig := twitter.AuthConfig{
-		Account:               account,
-		BaseDir:               baseDir,
-		SkipLoginVerification: ts.configuration.SkipLoginVerification,
+		Account: account,
+		BaseDir: baseDir,
 	}
 	scraper := twitter.NewScraper(authConfig)
 	if scraper == nil {

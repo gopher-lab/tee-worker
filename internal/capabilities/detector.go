@@ -21,15 +21,10 @@ type JobServerInterface interface {
 }
 
 // DetectCapabilities automatically detects available capabilities based on configuration
-// If jobServer is provided, it will use the actual worker capabilities
+// Always performs real capability detection by probing APIs and actors to ensure accurate reporting
 func DetectCapabilities(jc config.JobConfiguration, jobServer JobServerInterface) teetypes.WorkerCapabilities {
-	// If we have a JobServer, get capabilities directly from the workers
-	if jobServer != nil {
-		return jobServer.GetWorkerCapabilities()
-	}
-
-	// Fallback to basic detection if no JobServer is available
-	// This maintains backward compatibility and is used during initialization
+	// Always perform real capability detection to ensure accurate reporting
+	// This guarantees miners report only capabilities they actually have access to
 	capabilities := make(teetypes.WorkerCapabilities)
 
 	// Start with always available capabilities

@@ -81,13 +81,9 @@ func getAuthenticatedScraper(baseDir string) (*Scraper, *TwitterAccount, error) 
 		return nil, nil, fmt.Errorf("all accounts are rate-limited")
 	}
 
-	// Check if we should skip login verification from environment
-	skipVerification := os.Getenv("TWITTER_SKIP_LOGIN_VERIFICATION") == "true"
-
 	authConfig := AuthConfig{
-		Account:               account,
-		BaseDir:               baseDir,
-		SkipLoginVerification: skipVerification,
+		Account: account,
+		BaseDir: baseDir,
 	}
 
 	scraper := NewScraper(authConfig)

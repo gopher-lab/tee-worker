@@ -33,11 +33,6 @@ func ReadConfig() JobConfiguration {
 	// that is needed for the job
 	jc := JobConfiguration{}
 
-	logLevel := os.Getenv("LOG_LEVEL")
-	level := ParseLogLevel(logLevel)
-	jc["log_level"] = level.String()
-	SetLogLevel(level)
-
 	dataDir := os.Getenv("DATA_DIR")
 	if dataDir == "" {
 		dataDir = "/home/masa"
@@ -57,6 +52,12 @@ func ReadConfig() JobConfiguration {
 		fmt.Println("Failed reading env file. Running in simulation mode, reading from environment variables")
 	}
 
+	// Parse LOG_LEVEL after .env file is loaded
+	logLevel := os.Getenv("LOG_LEVEL")
+	level := ParseLogLevel(logLevel)
+	jc["log_level"] = level
+	SetLogLevel(level)
+
 	bufSizeStr := os.Getenv("STATS_BUF_SIZE")
 	if bufSizeStr == "" {
 		bufSizeStr = "128"
@@ -66,18 +67,18 @@ func ReadConfig() JobConfiguration {
 		logrus.Errorf("Error parsing STATS_BUF_SIZE: %s. Setting to default.", err)
 		bufSize = 128
 	}
-	jc["stats_buf_size"] = uint(bufSize)
+	jc["stats_buf_size"] = bufSize
 
-	maxJobsStr := os.Getenv("STATS_BUF_SIZE")
+	maxJobsStr := os.Getenv("MAX_JOBS")
 	if maxJobsStr == "" {
 		maxJobsStr = "10"
 	}
 	maxJobs, err := strconv.Atoi(maxJobsStr)
 	if err != nil {
 		logrus.Errorf("Error parsing MAX_JOBS %s. Setting to default.", err)
-		bufSize = 10
+		maxJobs = 10
 	}
-	jc["max_jobs"] = uint(maxJobs)
+	jc["max_jobs"] = maxJobs
 
 	listenAddress := os.Getenv("LISTEN_ADDRESS")
 	if listenAddress == "" {
@@ -278,6 +279,16 @@ func (jc JobConfiguration) GetBool(key string, def bool) bool {
 	return def
 }
 
+// GetLogLevel safely extracts a logrus.Level from JobConfiguration, with a default fallback
+func (jc JobConfiguration) GetLogLevel() logrus.Level {
+	if v, ok := jc["log_level"]; ok {
+		if level, ok := v.(logrus.Level); ok {
+			return level
+		}
+	}
+	return logrus.InfoLevel // default
+}
+
 // TwitterScraperConfig represents the configuration needed for Twitter scraping
 // This is defined here to avoid circular imports between api/types and internal/jobs
 type TwitterScraperConfig struct {
@@ -379,7 +390,10 @@ func ParseLogLevel(logLevel string) logrus.Level {
 	case "error":
 		return logrus.ErrorLevel
 	default:
-		logrus.Error("Invalid log level", "level", logLevel, "setting_to", logrus.InfoLevel.String())
+		logrus.WithFields(logrus.Fields{
+			"level":      logLevel,
+			"setting_to": logrus.InfoLevel.String(),
+		}).Error("Invalid log level")
 		return logrus.InfoLevel
 	}
 }
