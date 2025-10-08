@@ -12,7 +12,7 @@ require (
 	github.com/labstack/echo-contrib v0.17.4
 	github.com/labstack/echo/v4 v4.13.4
 	// FIXME: replace when released
-	github.com/masa-finance/tee-types v1.1.18-0.20251008190839-e2dde58f5c87
+	github.com/masa-finance/tee-types v1.1.18-0.20251008220545-7ded3bde0729
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.38.0
 	github.com/sirupsen/logrus v1.9.3
