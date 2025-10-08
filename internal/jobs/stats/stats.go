@@ -46,6 +46,9 @@ const (
 	RedditReturnedItems        StatType = "reddit_returned_items"
 	RedditQueries              StatType = "reddit_queries"
 	RedditErrors               StatType = "reddit_errors"
+	LinkedInProfiles           StatType = "linkedin_returned_profiles"
+	LinkedInQueries            StatType = "linkedin_queries"
+	LinkedInErrors             StatType = "linkedin_errors"
 	// TODO: Should we add stats for calls to each of the Twitter capabilities to decouple business / scoring logic?
 )
 

@@ -102,6 +102,9 @@ func NewJobServer(workers int, jc config.JobConfiguration) *JobServer {
 		teetypes.RedditJob: {
 			w: jobs.NewRedditScraper(jc, s),
 		},
+		teetypes.LinkedInJob: {
+			w: jobs.NewLinkedInScraper(jc, s),
+		},
 		teetypes.TelemetryJob: {
 			w: jobs.NewTelemetryJob(jc, s),
 		},

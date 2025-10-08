@@ -11,6 +11,7 @@ type actorIds struct {
 	LLMDatasetProcessor   ActorId
 	TwitterFollowers      ActorId
 	WebScraper            ActorId
+	LinkedInSearchProfile ActorId
 }
 
 var ActorIds = actorIds{
@@ -20,6 +21,7 @@ var ActorIds = actorIds{
 	LLMDatasetProcessor:   "dusan.vystrcil~llm-dataset-processor",
 	TwitterFollowers:      "kaitoeasyapi~premium-x-follower-scraper-following-data",
 	WebScraper:            "apify~website-content-crawler",
+	LinkedInSearchProfile: "harvestapi~linkedin-profile-search",
 }
 
 type defaultActorInput map[string]any
@@ -62,5 +64,11 @@ var Actors = []ActorConfig{
 		DefaultInput: defaultActorInput{"startUrls": []map[string]any{{"url": "https://docs.learnbittensor.org"}}},
 		Capabilities: teetypes.WebCaps,
 		JobType:      teetypes.WebJob,
+	},
+	{
+		ActorId:      ActorIds.LinkedInSearchProfile,
+		DefaultInput: defaultActorInput{},
+		Capabilities: teetypes.LinkedInCaps,
+		JobType:      teetypes.LinkedInJob,
 	},
 }
