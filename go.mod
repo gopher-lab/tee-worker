@@ -23,9 +23,7 @@ replace github.com/imperatrona/twitter-scraper => github.com/masa-finance/twitte
 require (
 	github.com/AlexEidt/Vidio v1.5.1 // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
-	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
-	github.com/ianlancetaylor/demangle v0.0.0-20250417193237-f615e6bd150b // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/mod v0.28.0 // indirect
@@ -50,5 +48,4 @@ require (
 	golang.org/x/time v0.14.0 // indirect
 	golang.org/x/tools v0.37.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
