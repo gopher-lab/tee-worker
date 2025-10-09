@@ -106,12 +106,14 @@ var _ = Describe("LinkedInScraper", func() {
 				"maxItems":    10,
 			}
 
+			headline := "Software Engineer"
+			headline2 := "Senior Software Engineer"
 			expectedProfiles := []*profileTypes.Profile{
 				{
 					ID:               "profile-1",
 					FirstName:        "John",
 					LastName:         "Doe",
-					Headline:         "Software Engineer",
+					Headline:         &headline,
 					PublicIdentifier: "john-doe",
 					URL:              "https://linkedin.com/in/john-doe",
 				},
@@ -119,7 +121,7 @@ var _ = Describe("LinkedInScraper", func() {
 					ID:               "profile-2",
 					FirstName:        "Jane",
 					LastName:         "Smith",
-					Headline:         "Senior Software Engineer",
+					Headline:         &headline2,
 					PublicIdentifier: "jane-smith",
 					URL:              "https://linkedin.com/in/jane-smith",
 				},
