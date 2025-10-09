@@ -14,6 +14,7 @@ import (
 	"github.com/masa-finance/tee-worker/pkg/client"
 
 	profileArgs "github.com/masa-finance/tee-types/args/linkedin/profile"
+	"github.com/masa-finance/tee-types/types"
 	"github.com/masa-finance/tee-types/types/linkedin/profile"
 )
 
@@ -206,6 +207,7 @@ var _ = Describe("LinkedInApifyClient", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			args := profileArgs.Arguments{
+				QueryType:   types.CapSearchByProfile,
 				Query:       "software engineer",
 				MaxItems:    1,
 				ScraperMode: profile.ScraperModeShort,
