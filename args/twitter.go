@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 
 	teetypes "github.com/masa-finance/tee-types/types"
 )
@@ -22,13 +21,13 @@ const (
 
 // TwitterSearchArguments defines args for Twitter searches
 type TwitterSearchArguments struct {
-	QueryType  string `json:"type"`  // Optional, type of search
-	Query      string `json:"query"` // Username or search query
-	Count      int    `json:"count"`
-	StartTime  string `json:"start_time"`  // Optional ISO timestamp
-	EndTime    string `json:"end_time"`    // Optional ISO timestamp
-	MaxResults int    `json:"max_results"` // Optional, max number of results
-	NextCursor string `json:"next_cursor"`
+	QueryType  teetypes.Capability `json:"type"`  // Optional, type of search
+	Query      string              `json:"query"` // Username or search query
+	Count      int                 `json:"count"`
+	StartTime  string              `json:"start_time"`  // Optional ISO timestamp
+	EndTime    string              `json:"end_time"`    // Optional ISO timestamp
+	MaxResults int                 `json:"max_results"` // Optional, max number of results
+	NextCursor string              `json:"next_cursor"`
 }
 
 // UnmarshalJSON implements custom JSON unmarshaling with validation
@@ -44,9 +43,6 @@ func (t *TwitterSearchArguments) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, aux); err != nil {
 		return fmt.Errorf("failed to unmarshal Twitter arguments: %w", err)
 	}
-
-	// Normalize QueryType to lowercase
-	t.QueryType = strings.ToLower(t.QueryType)
 
 	return t.Validate()
 }

@@ -111,7 +111,6 @@ const (
 var (
 	AlwaysAvailableTelemetryCaps = []Capability{CapTelemetry, CapEmpty}
 	AlwaysAvailableTiktokCaps    = []Capability{CapTranscription, CapEmpty}
-	AlwaysAvailableLinkedInCaps  = []Capability{CapSearchByQuery, CapGetProfile, CapEmpty}
 
 	// AlwaysAvailableCapabilities defines the job capabilities that are always available regardless of configuration
 	AlwaysAvailableCapabilities = WorkerCapabilities{
@@ -142,6 +141,9 @@ var (
 
 	// WebCaps are all the Web capabilities (only available with Apify)
 	WebCaps = []Capability{CapScraper, CapEmpty}
+
+	// LinkedInCaps are all the LinkedIn capabilities (only available with Apify)
+	LinkedInCaps = []Capability{CapSearchByProfile}
 )
 
 // JobCapabilityMap defines which capabilities are valid for each job type
@@ -162,6 +164,9 @@ var JobCapabilityMap = map[JobType][]Capability{
 
 	// Web job capabilities
 	WebJob: WebCaps,
+
+	// LinkedIn job capabilities
+	LinkedInJob: LinkedInCaps,
 
 	// TikTok job capabilities
 	TiktokJob: combineCapabilities(
@@ -186,4 +191,5 @@ var JobDefaultCapabilityMap = map[JobType]Capability{
 	TiktokJob:            CapTranscription,
 	RedditJob:            CapScrapeUrls,
 	TelemetryJob:         CapTelemetry,
+	LinkedInJob:          CapSearchByProfile,
 }

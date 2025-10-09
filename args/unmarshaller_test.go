@@ -51,7 +51,7 @@ var _ = Describe("Unmarshaller", func() {
 				Expect(err).ToNot(HaveOccurred())
 				twitterArgs, ok := jobArgs.(*args.TwitterSearchArguments)
 				Expect(ok).To(BeTrue())
-				Expect(twitterArgs.QueryType).To(Equal("searchbyquery"))
+				Expect(twitterArgs.QueryType).To(Equal(types.CapSearchByQuery))
 				Expect(twitterArgs.Query).To(Equal("golang"))
 				Expect(twitterArgs.Count).To(Equal(10))
 			})

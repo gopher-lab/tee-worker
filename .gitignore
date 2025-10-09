@@ -13,3 +13,5 @@ go.work
 # LLM-related files
 .aider*
 GEMINI.md
+
+/examples/*json

@@ -3,7 +3,6 @@ package args
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/masa-finance/tee-types/types"
 )
@@ -55,16 +54,15 @@ func unmarshalTikTokArguments(args map[string]any) (JobArguments, error) {
 	if err := unmarshalToStruct(args, minimal); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal TikTok arguments: %w", err)
 	}
-	capability := types.Capability(strings.ToLower(minimal.QueryType))
-	if capability == types.CapEmpty {
+	if minimal.QueryType == types.CapEmpty {
 		defaultCap, exists := types.JobDefaultCapabilityMap[types.TiktokJob]
 		if !exists {
 			return nil, fmt.Errorf("no default capability configured for job type: %s", types.TiktokJob)
 		}
-		capability = defaultCap
+		minimal.QueryType = defaultCap
 	}
 
-	switch capability {
+	switch minimal.QueryType {
 	case types.CapSearchByQuery:
 		searchArgs := &TikTokSearchByQueryArguments{}
 		if err := unmarshalToStruct(args, searchArgs); err != nil {
@@ -93,7 +91,7 @@ func unmarshalTikTokArguments(args map[string]any) (JobArguments, error) {
 		}
 		return transcriptionArgs, nil
 	default:
-		return nil, fmt.Errorf("unknown tiktok type: %s", capability)
+		return nil, fmt.Errorf("unknown tiktok type: %s", minimal.QueryType)
 	}
 }
 
@@ -106,7 +104,7 @@ func unmarshalTwitterArguments(jobType types.JobType, args map[string]any) (*Twi
 	// If no QueryType is specified, use the default capability for this job type
 	if twitterArgs.QueryType == "" {
 		if defaultCap, exists := types.JobDefaultCapabilityMap[jobType]; exists {
-			twitterArgs.QueryType = string(defaultCap)
+			twitterArgs.QueryType = defaultCap
 		}
 	}
 
@@ -118,25 +116,31 @@ func unmarshalTwitterArguments(jobType types.JobType, args map[string]any) (*Twi
 	return twitterArgs, nil
 }
 
-func unmarshalLinkedInArguments(jobType types.JobType, args map[string]any) (*LinkedInArguments, error) {
-	linkedInArgs := &LinkedInArguments{}
-	if err := unmarshalToStruct(args, linkedInArgs); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal LinkedIn job arguments: %w", err)
+func unmarshalLinkedInArguments(jobType types.JobType, args map[string]any) (JobArguments, error) {
+	minimal := &QueryTypeArgument{}
+	if err := unmarshalToStruct(args, minimal); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal LinkedIn arguments: %w", err)
 	}
 
-	// If no QueryType is specified, use the default capability for this job type
-	if linkedInArgs.QueryType == "" {
+	if minimal.QueryType == types.CapEmpty {
 		if defaultCap, exists := types.JobDefaultCapabilityMap[jobType]; exists {
-			linkedInArgs.QueryType = string(defaultCap)
+			minimal.QueryType = defaultCap
 		}
 	}
 
-	// Perform job-type-specific validation for LinkedIn
-	if err := linkedInArgs.ValidateForJobType(jobType); err != nil {
-		return nil, fmt.Errorf("linkedin job validation failed: %w", err)
+	switch minimal.QueryType {
+	case types.CapSearchByProfile:
+		linkedInArgs := &LinkedInProfileArguments{}
+		if err := unmarshalToStruct(args, linkedInArgs); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal LinkedIn job arguments: %w", err)
+		}
+		if err := linkedInArgs.ValidateForJobType(jobType); err != nil {
+			return nil, fmt.Errorf("linkedin job validation failed: %w", err)
+		}
+		return linkedInArgs, nil
+	default:
+		return nil, fmt.Errorf("unknown linkedin type: %s", minimal.QueryType)
 	}
-
-	return linkedInArgs, nil
 }
 
 func unmarshalRedditArguments(jobType types.JobType, args map[string]any) (*RedditArguments, error) {
