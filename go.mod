@@ -2,10 +2,10 @@ module github.com/masa-finance/tee-worker
 
 go 1.24.0
 
-toolchain go1.24.6
+toolchain go1.24.3
 
 require (
-	github.com/edgelesssys/ego v1.8.0
+	github.com/edgelesssys/ego v1.7.0
 	github.com/google/uuid v1.6.0
 	github.com/imperatrona/twitter-scraper v0.0.18
 	github.com/joho/godotenv v1.5.1
