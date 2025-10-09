@@ -1,5 +1,5 @@
 ARG egover=1.7.2
-ARG baseimage=ghcr.io/edgelesssys/ego-deploy:${egover}
+ARG baseimage=ghcr.io/edgelesssys/ego-deploy:v${egover}
 ARG VERSION
 
 # Build the Go binary in a separate stage utilizing Makefile
