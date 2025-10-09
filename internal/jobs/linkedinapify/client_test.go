@@ -14,6 +14,7 @@ import (
 	"github.com/masa-finance/tee-worker/pkg/client"
 
 	profileArgs "github.com/masa-finance/tee-types/args/linkedin/profile"
+	"github.com/masa-finance/tee-types/types/linkedin/profile"
 )
 
 // MockApifyClient is a mock implementation of the ApifyClient.
@@ -205,8 +206,9 @@ var _ = Describe("LinkedInApifyClient", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			args := profileArgs.Arguments{
-				Query:    "software engineer",
-				MaxItems: 1,
+				Query:       "software engineer",
+				MaxItems:    1,
+				ScraperMode: profile.ScraperModeShort,
 			}
 
 			results, datasetId, cursor, err := realClient.SearchProfiles("test-worker", &args, client.EmptyCursor)
