@@ -44,12 +44,8 @@ github.com/labstack/gommon v0.4.2 h1:F8qTUNXgG1+6WQmqoUWnz8WiEU60mXVVw0P4ht1WRA0
 github.com/labstack/gommon v0.4.2/go.mod h1:QlUFxVM+SNXhDL/Z7YhocGIBYOiwB0mXm1+1bAPHPyU=
 github.com/maruel/natural v1.1.1 h1:Hja7XhhmvEFhcByqDoHz9QZbkWey+COd9xWfCfn1ioo=
 github.com/maruel/natural v1.1.1/go.mod h1:v+Rfd79xlw1AgVBjbO0BEQmptqb5HvL/k9GRHB7ZKEg=
-github.com/masa-finance/tee-types v1.1.18-0.20251008223552-a6a8a5875783 h1:5C+DdMf6QbrBFELc99cJhZ7d1XZS9GD/y6/KuRwuXOI=
-github.com/masa-finance/tee-types v1.1.18-0.20251008223552-a6a8a5875783/go.mod h1:sB98t0axFlPi2d0zUPFZSQ84mPGwbr9eRY5yLLE3fSc=
-github.com/masa-finance/tee-types v1.1.18-0.20251008232053-2fca02a9a185 h1:YQEBWw068xHLKchPsjcqy20UDPrrAAkM/lmMrEp1w/c=
-github.com/masa-finance/tee-types v1.1.18-0.20251008232053-2fca02a9a185/go.mod h1:sB98t0axFlPi2d0zUPFZSQ84mPGwbr9eRY5yLLE3fSc=
-github.com/masa-finance/tee-types v1.1.18-0.20251009040853-d34fe98f5339 h1:tcMa9a989K/VnKq7j5Vy4y9l7Avc2uUXMArlqDAhSy4=
-github.com/masa-finance/tee-types v1.1.18-0.20251009040853-d34fe98f5339/go.mod h1:sB98t0axFlPi2d0zUPFZSQ84mPGwbr9eRY5yLLE3fSc=
+github.com/masa-finance/tee-types v1.1.18-0.20251009043043-6d5812815e46 h1:Xz5gqVWxsHh4iIY8cNLlSKWvXw+7UfarYQ57fO3VmDE=
+github.com/masa-finance/tee-types v1.1.18-0.20251009043043-6d5812815e46/go.mod h1:sB98t0axFlPi2d0zUPFZSQ84mPGwbr9eRY5yLLE3fSc=
 github.com/masa-finance/twitter-scraper v1.0.2 h1:him+wvYZHg/7EDdy73z1ceUywDJDRAhPLD2CSEa2Vfk=
 github.com/masa-finance/twitter-scraper v1.0.2/go.mod h1:38MY3g/h4V7Xl4HbW9lnkL8S3YiFZenBFv86hN57RG8=
 github.com/mattn/go-colorable v0.1.14 h1:9A9LHSqF/7dyVVX6g0U9cwm9pG3kP9gSzcuIPHPsaIE=
