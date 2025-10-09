@@ -1,4 +1,4 @@
-ARG egover=latest
+ARG egover=1.8.0
 ARG baseimage=ghcr.io/edgelesssys/ego-deploy:${egover}
 ARG VERSION
 
