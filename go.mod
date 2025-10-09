@@ -11,8 +11,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-contrib v0.17.4
 	github.com/labstack/echo/v4 v4.13.4
-	// FIXME: replace when released
-	github.com/masa-finance/tee-types v1.1.18-0.20251009044435-2f46f903bcb9
+	github.com/masa-finance/tee-types v1.2.0
 	github.com/onsi/ginkgo/v2 v2.26.0
 	github.com/onsi/gomega v1.38.2
 	github.com/sirupsen/logrus v1.9.3
