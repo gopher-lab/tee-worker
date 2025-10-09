@@ -1314,7 +1314,7 @@ func defaultStrategyFallback(j types.Job, ts *TwitterScraper, jobArgs *teeargs.T
 		space, err := ts.GetSpace(j, ts.configuration.DataDir, jobArgs.Query)
 		return processResponse(space, "", err)
 	}
-	return types.JobResult{Error: "invalid search type in defaultStrategyFallback: " + jobArgs.QueryType}, fmt.Errorf("invalid search type: %s", jobArgs.QueryType)
+	return types.JobResult{Error: "invalid search type in defaultStrategyFallback: " + string(jobArgs.QueryType)}, fmt.Errorf("invalid search type: %s", jobArgs.QueryType)
 }
 
 // ExecuteJob runs a job using the appropriate scrape strategy based on the job type.
