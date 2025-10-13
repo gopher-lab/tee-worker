@@ -16,8 +16,8 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/webapify"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	teeargs "github.com/masa-finance/tee-types/args"
-	teetypes "github.com/masa-finance/tee-types/types"
+	teeargs "github.com/masa-finance/tee-worker/api/args"
+	teetypes "github.com/masa-finance/tee-worker/api/types"
 )
 
 // MockWebApifyClient is a mock implementation of the WebApifyClient.

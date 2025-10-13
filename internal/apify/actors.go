@@ -1,6 +1,6 @@
 package apify
 
-import teetypes "github.com/masa-finance/tee-types/types"
+import teetypes "github.com/masa-finance/tee-worker/api/types"
 
 type ActorId string
 

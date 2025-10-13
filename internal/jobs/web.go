@@ -14,9 +14,9 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/webapify"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	teeargs "github.com/masa-finance/tee-types/args"
-	"github.com/masa-finance/tee-types/pkg/util"
-	teetypes "github.com/masa-finance/tee-types/types"
+	teeargs "github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/pkg/util"
+	teetypes "github.com/masa-finance/tee-worker/api/types"
 )
 
 // WebApifyClient defines the interface for the Web Apify client to allow mocking in tests

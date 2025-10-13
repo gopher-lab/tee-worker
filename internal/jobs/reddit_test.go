@@ -10,14 +10,14 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/api/types/reddit"
+	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs"
 	"github.com/masa-finance/tee-worker/internal/jobs/redditapify"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	teetypes "github.com/masa-finance/tee-types/types"
+	teetypes "github.com/masa-finance/tee-worker/api/types"
 )
 
 // MockRedditApifyClient is a mock implementation of the RedditApifyClient.

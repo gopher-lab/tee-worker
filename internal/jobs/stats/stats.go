@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	teetypes "github.com/masa-finance/tee-types/types"
+	teetypes "github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/capabilities"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/versioning"

@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	teetypes "github.com/masa-finance/tee-types/types"
+	teetypes "github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/api/types"
 )
 

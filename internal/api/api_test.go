@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
 
-	teetypes "github.com/masa-finance/tee-types/types"
+	teetypes "github.com/masa-finance/tee-worker/api/types"
 	. "github.com/masa-finance/tee-worker/internal/api"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/pkg/client"

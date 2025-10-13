@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	teetypes "github.com/masa-finance/tee-types/types"
+	teetypes "github.com/masa-finance/tee-worker/api/types"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

@@ -7,13 +7,13 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/masa-finance/tee-worker/api/types/reddit"
+	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	teeargs "github.com/masa-finance/tee-types/args"
-	teetypes "github.com/masa-finance/tee-types/types"
+	teeargs "github.com/masa-finance/tee-worker/api/args"
+	teetypes "github.com/masa-finance/tee-worker/api/types"
 )
 
 // CommonArgs holds the parameters that all Reddit searches support, in a single struct

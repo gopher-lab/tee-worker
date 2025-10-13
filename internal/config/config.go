@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	teeargs "github.com/masa-finance/tee-types/args"
+	teeargs "github.com/masa-finance/tee-worker/api/args"
 	"github.com/sirupsen/logrus"
 )
 

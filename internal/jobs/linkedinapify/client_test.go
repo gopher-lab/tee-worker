@@ -13,9 +13,9 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	profileArgs "github.com/masa-finance/tee-types/args/linkedin/profile"
-	"github.com/masa-finance/tee-types/types"
-	"github.com/masa-finance/tee-types/types/linkedin/profile"
+	profileArgs "github.com/masa-finance/tee-worker/api/args/linkedin/profile"
+	"github.com/masa-finance/tee-worker/api/types"
+	"github.com/masa-finance/tee-worker/api/types/linkedin/profile"
 )
 
 // MockApifyClient is a mock implementation of the ApifyClient.

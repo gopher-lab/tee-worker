@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	teeargs "github.com/masa-finance/tee-types/args"
-	teetypes "github.com/masa-finance/tee-types/types"
+	teeargs "github.com/masa-finance/tee-worker/api/args"
+	teetypes "github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"

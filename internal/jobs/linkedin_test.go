@@ -17,9 +17,9 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	profileArgs "github.com/masa-finance/tee-types/args/linkedin/profile"
-	teetypes "github.com/masa-finance/tee-types/types"
-	profileTypes "github.com/masa-finance/tee-types/types/linkedin/profile"
+	profileArgs "github.com/masa-finance/tee-worker/api/args/linkedin/profile"
+	teetypes "github.com/masa-finance/tee-worker/api/types"
+	profileTypes "github.com/masa-finance/tee-worker/api/types/linkedin/profile"
 )
 
 // MockLinkedInApifyClient is a mock implementation of the LinkedInApifyClient.

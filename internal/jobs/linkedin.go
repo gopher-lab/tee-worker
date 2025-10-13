@@ -13,10 +13,10 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	teeargs "github.com/masa-finance/tee-types/args"
-	profileArgs "github.com/masa-finance/tee-types/args/linkedin/profile"
-	teetypes "github.com/masa-finance/tee-types/types"
-	profileTypes "github.com/masa-finance/tee-types/types/linkedin/profile"
+	teeargs "github.com/masa-finance/tee-worker/api/args"
+	profileArgs "github.com/masa-finance/tee-worker/api/args/linkedin/profile"
+	teetypes "github.com/masa-finance/tee-worker/api/types"
+	profileTypes "github.com/masa-finance/tee-worker/api/types/linkedin/profile"
 )
 
 // LinkedInApifyClient defines the interface for the LinkedIn Apify client to allow mocking in tests
