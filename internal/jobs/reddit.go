@@ -20,10 +20,10 @@ import (
 // RedditApifyClient defines the interface for the Reddit Apify client.
 // This allows for mocking in tests.
 type RedditApifyClient interface {
-	ScrapeUrls(workerID string, urls []types.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error)
-	SearchPosts(workerID string, queries []string, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error)
-	SearchCommunities(workerID string, queries []string, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error)
-	SearchUsers(workerID string, queries []string, skipPosts bool, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error)
+	ScrapeUrls(workerID string, urls []types.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
+	SearchPosts(workerID string, queries []string, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
+	SearchCommunities(workerID string, queries []string, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
+	SearchUsers(workerID string, queries []string, skipPosts bool, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
 }
 
 // NewRedditApifyClient is a function variable that can be replaced in tests.
@@ -102,7 +102,7 @@ func (r *RedditScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 	}
 }
 
-func processRedditResponse(j types.Job, resp []*types.RedditItem, cursor client.Cursor, err error) (types.JobResult, error) {
+func processRedditResponse(j types.Job, resp []*types.RedditResponse, cursor client.Cursor, err error) (types.JobResult, error) {
 	if err != nil {
 		return types.JobResult{Error: fmt.Sprintf("error while scraping Reddit: %s", err.Error())}, fmt.Errorf("error scraping Reddit: %w", err)
 	}

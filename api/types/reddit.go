@@ -123,68 +123,84 @@ type RedditCommunity struct {
 	DataType        string    `json:"dataType"`
 }
 
-type RedditTypeSwitch struct {
-	Type RedditItemType `json:"type"`
+// RedditResponse represents a Reddit API response that can be any of the Reddit item types
+type RedditResponse struct {
+	Type      RedditItemType   `json:"type"`
+	User      *RedditUser      `json:"user,omitempty"`
+	Post      *RedditPost      `json:"post,omitempty"`
+	Comment   *RedditComment   `json:"comment,omitempty"`
+	Community *RedditCommunity `json:"community,omitempty"`
 }
 
-type RedditItem struct {
-	TypeSwitch *RedditTypeSwitch
-	User       *RedditUser
-	Post       *RedditPost
-	Comment    *RedditComment
-	Community  *RedditCommunity
-}
-
-func (t *RedditItem) UnmarshalJSON(data []byte) error {
-	t.TypeSwitch = &RedditTypeSwitch{}
-	if err := json.Unmarshal(data, &t.TypeSwitch); err != nil {
-		return fmt.Errorf("failed to unmarshal reddit response type: %w", err)
+// UnmarshalJSON implements custom JSON unmarshaling for RedditResponse
+func (r *RedditResponse) UnmarshalJSON(data []byte) error {
+	// First, unmarshal into a map to get the type
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
 	}
 
-	switch t.TypeSwitch.Type {
+	// Get the type field (check both 'type' and 'dataType' for compatibility)
+	var itemType RedditItemType
+	if typeData, exists := raw["type"]; exists {
+		if err := json.Unmarshal(typeData, &itemType); err != nil {
+			return fmt.Errorf("failed to unmarshal reddit response type: %w", err)
+		}
+	} else if typeData, exists := raw["dataType"]; exists {
+		if err := json.Unmarshal(typeData, &itemType); err != nil {
+			return fmt.Errorf("failed to unmarshal reddit response dataType: %w", err)
+		}
+	} else {
+		return fmt.Errorf("missing 'type' or 'dataType' field in reddit response")
+	}
+
+	r.Type = itemType
+
+	// Unmarshal the appropriate struct based on type
+	switch itemType {
 	case RedditUserItem:
-		t.User = &RedditUser{}
-		if err := json.Unmarshal(data, t.User); err != nil {
+		r.User = &RedditUser{}
+		if err := json.Unmarshal(data, r.User); err != nil {
 			return fmt.Errorf("failed to unmarshal reddit user: %w", err)
 		}
 	case RedditPostItem:
-		t.Post = &RedditPost{}
-		if err := json.Unmarshal(data, t.Post); err != nil {
+		r.Post = &RedditPost{}
+		if err := json.Unmarshal(data, r.Post); err != nil {
 			return fmt.Errorf("failed to unmarshal reddit post: %w", err)
 		}
 	case RedditCommentItem:
-		t.Comment = &RedditComment{}
-		if err := json.Unmarshal(data, t.Comment); err != nil {
+		r.Comment = &RedditComment{}
+		if err := json.Unmarshal(data, r.Comment); err != nil {
 			return fmt.Errorf("failed to unmarshal reddit comment: %w", err)
 		}
 	case RedditCommunityItem:
-		t.Community = &RedditCommunity{}
-		if err := json.Unmarshal(data, t.Community); err != nil {
+		r.Community = &RedditCommunity{}
+		if err := json.Unmarshal(data, r.Community); err != nil {
 			return fmt.Errorf("failed to unmarshal reddit community: %w", err)
 		}
 	default:
-		return fmt.Errorf("unknown Reddit response type: %s", t.TypeSwitch.Type)
+		return fmt.Errorf("unknown Reddit response type: %s", itemType)
 	}
+
 	return nil
 }
 
-// MarshalJSON implements the json.Marshaller interface for RedditResponse.
+// MarshalJSON implements the json.Marshaler interface for RedditResponse.
 // It unwraps the inner struct (User, Post, Comment, or Community) and marshals it directly.
-func (t *RedditItem) MarshalJSON() ([]byte, error) {
-	if t.TypeSwitch == nil {
-		return []byte("null"), nil
-	}
-
-	switch t.TypeSwitch.Type {
+func (r *RedditResponse) MarshalJSON() ([]byte, error) {
+	switch r.Type {
 	case RedditUserItem:
-		return json.Marshal(t.User)
+		return json.Marshal(r.User)
 	case RedditPostItem:
-		return json.Marshal(t.Post)
+		return json.Marshal(r.Post)
 	case RedditCommentItem:
-		return json.Marshal(t.Comment)
+		return json.Marshal(r.Comment)
 	case RedditCommunityItem:
-		return json.Marshal(t.Community)
+		return json.Marshal(r.Community)
 	default:
-		return nil, fmt.Errorf("unknown Reddit response type: %s", t.TypeSwitch.Type)
+		return nil, fmt.Errorf("unknown Reddit response type: %s", r.Type)
 	}
 }
+
+// RedditItem is an alias for RedditResponse for backward compatibility
+type RedditItem = RedditResponse

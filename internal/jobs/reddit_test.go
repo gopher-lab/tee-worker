@@ -19,13 +19,13 @@ import (
 
 // MockRedditApifyClient is a mock implementation of the RedditApifyClient.
 type MockRedditApifyClient struct {
-	ScrapeUrlsFunc        func(urls []types.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error)
-	SearchPostsFunc       func(queries []string, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error)
-	SearchCommunitiesFunc func(queries []string, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error)
-	SearchUsersFunc       func(queries []string, skipPosts bool, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error)
+	ScrapeUrlsFunc        func(urls []types.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
+	SearchPostsFunc       func(queries []string, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
+	SearchCommunitiesFunc func(queries []string, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
+	SearchUsersFunc       func(queries []string, skipPosts bool, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
 }
 
-func (m *MockRedditApifyClient) ScrapeUrls(_ string, urls []types.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+func (m *MockRedditApifyClient) ScrapeUrls(_ string, urls []types.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	if m != nil && m.ScrapeUrlsFunc != nil {
 		res, cursor, err := m.ScrapeUrlsFunc(urls, after, args, cursor, maxResults)
 		for i, r := range res {
@@ -36,21 +36,21 @@ func (m *MockRedditApifyClient) ScrapeUrls(_ string, urls []types.RedditStartURL
 	return nil, "", nil
 }
 
-func (m *MockRedditApifyClient) SearchPosts(_ string, queries []string, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+func (m *MockRedditApifyClient) SearchPosts(_ string, queries []string, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	if m != nil && m.SearchPostsFunc != nil {
 		return m.SearchPostsFunc(queries, after, args, cursor, maxResults)
 	}
 	return nil, "", nil
 }
 
-func (m *MockRedditApifyClient) SearchCommunities(_ string, queries []string, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+func (m *MockRedditApifyClient) SearchCommunities(_ string, queries []string, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	if m != nil && m.SearchCommunitiesFunc != nil {
 		return m.SearchCommunitiesFunc(queries, args, cursor, maxResults)
 	}
 	return nil, "", nil
 }
 
-func (m *MockRedditApifyClient) SearchUsers(_ string, queries []string, skipPosts bool, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+func (m *MockRedditApifyClient) SearchUsers(_ string, queries []string, skipPosts bool, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	if m != nil && m.SearchUsersFunc != nil {
 		return m.SearchUsersFunc(queries, skipPosts, args, cursor, maxResults)
 	}
@@ -101,16 +101,16 @@ var _ = Describe("RedditScraper", func() {
 				"urls": testUrls,
 			}
 
-			mockClient.ScrapeUrlsFunc = func(urls []types.RedditStartURL, after time.Time, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+			mockClient.ScrapeUrlsFunc = func(urls []types.RedditStartURL, after time.Time, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 				Expect(urls).To(HaveLen(1))
 				Expect(urls[0].URL).To(Equal(testUrls[0]))
-				return []*types.RedditItem{{TypeSwitch: &types.RedditTypeSwitch{Type: types.RedditUserItem}, User: &types.RedditUser{ID: "user1", DataType: string(types.RedditUserItem)}}}, "next", nil
+				return []*types.RedditResponse{{Type: types.RedditUserItem, User: &types.RedditUser{ID: "user1", DataType: string(types.RedditUserItem)}}}, "next", nil
 			}
 
 			result, err := scraper.ExecuteJob(job)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.NextCursor).To(Equal("next"))
-			var resp []*types.RedditItem
+			var resp []*types.RedditResponse
 			err = json.Unmarshal(result.Data, &resp)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp).To(HaveLen(1))
@@ -125,15 +125,15 @@ var _ = Describe("RedditScraper", func() {
 				"queries": []string{"user-query"},
 			}
 
-			mockClient.SearchUsersFunc = func(queries []string, skipPosts bool, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+			mockClient.SearchUsersFunc = func(queries []string, skipPosts bool, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 				Expect(queries).To(Equal([]string{"user-query"}))
-				return []*types.RedditItem{{TypeSwitch: &types.RedditTypeSwitch{Type: types.RedditUserItem}, User: &types.RedditUser{ID: "user2", DataType: string(types.RedditUserItem)}}}, "next-user", nil
+				return []*types.RedditResponse{{Type: types.RedditUserItem, User: &types.RedditUser{ID: "user2", DataType: string(types.RedditUserItem)}}}, "next-user", nil
 			}
 
 			result, err := scraper.ExecuteJob(job)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.NextCursor).To(Equal("next-user"))
-			var resp []*types.RedditItem
+			var resp []*types.RedditResponse
 			err = json.Unmarshal(result.Data, &resp)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp).To(HaveLen(1))
@@ -148,15 +148,15 @@ var _ = Describe("RedditScraper", func() {
 				"queries": []string{"post-query"},
 			}
 
-			mockClient.SearchPostsFunc = func(queries []string, after time.Time, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+			mockClient.SearchPostsFunc = func(queries []string, after time.Time, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 				Expect(queries).To(Equal([]string{"post-query"}))
-				return []*types.RedditItem{{TypeSwitch: &types.RedditTypeSwitch{Type: types.RedditPostItem}, Post: &types.RedditPost{ID: "post1", DataType: string(types.RedditPostItem)}}}, "next-post", nil
+				return []*types.RedditResponse{{Type: types.RedditPostItem, Post: &types.RedditPost{ID: "post1", DataType: string(types.RedditPostItem)}}}, "next-post", nil
 			}
 
 			result, err := scraper.ExecuteJob(job)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.NextCursor).To(Equal("next-post"))
-			var resp []*types.RedditItem
+			var resp []*types.RedditResponse
 			err = json.Unmarshal(result.Data, &resp)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp).To(HaveLen(1))
@@ -171,15 +171,15 @@ var _ = Describe("RedditScraper", func() {
 				"queries": []string{"community-query"},
 			}
 
-			mockClient.SearchCommunitiesFunc = func(queries []string, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+			mockClient.SearchCommunitiesFunc = func(queries []string, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 				Expect(queries).To(Equal([]string{"community-query"}))
-				return []*types.RedditItem{{TypeSwitch: &types.RedditTypeSwitch{Type: types.RedditCommunityItem}, Community: &types.RedditCommunity{ID: "comm1", DataType: string(types.RedditCommunityItem)}}}, "next-comm", nil
+				return []*types.RedditResponse{{Type: types.RedditCommunityItem, Community: &types.RedditCommunity{ID: "comm1", DataType: string(types.RedditCommunityItem)}}}, "next-comm", nil
 			}
 
 			result, err := scraper.ExecuteJob(job)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.NextCursor).To(Equal("next-comm"))
-			var resp []*types.RedditItem
+			var resp []*types.RedditResponse
 			err = json.Unmarshal(result.Data, &resp)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp).To(HaveLen(1))
@@ -206,7 +206,7 @@ var _ = Describe("RedditScraper", func() {
 			}
 
 			expectedErr := errors.New("client error")
-			mockClient.SearchPostsFunc = func(queries []string, after time.Time, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+			mockClient.SearchPostsFunc = func(queries []string, after time.Time, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 				return nil, "", expectedErr
 			}
 

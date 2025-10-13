@@ -14,7 +14,7 @@ var _ = Describe("RedditResponse", func() {
 	Describe("Unmarshalling", func() {
 		It("should unmarshal a user response", func() {
 			jsonData := `{"type": "user", "id": "user123", "username": "testuser"}`
-			var resp types.RedditItem
+			var resp types.RedditResponse
 			err := json.Unmarshal([]byte(jsonData), &resp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(resp.User).ToNot(BeNil())
@@ -25,7 +25,7 @@ var _ = Describe("RedditResponse", func() {
 
 		It("should unmarshal a post response", func() {
 			jsonData := `{"type": "post", "id": "post123", "title": "Test Post"}`
-			var resp types.RedditItem
+			var resp types.RedditResponse
 			err := json.Unmarshal([]byte(jsonData), &resp)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(resp.Post).ToNot(BeNil())
@@ -36,7 +36,7 @@ var _ = Describe("RedditResponse", func() {
 
 		It("should return an error for an unknown type", func() {
 			jsonData := `{"type": "unknown", "id": "123"}`
-			var resp types.RedditItem
+			var resp types.RedditResponse
 			err := json.Unmarshal([]byte(jsonData), &resp)
 			Expect(err).To(MatchError("unknown Reddit response type: unknown"))
 		})
@@ -45,8 +45,8 @@ var _ = Describe("RedditResponse", func() {
 	Describe("Marshalling", func() {
 		It("should marshal a user response", func() {
 			now := time.Now()
-			resp := types.RedditItem{
-				TypeSwitch: &types.RedditTypeSwitch{Type: types.RedditUserItem},
+			resp := types.RedditResponse{
+				Type: types.RedditUserItem,
 				User: &types.RedditUser{
 					ID:           "user123",
 					Username:     "testuser",
@@ -65,8 +65,8 @@ var _ = Describe("RedditResponse", func() {
 		})
 
 		It("should marshal a post response", func() {
-			resp := types.RedditItem{
-				TypeSwitch: &types.RedditTypeSwitch{Type: types.RedditPostItem},
+			resp := types.RedditResponse{
+				Type: types.RedditPostItem,
 				Post: &types.RedditPost{
 					ID:    "post123",
 					Title: "Test Post",
@@ -83,8 +83,8 @@ var _ = Describe("RedditResponse", func() {
 		})
 
 		It("should return an error for an unknown type", func() {
-			resp := types.RedditItem{
-				TypeSwitch: &types.RedditTypeSwitch{Type: "unknown"},
+			resp := types.RedditResponse{
+				Type: "unknown",
 			}
 			_, err := json.Marshal(&resp)
 			Expect(err).To(HaveOccurred())

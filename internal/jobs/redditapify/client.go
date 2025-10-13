@@ -100,7 +100,7 @@ func (c *RedditApifyClient) ValidateApiKey() error {
 }
 
 // ScrapeUrls scrapes Reddit URLs
-func (c *RedditApifyClient) ScrapeUrls(workerID string, urls []types.RedditStartURL, after time.Time, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+func (c *RedditApifyClient) ScrapeUrls(workerID string, urls []types.RedditStartURL, after time.Time, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	input := args.ToActorRequest()
 	input.StartUrls = urls
 	input.Searches = nil
@@ -117,7 +117,7 @@ func (c *RedditApifyClient) ScrapeUrls(workerID string, urls []types.RedditStart
 }
 
 // SearchPosts searches Reddit posts
-func (c *RedditApifyClient) SearchPosts(workerID string, queries []string, after time.Time, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+func (c *RedditApifyClient) SearchPosts(workerID string, queries []string, after time.Time, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	input := args.ToActorRequest()
 	input.Searches = queries
 	input.StartUrls = nil
@@ -134,7 +134,7 @@ func (c *RedditApifyClient) SearchPosts(workerID string, queries []string, after
 }
 
 // SearchCommunities searches Reddit communities
-func (c *RedditApifyClient) SearchCommunities(workerID string, queries []string, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+func (c *RedditApifyClient) SearchCommunities(workerID string, queries []string, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	input := args.ToActorRequest()
 	input.Searches = queries
 	input.StartUrls = nil
@@ -145,7 +145,7 @@ func (c *RedditApifyClient) SearchCommunities(workerID string, queries []string,
 }
 
 // SearchUsers searches Reddit users
-func (c *RedditApifyClient) SearchUsers(workerID string, queries []string, skipPosts bool, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditItem, client.Cursor, error) {
+func (c *RedditApifyClient) SearchUsers(workerID string, queries []string, skipPosts bool, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	input := args.ToActorRequest()
 	input.Searches = queries
 	input.StartUrls = nil
@@ -157,7 +157,7 @@ func (c *RedditApifyClient) SearchUsers(workerID string, queries []string, skipP
 }
 
 // getProfiles runs the actor and retrieves profiles from the dataset
-func (c *RedditApifyClient) queryReddit(workerID string, input RedditActorRequest, cursor client.Cursor, limit uint) ([]*types.RedditItem, client.Cursor, error) {
+func (c *RedditApifyClient) queryReddit(workerID string, input RedditActorRequest, cursor client.Cursor, limit uint) ([]*types.RedditResponse, client.Cursor, error) {
 	if c.statsCollector != nil {
 		c.statsCollector.Add(workerID, stats.RedditQueries, 1)
 	}
@@ -170,9 +170,9 @@ func (c *RedditApifyClient) queryReddit(workerID string, input RedditActorReques
 		return nil, client.EmptyCursor, err
 	}
 
-	response := make([]*types.RedditItem, 0, len(dataset.Data.Items))
+	response := make([]*types.RedditResponse, 0, len(dataset.Data.Items))
 	for i, item := range dataset.Data.Items {
-		var resp types.RedditItem
+		var resp types.RedditResponse
 		if err := json.Unmarshal(item, &resp); err != nil {
 			logrus.Warnf("Failed to unmarshal profile at index %d: %v", i, err)
 			continue
