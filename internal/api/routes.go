@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	teejob "github.com/masa-finance/tee-worker/api/tee"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/jobserver"
 	"github.com/masa-finance/tee-worker/pkg/tee"
@@ -21,7 +22,7 @@ func generate(c echo.Context) error {
 
 	job.WorkerID = tee.WorkerID // attach worker ID to job
 
-	encryptedSignature, err := job.GenerateJobSignature()
+	encryptedSignature, err := teejob.GenerateJobSignature(job)
 	if err != nil {
 		logrus.Errorf("Error while generating job signature: %s", err)
 		return c.JSON(http.StatusInternalServerError, types.JobError{Error: err.Error()})
@@ -46,7 +47,7 @@ func add(jobServer *jobserver.JobServer) func(c echo.Context) error {
 			return c.JSON(http.StatusBadRequest, types.JobError{Error: err.Error()})
 		}
 
-		job, err := jobRequest.DecryptJob()
+		job, err := teejob.DecryptJob(&jobRequest)
 		if err != nil {
 			logrus.Errorf("Error while decrypting job %s: %s", jobRequest, err)
 			return c.JSON(http.StatusInternalServerError, types.JobError{Error: fmt.Sprintf("Error while decrypting job: %s", err.Error())})

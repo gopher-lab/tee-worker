@@ -13,12 +13,12 @@ type JobType string
 
 type JobArguments map[string]interface{}
 
-func (j JobArguments) Unmarshal(i interface{}) error {
-	d, err := json.Marshal(j)
+func (ja JobArguments) Unmarshal(i interface{}) error {
+	dat, err := json.Marshal(ja)
 	if err != nil {
 		return err
 	}
-	return json.Unmarshal(d, i)
+	return json.Unmarshal(dat, i)
 }
 
 type Job struct {
@@ -29,6 +29,10 @@ type Job struct {
 	WorkerID     string        `json:"worker_id"`
 	TargetWorker string        `json:"target_worker"`
 	Timeout      time.Duration `json:"timeout"`
+}
+
+func (j Job) String() string {
+	return fmt.Sprintf("UUID: %s Type: %s Arguments: %s", j.UUID, j.Type, j.Arguments)
 }
 
 type Capability string
@@ -192,4 +196,37 @@ var JobDefaultCapabilityMap = map[JobType]Capability{
 	RedditJob:            CapScrapeUrls,
 	TelemetryJob:         CapTelemetry,
 	LinkedInJob:          CapSearchByProfile,
+}
+
+// JobResponse represents a response to a job submission
+type JobResponse struct {
+	UID string `json:"uid"`
+}
+
+// JobResult represents the result of a job execution
+type JobResult struct {
+	Error      string `json:"error"`
+	Data       []byte `json:"data"`
+	Job        Job    `json:"job"`
+	NextCursor string `json:"next_cursor"`
+}
+
+// Success returns true if the job was successful.
+func (jr JobResult) Success() bool {
+	return jr.Error == ""
+}
+
+// Unmarshal unmarshals the job result data.
+func (jr JobResult) Unmarshal(i interface{}) error {
+	return json.Unmarshal(jr.Data, i)
+}
+
+// JobRequest represents a request to execute a job
+type JobRequest struct {
+	EncryptedJob string `json:"encrypted_job"`
+}
+
+// JobError represents an error in job execution
+type JobError struct {
+	Error string `json:"error"`
 }
