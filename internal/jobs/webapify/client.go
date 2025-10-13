@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	teeargs "github.com/masa-finance/tee-worker/api/args"
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
@@ -41,7 +39,7 @@ func (c *ApifyClient) ValidateApiKey() error {
 	return c.client.ValidateApiKey()
 }
 
-func (c *ApifyClient) Scrape(workerID string, args teeargs.WebArguments, cursor client.Cursor) ([]*teetypes.WebScraperResult, string, client.Cursor, error) {
+func (c *ApifyClient) Scrape(workerID string, args args.WebArguments, cursor client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error) {
 	if c.statsCollector != nil {
 		c.statsCollector.Add(workerID, stats.WebQueries, 1)
 	}
@@ -57,10 +55,10 @@ func (c *ApifyClient) Scrape(workerID string, args teeargs.WebArguments, cursor 
 		return nil, "", client.EmptyCursor, err
 	}
 
-	response := make([]*teetypes.WebScraperResult, 0, len(dataset.Data.Items))
+	response := make([]*types.WebScraperResult, 0, len(dataset.Data.Items))
 
 	for i, item := range dataset.Data.Items {
-		var resp teetypes.WebScraperResult
+		var resp types.WebScraperResult
 		if err := json.Unmarshal(item, &resp); err != nil {
 			logrus.Warnf("Failed to unmarshal scrape result at index %d: %v", i, err)
 			continue

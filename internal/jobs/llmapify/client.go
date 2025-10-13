@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	teeargs "github.com/masa-finance/tee-worker/api/args"
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
@@ -54,7 +52,7 @@ func (c *ApifyClient) ValidateApiKey() error {
 	return c.client.ValidateApiKey()
 }
 
-func (c *ApifyClient) Process(workerID string, args teeargs.LLMProcessorArguments, cursor client.Cursor) ([]*teetypes.LLMProcessorResult, client.Cursor, error) {
+func (c *ApifyClient) Process(workerID string, args args.LLMProcessorArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error) {
 	if c.statsCollector != nil {
 		c.statsCollector.Add(workerID, stats.LLMQueries, 1)
 	}
@@ -78,10 +76,10 @@ func (c *ApifyClient) Process(workerID string, args teeargs.LLMProcessorArgument
 		return nil, client.EmptyCursor, err
 	}
 
-	response := make([]*teetypes.LLMProcessorResult, 0, len(dataset.Data.Items))
+	response := make([]*types.LLMProcessorResult, 0, len(dataset.Data.Items))
 
 	for i, item := range dataset.Data.Items {
-		var resp teetypes.LLMProcessorResult
+		var resp types.LLMProcessorResult
 		if err := json.Unmarshal(item, &resp); err != nil {
 			logrus.Warnf("Failed to unmarshal llm result at index %d: %v", i, err)
 			continue

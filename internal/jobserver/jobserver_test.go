@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/config"
@@ -24,7 +23,7 @@ var _ = Describe("Jobserver", func() {
 		jobserver := NewJobServer(2, config.JobConfiguration{})
 
 		uuid, err := jobserver.AddJob(types.Job{
-			Type: teetypes.WebJob,
+			Type: types.WebJob,
 			Arguments: map[string]any{
 				"url": "google",
 			},
@@ -51,7 +50,7 @@ var _ = Describe("Jobserver", func() {
 		jobserver := NewJobServer(2, config.JobConfiguration{})
 
 		uuid, err := jobserver.AddJob(types.Job{
-			Type: teetypes.WebJob,
+			Type: types.WebJob,
 			Arguments: map[string]any{
 				"url": "google",
 			},
@@ -64,7 +63,7 @@ var _ = Describe("Jobserver", func() {
 		Expect(err.Error()).To(ContainSubstring("this job is not from a whitelisted miner"))
 
 		uuid, err = jobserver.AddJob(types.Job{
-			Type:     teetypes.WebJob,
+			Type:     types.WebJob,
 			WorkerID: "miner1",
 			Arguments: map[string]any{
 				"url": "google",
@@ -81,7 +80,7 @@ var _ = Describe("Jobserver", func() {
 		jobserver := NewJobServer(2, config.JobConfiguration{})
 
 		uuid, err := jobserver.AddJob(types.Job{
-			Type: teetypes.WebJob,
+			Type: types.WebJob,
 			Arguments: map[string]any{
 				"url": "google",
 			},
@@ -96,7 +95,7 @@ var _ = Describe("Jobserver", func() {
 		Expect(exists).ToNot(BeTrue())
 
 		uuid, err = jobserver.AddJob(types.Job{
-			Type: teetypes.WebJob,
+			Type: types.WebJob,
 			Arguments: map[string]any{
 				"url": "google",
 			},

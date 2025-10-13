@@ -14,14 +14,12 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/webapify"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	teeargs "github.com/masa-finance/tee-worker/api/args"
 	"github.com/masa-finance/tee-worker/pkg/util"
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 )
 
 // WebApifyClient defines the interface for the Web Apify client to allow mocking in tests
 type WebApifyClient interface {
-	Scrape(workerID string, args teeargs.WebArguments, cursor client.Cursor) ([]*teetypes.WebScraperResult, string, client.Cursor, error)
+	Scrape(workerID string, args args.WebArguments, cursor client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error)
 }
 
 // NewWebApifyClient is a function variable that can be replaced in tests.
@@ -33,7 +31,7 @@ var NewWebApifyClient = func(apiKey string, statsCollector *stats.StatsCollector
 // LLMApify is the interface for the LLM processor client
 // Only the Process method is required for this flow
 type LLMApify interface {
-	Process(workerID string, args teeargs.LLMProcessorArguments, cursor client.Cursor) ([]*teetypes.LLMProcessorResult, client.Cursor, error)
+	Process(workerID string, args args.LLMProcessorArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error)
 }
 
 // NewLLMApifyClient is a function variable to allow injection in tests
@@ -44,7 +42,7 @@ var NewLLMApifyClient = func(apiKey string, llmConfig config.LlmConfig, statsCol
 type WebScraper struct {
 	configuration  config.WebConfig
 	statsCollector *stats.StatsCollector
-	capabilities   []teetypes.Capability
+	capabilities   []types.Capability
 }
 
 func NewWebScraper(jc config.JobConfiguration, statsCollector *stats.StatsCollector) *WebScraper {
@@ -53,7 +51,7 @@ func NewWebScraper(jc config.JobConfiguration, statsCollector *stats.StatsCollec
 	return &WebScraper{
 		configuration:  cfg,
 		statsCollector: statsCollector,
-		capabilities:   teetypes.WebCaps,
+		capabilities:   types.WebCaps,
 	}
 }
 
@@ -66,13 +64,13 @@ func (w *WebScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		return types.JobResult{Error: msg.Error()}, msg
 	}
 
-	jobArgs, err := teeargs.UnmarshalJobArguments(teetypes.JobType(j.Type), map[string]any(j.Arguments))
+	jobArgs, err := args.UnmarshalJobArguments(types.JobType(j.Type), map[string]any(j.Arguments))
 	if err != nil {
 		msg := fmt.Errorf("failed to unmarshal job arguments: %w", err)
 		return types.JobResult{Error: msg.Error()}, msg
 	}
 
-	webArgs, ok := jobArgs.(*teeargs.WebArguments)
+	webArgs, ok := jobArgs.(*args.WebArguments)
 	if !ok {
 		return types.JobResult{Error: "invalid argument type for Web job"}, errors.New("invalid argument type")
 	}
@@ -98,11 +96,11 @@ func (w *WebScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		return types.JobResult{Error: "error creating LLM Apify client"}, fmt.Errorf("failed to create LLM Apify client: %w", err)
 	}
 
-	llmArgs := teeargs.LLMProcessorArguments{
+	llmArgs := args.LLMProcessorArguments{
 		DatasetId:   datasetId,
 		Prompt:      "summarize the content of this webpage, focusing on keywords and topics: ${markdown}",
-		MaxTokens:   teeargs.LLMDefaultMaxTokens,
-		Temperature: teeargs.LLMDefaultTemperature,
+		MaxTokens:   args.LLMDefaultMaxTokens,
+		Temperature: args.LLMDefaultTemperature,
 		Items:       uint(len(webResp)),
 	}
 	llmResp, _, llmErr := llmClient.Process(j.WorkerID, llmArgs, client.EmptyCursor)
@@ -135,11 +133,11 @@ func (w *WebScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 
 // GetStructuredCapabilities returns the structured capabilities supported by the Web scraper
 // based on the available credentials and API keys
-func (ws *WebScraper) GetStructuredCapabilities() teetypes.WorkerCapabilities {
-	capabilities := make(teetypes.WorkerCapabilities)
+func (ws *WebScraper) GetStructuredCapabilities() types.WorkerCapabilities {
+	capabilities := make(types.WorkerCapabilities)
 
 	if ws.configuration.ApifyApiKey != "" && ws.configuration.GeminiApiKey.IsValid() {
-		capabilities[teetypes.WebJob] = teetypes.WebCaps
+		capabilities[types.WebJob] = types.WebCaps
 	}
 
 	return capabilities

@@ -15,8 +15,6 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/llmapify"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	teeargs "github.com/masa-finance/tee-worker/api/args"
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 )
 
 // MockApifyClient is a mock implementation of the ApifyClient.
@@ -68,7 +66,7 @@ var _ = Describe("LLMApifyClient", func() {
 
 	Describe("Process", func() {
 		It("should construct the correct actor input", func() {
-			args := teeargs.LLMProcessorArguments{
+			args := args.LLMProcessorArguments{
 				DatasetId: "test-dataset-id",
 				Prompt:    "test-prompt",
 			}
@@ -84,15 +82,15 @@ var _ = Describe("LLMApifyClient", func() {
 				Expect(limit).To(Equal(uint(1)))
 
 				// Verify the input is correctly converted to LLMProcessorRequest
-				request, ok := input.(teetypes.LLMProcessorRequest)
+				request, ok := input.(types.LLMProcessorRequest)
 				Expect(ok).To(BeTrue())
 				Expect(request.InputDatasetId).To(Equal("test-dataset-id"))
 				Expect(request.Prompt).To(Equal("test-prompt"))
 				Expect(request.LLMProviderApiKey).To(Equal("test-claude-llm-key"))                                     // should be set from constructor
-				Expect(request.Model).To(Equal(teeargs.LLMDefaultClaudeModel))                                         // default model
-				Expect(request.MultipleColumns).To(Equal(teeargs.LLMDefaultMultipleColumns))                           // default value
-				Expect(request.MaxTokens).To(Equal(teeargs.LLMDefaultMaxTokens))                                       // default value
-				Expect(request.Temperature).To(Equal(strconv.FormatFloat(teeargs.LLMDefaultTemperature, 'f', -1, 64))) // default value
+				Expect(request.Model).To(Equal(args.LLMDefaultClaudeModel))                                         // default model
+				Expect(request.MultipleColumns).To(Equal(args.LLMDefaultMultipleColumns))                           // default value
+				Expect(request.MaxTokens).To(Equal(args.LLMDefaultMaxTokens))                                       // default value
+				Expect(request.Temperature).To(Equal(strconv.FormatFloat(args.LLMDefaultTemperature, 'f', -1, 64))) // default value
 
 				return &client.DatasetResponse{Data: client.ApifyDatasetData{Items: []json.RawMessage{}}}, "next", nil
 			}
@@ -107,7 +105,7 @@ var _ = Describe("LLMApifyClient", func() {
 				return nil, "", expectedErr
 			}
 
-			args := teeargs.LLMProcessorArguments{
+			args := args.LLMProcessorArguments{
 				DatasetId: "test-dataset-id",
 				Prompt:    "test-prompt",
 			}
@@ -126,7 +124,7 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := teeargs.LLMProcessorArguments{
+			args := args.LLMProcessorArguments{
 				DatasetId: "test-dataset-id",
 				Prompt:    "test-prompt",
 			}
@@ -148,7 +146,7 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := teeargs.LLMProcessorArguments{
+			args := args.LLMProcessorArguments{
 				DatasetId: "test-dataset-id",
 				Prompt:    "test-prompt",
 			}
@@ -175,7 +173,7 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := teeargs.LLMProcessorArguments{
+			args := args.LLMProcessorArguments{
 				DatasetId: "test-dataset-id",
 				Prompt:    "test-prompt",
 			}
@@ -187,7 +185,7 @@ var _ = Describe("LLMApifyClient", func() {
 		})
 
 		It("should use custom values when provided", func() {
-			args := teeargs.LLMProcessorArguments{
+			args := args.LLMProcessorArguments{
 				DatasetId:   "test-dataset-id",
 				Prompt:      "test-prompt",
 				MaxTokens:   500,
@@ -195,7 +193,7 @@ var _ = Describe("LLMApifyClient", func() {
 			}
 
 			mockClient.RunActorAndGetResponseFunc = func(actorID apify.ActorId, input any, cursor client.Cursor, limit uint) (*client.DatasetResponse, client.Cursor, error) {
-				request, ok := input.(teetypes.LLMProcessorRequest)
+				request, ok := input.(types.LLMProcessorRequest)
 				Expect(ok).To(BeTrue())
 				Expect(request.MaxTokens).To(Equal(uint(500)))
 				Expect(request.Temperature).To(Equal("0.5"))
@@ -258,7 +256,7 @@ var _ = Describe("LLMApifyClient", func() {
 			realClient, err := llmapify.NewClient(apifyKey, config.LlmConfig{GeminiApiKey: config.LlmApiKey(geminiKey)}, nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			args := teeargs.LLMProcessorArguments{
+			args := args.LLMProcessorArguments{
 				DatasetId: "V6tyuuZIgfiETl1cl",
 				Prompt:    "summarize the content of this webpage ${markdown}",
 			}

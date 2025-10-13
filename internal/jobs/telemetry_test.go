@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
 
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/config"
 	. "github.com/masa-finance/tee-worker/internal/jobs"
@@ -41,7 +40,7 @@ var _ = Describe("Telemetry Job", func() {
 
 			// Execute the telemetry job
 			job := types.Job{
-				Type:     teetypes.TelemetryJob,
+				Type:     types.TelemetryJob,
 				WorkerID: "telemetry-test",
 			}
 
@@ -87,7 +86,7 @@ var _ = Describe("Telemetry Job", func() {
 			telemetryJobNoStats := NewTelemetryJob(config.JobConfiguration{}, nil)
 
 			job := types.Job{
-				Type:     teetypes.TelemetryJob,
+				Type:     types.TelemetryJob,
 				WorkerID: "telemetry-test-no-stats",
 			}
 
@@ -105,7 +104,7 @@ var _ = Describe("Telemetry Job", func() {
 
 			Expect(capabilities).NotTo(BeEmpty())
 			Expect(capabilities).To(HaveLen(1))
-			Expect(capabilities[teetypes.TelemetryJob]).To(ContainElement(teetypes.CapTelemetry))
+			Expect(capabilities[types.TelemetryJob]).To(ContainElement(types.CapTelemetry))
 
 			logrus.WithField("capabilities", capabilities).Info("Telemetry job capabilities verified")
 		})

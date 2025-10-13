@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	teeargs "github.com/masa-finance/tee-worker/api/args"
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/pkg/client"
 )
@@ -43,7 +41,7 @@ func (c *TikTokApifyClient) ValidateApiKey() error {
 }
 
 // SearchByQuery runs the search actor and returns typed results
-func (c *TikTokApifyClient) SearchByQuery(input teeargs.TikTokSearchByQueryArguments, cursor client.Cursor, limit uint) ([]*teetypes.TikTokSearchByQueryResult, client.Cursor, error) {
+func (c *TikTokApifyClient) SearchByQuery(input args.TikTokSearchByQueryArguments, cursor client.Cursor, limit uint) ([]*types.TikTokSearchByQueryResult, client.Cursor, error) {
 	// Map snake_case fields to Apify actor's expected camelCase input
 	startUrls := input.StartUrls
 	if startUrls == nil {
@@ -79,9 +77,9 @@ func (c *TikTokApifyClient) SearchByQuery(input teeargs.TikTokSearchByQueryArgum
 		return nil, "", fmt.Errorf("apify run (search): %w", err)
 	}
 
-	var results []*teetypes.TikTokSearchByQueryResult
+	var results []*types.TikTokSearchByQueryResult
 	for _, raw := range dataset.Data.Items {
-		var item teetypes.TikTokSearchByQueryResult
+		var item types.TikTokSearchByQueryResult
 		if err := json.Unmarshal(raw, &item); err != nil {
 			// Skip any items whose structure doesn't match
 			continue
@@ -92,7 +90,7 @@ func (c *TikTokApifyClient) SearchByQuery(input teeargs.TikTokSearchByQueryArgum
 }
 
 // SearchByTrending runs the trending actor and returns typed results
-func (c *TikTokApifyClient) SearchByTrending(input teeargs.TikTokSearchByTrendingArguments, cursor client.Cursor, limit uint) ([]*teetypes.TikTokSearchByTrending, client.Cursor, error) {
+func (c *TikTokApifyClient) SearchByTrending(input args.TikTokSearchByTrendingArguments, cursor client.Cursor, limit uint) ([]*types.TikTokSearchByTrending, client.Cursor, error) {
 	request := TikTokSearchByTrendingRequest{
 		CountryCode: input.CountryCode,
 		SortBy:      input.SortBy,
@@ -115,9 +113,9 @@ func (c *TikTokApifyClient) SearchByTrending(input teeargs.TikTokSearchByTrendin
 		return nil, "", fmt.Errorf("apify run (trending): %w", err)
 	}
 
-	var results []*teetypes.TikTokSearchByTrending
+	var results []*types.TikTokSearchByTrending
 	for _, raw := range dataset.Data.Items {
-		var item teetypes.TikTokSearchByTrending
+		var item types.TikTokSearchByTrending
 		if err := json.Unmarshal(raw, &item); err != nil {
 			continue
 		}

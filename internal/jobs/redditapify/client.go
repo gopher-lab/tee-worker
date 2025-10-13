@@ -7,18 +7,17 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
-
-	teeargs "github.com/masa-finance/tee-worker/api/args"
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 )
 
 // CommonArgs holds the parameters that all Reddit searches support, in a single struct
 type CommonArgs struct {
-	Sort           teetypes.RedditSortType
+	Sort           types.RedditSortType
 	IncludeNSFW    bool
 	MaxItems       uint
 	MaxPosts       uint
@@ -27,7 +26,7 @@ type CommonArgs struct {
 	MaxUsers       uint
 }
 
-func (ca *CommonArgs) CopyFromArgs(a *teeargs.RedditArguments) {
+func (ca *CommonArgs) CopyFromArgs(a *args.RedditArguments) {
 	ca.Sort = a.Sort
 	ca.IncludeNSFW = a.IncludeNSFW
 	ca.MaxItems = a.MaxItems
@@ -52,23 +51,23 @@ func (args *CommonArgs) ToActorRequest() RedditActorRequest {
 // RedditActorRequest represents the query parameters for the Apify Reddit Scraper actor.
 // Based on the input schema of https://apify.com/trudax/reddit-scraper
 type RedditActorRequest struct {
-	Type                teetypes.RedditQueryType  `json:"type,omitempty"`
-	Searches            []string                  `json:"searches,omitempty"`
-	StartUrls           []teetypes.RedditStartURL `json:"startUrls,omitempty"`
-	Sort                teetypes.RedditSortType   `json:"sort,omitempty"`
-	PostDateLimit       *time.Time                `json:"postDateLimit,omitempty"`
-	IncludeNSFW         bool                      `json:"includeNSFW"`
-	MaxItems            uint                      `json:"maxItems,omitempty"`            // Total number of items to scrape
-	MaxPostCount        uint                      `json:"maxPostCount,omitempty"`        // Max number of posts per page
-	MaxComments         uint                      `json:"maxComments,omitempty"`         // Max number of comments per page
-	MaxCommunitiesCount uint                      `json:"maxCommunitiesCount,omitempty"` // Max number of communities per page
-	MaxUserCount        uint                      `json:"maxUserCount,omitempty"`        // Max number of users per page
-	SearchComments      bool                      `json:"searchComments"`
-	SearchCommunities   bool                      `json:"searchCommunities"`
-	SearchPosts         bool                      `json:"searchPosts"`
-	SearchUsers         bool                      `json:"searchUsers"`
-	SkipUserPosts       bool                      `json:"skipUserPosts"`
-	SkipComments        bool                      `json:"skipComments"`
+	Type                types.RedditQueryType  `json:"type,omitempty"`
+	Searches            []string               `json:"searches,omitempty"`
+	StartUrls           []types.RedditStartURL `json:"startUrls,omitempty"`
+	Sort                types.RedditSortType   `json:"sort,omitempty"`
+	PostDateLimit       *time.Time             `json:"postDateLimit,omitempty"`
+	IncludeNSFW         bool                   `json:"includeNSFW"`
+	MaxItems            uint                   `json:"maxItems,omitempty"`            // Total number of items to scrape
+	MaxPostCount        uint                   `json:"maxPostCount,omitempty"`        // Max number of posts per page
+	MaxComments         uint                   `json:"maxComments,omitempty"`         // Max number of comments per page
+	MaxCommunitiesCount uint                   `json:"maxCommunitiesCount,omitempty"` // Max number of communities per page
+	MaxUserCount        uint                   `json:"maxUserCount,omitempty"`        // Max number of users per page
+	SearchComments      bool                   `json:"searchComments"`
+	SearchCommunities   bool                   `json:"searchCommunities"`
+	SearchPosts         bool                   `json:"searchPosts"`
+	SearchUsers         bool                   `json:"searchUsers"`
+	SkipUserPosts       bool                   `json:"skipUserPosts"`
+	SkipComments        bool                   `json:"skipComments"`
 }
 
 // RedditApifyClient wraps the generic Apify client for Reddit-specific operations
@@ -102,7 +101,7 @@ func (c *RedditApifyClient) ValidateApiKey() error {
 }
 
 // ScrapeUrls scrapes Reddit URLs
-func (c *RedditApifyClient) ScrapeUrls(workerID string, urls []teetypes.RedditStartURL, after time.Time, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error) {
+func (c *RedditApifyClient) ScrapeUrls(workerID string, urls []types.RedditStartURL, after time.Time, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error) {
 	input := args.ToActorRequest()
 	input.StartUrls = urls
 	input.Searches = nil

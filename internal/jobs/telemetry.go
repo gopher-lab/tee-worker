@@ -1,7 +1,6 @@
 package jobs
 
 import (
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
@@ -17,9 +16,9 @@ func NewTelemetryJob(jc config.JobConfiguration, c *stats.StatsCollector) Teleme
 }
 
 // GetStructuredCapabilities returns the structured capabilities supported by the telemetry job
-func (t TelemetryJob) GetStructuredCapabilities() teetypes.WorkerCapabilities {
-	return teetypes.WorkerCapabilities{
-		teetypes.TelemetryJob: teetypes.AlwaysAvailableTelemetryCaps,
+func (t TelemetryJob) GetStructuredCapabilities() types.WorkerCapabilities {
+	return types.WorkerCapabilities{
+		types.TelemetryJob: types.AlwaysAvailableTelemetryCaps,
 	}
 }
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	util "github.com/masa-finance/tee-worker/pkg/util"
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/pkg/client"
 	"github.com/sirupsen/logrus"
@@ -44,7 +43,7 @@ func (c *TwitterApifyClient) ValidateApiKey() error {
 }
 
 // GetFollowers retrieves followers for a username using Apify
-func (c *TwitterApifyClient) GetFollowers(username string, maxResults uint, cursor client.Cursor) ([]*teetypes.ProfileResultApify, client.Cursor, error) {
+func (c *TwitterApifyClient) GetFollowers(username string, maxResults uint, cursor client.Cursor) ([]*types.ProfileResultApify, client.Cursor, error) {
 	minimum := uint(200)
 
 	// Ensure minimum of 200 as required by the actor
@@ -63,7 +62,7 @@ func (c *TwitterApifyClient) GetFollowers(username string, maxResults uint, curs
 }
 
 // GetFollowing retrieves following for a username using Apify
-func (c *TwitterApifyClient) GetFollowing(username string, cursor client.Cursor, maxResults uint) ([]*teetypes.ProfileResultApify, client.Cursor, error) {
+func (c *TwitterApifyClient) GetFollowing(username string, cursor client.Cursor, maxResults uint) ([]*types.ProfileResultApify, client.Cursor, error) {
 	minimum := uint(200)
 
 	// Ensure minimum of 200 as required by the actor
@@ -82,15 +81,15 @@ func (c *TwitterApifyClient) GetFollowing(username string, cursor client.Cursor,
 }
 
 // getProfiles runs the actor and retrieves profiles from the dataset
-func (c *TwitterApifyClient) getProfiles(input FollowerActorRunRequest, cursor client.Cursor, limit uint) ([]*teetypes.ProfileResultApify, client.Cursor, error) {
+func (c *TwitterApifyClient) getProfiles(input FollowerActorRunRequest, cursor client.Cursor, limit uint) ([]*types.ProfileResultApify, client.Cursor, error) {
 	dataset, nextCursor, err := c.apifyClient.RunActorAndGetResponse(apify.ActorIds.TwitterFollowers, input, cursor, limit)
 	if err != nil {
 		return nil, client.EmptyCursor, err
 	}
 
-	profiles := make([]*teetypes.ProfileResultApify, 0, len(dataset.Data.Items))
+	profiles := make([]*types.ProfileResultApify, 0, len(dataset.Data.Items))
 	for i, item := range dataset.Data.Items {
-		var profile teetypes.ProfileResultApify
+		var profile types.ProfileResultApify
 		if err := json.Unmarshal(item, &profile); err != nil {
 			logrus.Warnf("Failed to unmarshal profile at index %d: %v", i, err)
 			continue

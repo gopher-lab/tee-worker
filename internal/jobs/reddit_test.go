@@ -17,18 +17,17 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 )
 
 // MockRedditApifyClient is a mock implementation of the RedditApifyClient.
 type MockRedditApifyClient struct {
-	ScrapeUrlsFunc        func(urls []teetypes.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error)
+	ScrapeUrlsFunc        func(urls []types.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error)
 	SearchPostsFunc       func(queries []string, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error)
 	SearchCommunitiesFunc func(queries []string, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error)
 	SearchUsersFunc       func(queries []string, skipPosts bool, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error)
 }
 
-func (m *MockRedditApifyClient) ScrapeUrls(_ string, urls []teetypes.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error) {
+func (m *MockRedditApifyClient) ScrapeUrls(_ string, urls []types.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error) {
 	if m != nil && m.ScrapeUrlsFunc != nil {
 		res, cursor, err := m.ScrapeUrlsFunc(urls, after, args, cursor, maxResults)
 		for i, r := range res {
@@ -83,7 +82,7 @@ var _ = Describe("RedditScraper", func() {
 
 		job = types.Job{
 			UUID: "test-uuid",
-			Type: teetypes.RedditJob,
+			Type: types.RedditJob,
 		}
 	})
 
@@ -100,11 +99,11 @@ var _ = Describe("RedditScraper", func() {
 				"https://www.reddit.com/r/HHGTTG/comments/1jynlrz/the_entire_series_after_restaurant_at_the_end_of/",
 			}
 			job.Arguments = map[string]any{
-				"type": teetypes.RedditScrapeUrls,
+				"type": types.RedditScrapeUrls,
 				"urls": testUrls,
 			}
 
-			mockClient.ScrapeUrlsFunc = func(urls []teetypes.RedditStartURL, after time.Time, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error) {
+			mockClient.ScrapeUrlsFunc = func(urls []types.RedditStartURL, after time.Time, cArgs redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error) {
 				Expect(urls).To(HaveLen(1))
 				Expect(urls[0].URL).To(Equal(testUrls[0]))
 				return []*reddit.Response{{TypeSwitch: &reddit.TypeSwitch{Type: reddit.UserResponse}, User: &reddit.User{ID: "user1", DataType: string(reddit.UserResponse)}}}, "next", nil
@@ -124,7 +123,7 @@ var _ = Describe("RedditScraper", func() {
 
 		It("should call SearchUsers for the correct QueryType", func() {
 			job.Arguments = map[string]any{
-				"type":    teetypes.RedditSearchUsers,
+				"type":    types.RedditSearchUsers,
 				"queries": []string{"user-query"},
 			}
 
@@ -147,7 +146,7 @@ var _ = Describe("RedditScraper", func() {
 
 		It("should call SearchPosts for the correct QueryType", func() {
 			job.Arguments = map[string]any{
-				"type":    teetypes.RedditSearchPosts,
+				"type":    types.RedditSearchPosts,
 				"queries": []string{"post-query"},
 			}
 
@@ -170,7 +169,7 @@ var _ = Describe("RedditScraper", func() {
 
 		It("should call SearchCommunities for the correct QueryType", func() {
 			job.Arguments = map[string]any{
-				"type":    teetypes.RedditSearchCommunities,
+				"type":    types.RedditSearchCommunities,
 				"queries": []string{"community-query"},
 			}
 
@@ -204,7 +203,7 @@ var _ = Describe("RedditScraper", func() {
 
 		It("should handle errors from the reddit client", func() {
 			job.Arguments = map[string]any{
-				"type":    teetypes.RedditSearchPosts,
+				"type":    types.RedditSearchPosts,
 				"queries": []string{"post-query"},
 			}
 
@@ -224,7 +223,7 @@ var _ = Describe("RedditScraper", func() {
 				return nil, errors.New("client creation failed")
 			}
 			job.Arguments = map[string]any{
-				"type":    teetypes.RedditSearchPosts,
+				"type":    types.RedditSearchPosts,
 				"queries": []string{"post-query"},
 			}
 

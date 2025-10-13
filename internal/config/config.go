@@ -11,8 +11,9 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	teeargs "github.com/masa-finance/tee-worker/api/args"
 	"github.com/sirupsen/logrus"
+
+	"github.com/masa-finance/tee-worker/api/args"
 )
 
 var (
@@ -346,9 +347,9 @@ type LlmConfig struct {
 // GetModelAndKey returns the first available model and API key based on which keys are valid
 func (lc LlmConfig) GetModelAndKey() (model string, key string, err error) {
 	if lc.ClaudeApiKey.IsValid() {
-		return teeargs.LLMDefaultClaudeModel, string(lc.ClaudeApiKey), nil
+		return args.LLMDefaultClaudeModel, string(lc.ClaudeApiKey), nil
 	} else if lc.GeminiApiKey.IsValid() {
-		return teeargs.LLMDefaultGeminiModel, string(lc.GeminiApiKey), nil
+		return args.LLMDefaultGeminiModel, string(lc.GeminiApiKey), nil
 	}
 	return "", "", errors.New("no valid llm api key found")
 }

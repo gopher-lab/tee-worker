@@ -13,9 +13,7 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	teeargs "github.com/masa-finance/tee-worker/api/args"
 	profileArgs "github.com/masa-finance/tee-worker/api/args/linkedin/profile"
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 	profileTypes "github.com/masa-finance/tee-worker/api/types/linkedin/profile"
 )
 
@@ -34,7 +32,7 @@ var NewLinkedInApifyClient = func(apiKey string, statsCollector *stats.StatsColl
 type LinkedInScraper struct {
 	configuration  config.JobConfiguration
 	statsCollector *stats.StatsCollector
-	capabilities   []teetypes.Capability
+	capabilities   []types.Capability
 }
 
 func NewLinkedInScraper(jc config.JobConfiguration, statsCollector *stats.StatsCollector) *LinkedInScraper {
@@ -42,7 +40,7 @@ func NewLinkedInScraper(jc config.JobConfiguration, statsCollector *stats.StatsC
 	return &LinkedInScraper{
 		configuration:  jc,
 		statsCollector: statsCollector,
-		capabilities:   teetypes.LinkedInCaps,
+		capabilities:   types.LinkedInCaps,
 	}
 }
 
@@ -56,7 +54,7 @@ func (ls *LinkedInScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		return types.JobResult{Error: msg.Error()}, msg
 	}
 
-	jobArgs, err := teeargs.UnmarshalJobArguments(teetypes.JobType(j.Type), map[string]any(j.Arguments))
+	jobArgs, err := args.UnmarshalJobArguments(types.JobType(j.Type), map[string]any(j.Arguments))
 	if err != nil {
 		msg := fmt.Errorf("failed to unmarshal job arguments: %w", err)
 		return types.JobResult{Error: msg.Error()}, msg
@@ -96,12 +94,12 @@ func (ls *LinkedInScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 
 // GetStructuredCapabilities returns the structured capabilities supported by the LinkedIn scraper
 // based on the available credentials and API keys
-func (ls *LinkedInScraper) GetStructuredCapabilities() teetypes.WorkerCapabilities {
-	capabilities := make(teetypes.WorkerCapabilities)
+func (ls *LinkedInScraper) GetStructuredCapabilities() types.WorkerCapabilities {
+	capabilities := make(types.WorkerCapabilities)
 
 	apifyApiKey := ls.configuration.GetString("apify_api_key", "")
 	if apifyApiKey != "" {
-		capabilities[teetypes.LinkedInJob] = teetypes.LinkedInCaps
+		capabilities[types.LinkedInJob] = types.LinkedInCaps
 	}
 
 	return capabilities

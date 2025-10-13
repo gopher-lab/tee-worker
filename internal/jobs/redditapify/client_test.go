@@ -12,8 +12,6 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/redditapify"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	teeargs "github.com/masa-finance/tee-worker/api/args"
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 )
 
 // MockApifyClient is a mock implementation of the ApifyClient.
@@ -63,7 +61,7 @@ var _ = Describe("RedditApifyClient", func() {
 
 	Describe("ScrapeUrls", func() {
 		It("should construct the correct actor input", func() {
-			urls := []teetypes.RedditStartURL{{URL: "http://reddit.com/r/golang"}}
+			urls := []types.RedditStartURL{{URL: "http://reddit.com/r/golang"}}
 			after := time.Now()
 			args := redditapify.CommonArgs{MaxPosts: 10}
 
@@ -98,7 +96,7 @@ var _ = Describe("RedditApifyClient", func() {
 				Expect(req.Searches).To(Equal(queries))
 				Expect(req.StartUrls).To(BeNil())
 				Expect(*req.PostDateLimit).To(BeTemporally("~", after, time.Second))
-				Expect(req.Type).To(Equal(teetypes.RedditQueryType("posts")))
+				Expect(req.Type).To(Equal(types.RedditQueryType("posts")))
 				Expect(req.SearchPosts).To(BeTrue())
 				Expect(req.SkipComments).To(BeFalse())
 				Expect(req.MaxComments).To(Equal(uint(5)))
@@ -120,7 +118,7 @@ var _ = Describe("RedditApifyClient", func() {
 				req := input.(redditapify.RedditActorRequest)
 				Expect(req.Searches).To(Equal(queries))
 				Expect(req.StartUrls).To(BeNil())
-				Expect(req.Type).To(Equal(teetypes.RedditQueryType("communities")))
+				Expect(req.Type).To(Equal(types.RedditQueryType("communities")))
 				Expect(req.SearchCommunities).To(BeTrue())
 				return &client.DatasetResponse{Data: client.ApifyDatasetData{Items: []json.RawMessage{}}}, "next", nil
 			}
@@ -140,7 +138,7 @@ var _ = Describe("RedditApifyClient", func() {
 				req := input.(redditapify.RedditActorRequest)
 				Expect(req.Searches).To(Equal(queries))
 				Expect(req.StartUrls).To(BeNil())
-				Expect(req.Type).To(Equal(teetypes.RedditQueryType("users")))
+				Expect(req.Type).To(Equal(types.RedditQueryType("users")))
 				Expect(req.SearchUsers).To(BeTrue())
 				Expect(req.SkipUserPosts).To(BeTrue())
 				return &client.DatasetResponse{Data: client.ApifyDatasetData{Items: []json.RawMessage{}}}, "next", nil
@@ -201,8 +199,8 @@ var _ = Describe("RedditApifyClient", func() {
 
 	Describe("CommonArgs", func() {
 		It("should copy from RedditArguments correctly", func() {
-			redditArgs := &teeargs.RedditArguments{
-				Sort:           teetypes.RedditSortTop,
+			redditArgs := &args.RedditArguments{
+				Sort:           types.RedditSortTop,
 				IncludeNSFW:    true,
 				MaxItems:       1,
 				MaxPosts:       2,
@@ -213,7 +211,7 @@ var _ = Describe("RedditApifyClient", func() {
 			commonArgs := redditapify.CommonArgs{}
 			commonArgs.CopyFromArgs(redditArgs)
 
-			Expect(commonArgs.Sort).To(Equal(teetypes.RedditSortTop))
+			Expect(commonArgs.Sort).To(Equal(types.RedditSortTop))
 			Expect(commonArgs.IncludeNSFW).To(BeTrue())
 			Expect(commonArgs.MaxItems).To(Equal(uint(1)))
 			Expect(commonArgs.MaxPosts).To(Equal(uint(2)))
@@ -224,7 +222,7 @@ var _ = Describe("RedditApifyClient", func() {
 
 		It("should convert to RedditActorRequest correctly", func() {
 			commonArgs := redditapify.CommonArgs{
-				Sort:           teetypes.RedditSortNew,
+				Sort:           types.RedditSortNew,
 				IncludeNSFW:    true,
 				MaxItems:       10,
 				MaxPosts:       20,
@@ -234,7 +232,7 @@ var _ = Describe("RedditApifyClient", func() {
 			}
 			actorReq := commonArgs.ToActorRequest()
 
-			Expect(actorReq.Sort).To(Equal(teetypes.RedditSortNew))
+			Expect(actorReq.Sort).To(Equal(types.RedditSortNew))
 			Expect(actorReq.IncludeNSFW).To(BeTrue())
 			Expect(actorReq.MaxItems).To(Equal(uint(10)))
 			Expect(actorReq.MaxPostCount).To(Equal(uint(20)))

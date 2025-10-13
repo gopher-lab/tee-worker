@@ -11,7 +11,6 @@ import (
 	"golang.org/x/exp/maps"
 
 	"github.com/google/uuid"
-	teetypes "github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs"
@@ -28,7 +27,7 @@ type JobServer struct {
 	results          *ResultCache
 	jobConfiguration config.JobConfiguration
 
-	jobWorkers   map[teetypes.JobType]*jobWorkerEntry
+	jobWorkers   map[types.JobType]*jobWorkerEntry
 	executedJobs map[string]bool
 }
 
@@ -80,32 +79,32 @@ func NewJobServer(workers int, jc config.JobConfiguration) *JobServer {
 
 	// Initialize job workers
 	logrus.Info("Setting up job workers...")
-	jobworkers := map[teetypes.JobType]*jobWorkerEntry{
-		teetypes.WebJob: {
+	jobworkers := map[types.JobType]*jobWorkerEntry{
+		types.WebJob: {
 			w: jobs.NewWebScraper(jc, s),
 		},
-		teetypes.TwitterJob: {
+		types.TwitterJob: {
 			w: jobs.NewTwitterScraper(jc, s),
 		},
-		teetypes.TwitterCredentialJob: {
+		types.TwitterCredentialJob: {
 			w: jobs.NewTwitterScraper(jc, s), // Uses the same implementation as standard Twitter scraper
 		},
-		teetypes.TwitterApiJob: {
+		types.TwitterApiJob: {
 			w: jobs.NewTwitterScraper(jc, s), // Uses the same implementation as standard Twitter scraper
 		},
-		teetypes.TwitterApifyJob: {
+		types.TwitterApifyJob: {
 			w: jobs.NewTwitterScraper(jc, s), // Register Apify job type with Twitter scraper
 		},
-		teetypes.TiktokJob: {
+		types.TiktokJob: {
 			w: jobs.NewTikTokScraper(jc, s),
 		},
-		teetypes.RedditJob: {
+		types.RedditJob: {
 			w: jobs.NewRedditScraper(jc, s),
 		},
-		teetypes.LinkedInJob: {
+		types.LinkedInJob: {
 			w: jobs.NewLinkedInScraper(jc, s),
 		},
-		teetypes.TelemetryJob: {
+		types.TelemetryJob: {
 			w: jobs.NewTelemetryJob(jc, s),
 		},
 	}
@@ -155,15 +154,15 @@ func NewJobServer(workers int, jc config.JobConfiguration) *JobServer {
 }
 
 // GetWorkerCapabilities returns the structured capabilities for all registered workers
-func (js *JobServer) GetWorkerCapabilities() teetypes.WorkerCapabilities {
+func (js *JobServer) GetWorkerCapabilities() types.WorkerCapabilities {
 	// Use a map to deduplicate capabilities by job type
-	jobTypeCapMap := make(map[teetypes.JobType]map[teetypes.Capability]struct{})
+	jobTypeCapMap := make(map[types.JobType]map[types.Capability]struct{})
 
 	for _, workerEntry := range js.jobWorkers {
 		workerCapabilities := workerEntry.w.GetStructuredCapabilities()
 		for jobType, capabilities := range workerCapabilities {
 			if _, exists := jobTypeCapMap[jobType]; !exists {
-				jobTypeCapMap[jobType] = make(map[teetypes.Capability]struct{})
+				jobTypeCapMap[jobType] = make(map[types.Capability]struct{})
 			}
 			for _, capability := range capabilities {
 				jobTypeCapMap[jobType][capability] = struct{}{}
@@ -172,7 +171,7 @@ func (js *JobServer) GetWorkerCapabilities() teetypes.WorkerCapabilities {
 	}
 
 	// Convert to final map format
-	allCapabilities := make(teetypes.WorkerCapabilities)
+	allCapabilities := make(types.WorkerCapabilities)
 	for jobType, capabilitySet := range jobTypeCapMap {
 		capabilities := maps.Keys(capabilitySet)
 		allCapabilities[jobType] = capabilities
@@ -203,7 +202,7 @@ func (js *JobServer) AddJob(j types.Job) (string, error) {
 		return "", errors.New("this job is not for this worker")
 	}
 
-	if j.Type != teetypes.TelemetryJob && config.MinersWhiteList != "" {
+	if j.Type != types.TelemetryJob && config.MinersWhiteList != "" {
 		var miners []string
 
 		// In standalone mode, we just whitelist ourselves
