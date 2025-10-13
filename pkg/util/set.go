@@ -60,7 +60,6 @@ func (s *Set[T]) Union(sets ...*Set[T]) *Set[T] {
 	sum := s.Length()
 	for _, ss := range sets {
 		sum = sum + ss.Length()
-
 	}
 
 	ret := make(map[T]struct{}, sum)
