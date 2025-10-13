@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-
 	"github.com/masa-finance/tee-worker/internal/jobs/twitterx"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
+	"github.com/masa-finance/tee-worker/api/args"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"

@@ -9,6 +9,7 @@ import (
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/jobserver"
 	"github.com/masa-finance/tee-worker/pkg/tee"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -85,7 +86,7 @@ func status(jobServer *jobserver.JobServer) func(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, types.JobError{Error: res.Error})
 		}
 
-		sealedData, err := res.Seal()
+		sealedData, err := teejob.SealJobResult(&res)
 		if err != nil {
 			logrus.Errorf("Error while sealing status response for job %s: %s", res.Job.UUID, err)
 			return c.JSON(http.StatusInternalServerError, types.JobError{Error: err.Error()})

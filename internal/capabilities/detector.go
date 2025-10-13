@@ -6,11 +6,12 @@ import (
 
 	"maps"
 
-	util "github.com/masa-finance/tee-worker/pkg/util"
+	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs/twitter"
 	"github.com/masa-finance/tee-worker/pkg/client"
+	util "github.com/masa-finance/tee-worker/pkg/util"
 	"github.com/sirupsen/logrus"
 )
 

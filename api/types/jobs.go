@@ -230,3 +230,14 @@ type JobRequest struct {
 type JobError struct {
 	Error string `json:"error"`
 }
+
+// Key represents a key request
+type Key struct {
+	Key       string `json:"key"`
+	Signature string `json:"signature"`
+}
+
+// KeyResponse represents a response to a key operation
+type KeyResponse struct {
+	Status string `json:"status"`
+}

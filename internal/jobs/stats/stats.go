@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/capabilities"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/versioning"
@@ -65,7 +66,7 @@ type Stats struct {
 	CurrentTimeUnix      int64                        `json:"current_time"`
 	WorkerID             string                       `json:"worker_id"`
 	Stats                map[string]map[StatType]uint `json:"stats"`
-	ReportedCapabilities types.WorkerCapabilities  `json:"reported_capabilities"`
+	ReportedCapabilities types.WorkerCapabilities     `json:"reported_capabilities"`
 	WorkerVersion        string                       `json:"worker_version"`
 	ApplicationVersion   string                       `json:"application_version"`
 	sync.Mutex
