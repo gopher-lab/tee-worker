@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	teetypes "github.com/masa-finance/tee-worker/api/types"
+	"github.com/masa-finance/tee-worker/api/tee"
 	"github.com/masa-finance/tee-worker/api/types"
 )
 
@@ -44,7 +44,7 @@ func NewClient(baseURL string, opts ...Option) (*Client, error) {
 
 // CreateJobSignature sends a job to the server to generate a job signature.
 // The server will attach its worker ID to the job before generating the signature.
-func (c *Client) CreateJobSignature(job teetypes.Job) (JobSignature, error) {
+func (c *Client) CreateJobSignature(job types.Job) (JobSignature, error) {
 	jobJSON, err := json.Marshal(job)
 	if err != nil {
 		return JobSignature(""), fmt.Errorf("error marshaling job: %w", err)
@@ -115,7 +115,7 @@ func (c *Client) SubmitJob(JobSignature JobSignature) (*JobResult, error) {
 
 // Decrypt sends the encrypted result to the server to decrypt it.
 func (c *Client) Decrypt(JobSignature JobSignature, encryptedResult string) (string, error) {
-	decryptReq := types.EncryptedRequest{
+	decryptReq := tee.EncryptedRequest{
 		EncryptedResult:  encryptedResult,
 		EncryptedRequest: string(JobSignature),
 	}

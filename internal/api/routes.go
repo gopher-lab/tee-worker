@@ -97,7 +97,7 @@ func status(jobServer *jobserver.JobServer) func(c echo.Context) error {
 }
 
 func result(c echo.Context) error {
-	payload := types.EncryptedRequest{
+	payload := teejob.EncryptedRequest{
 		EncryptedResult:  "",
 		EncryptedRequest: "",
 	}

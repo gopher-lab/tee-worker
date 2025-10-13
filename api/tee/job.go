@@ -4,11 +4,10 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"time"
+	"math/rand/v2"
 
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/pkg/tee"
-	"golang.org/x/exp/rand"
 )
 
 var letterRunes = []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+")
@@ -17,7 +16,7 @@ func randStringRunes(n int) string {
 	b := make([]rune, n)
 	for i := range b {
 		// TODO: Move xcrypt from indexer to tee-types, and use RandomString here (although we'll need a different alpahbet)
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+		b[i] = letterRunes[rand.IntN(len(letterRunes))]
 	}
 	return string(b)
 }
