@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/masa-finance/tee-worker/api/tee"
 	"github.com/masa-finance/tee-worker/api/types"
 )
 
@@ -17,6 +16,13 @@ type Client struct {
 	BaseURL    string
 	options    *Options
 	HTTPClient *http.Client
+}
+
+// EncryptedRequest represents an encrypted request/response pair
+// note, this is copied from api/tee/encrypted.go to avoid TEE dependencies in client code
+type EncryptedRequest struct {
+	EncryptedResult  string `json:"encrypted_result"`
+	EncryptedRequest string `json:"encrypted_request"`
 }
 
 // setAPIKeyHeader sets the API key on the request if configured.
@@ -115,7 +121,7 @@ func (c *Client) SubmitJob(JobSignature JobSignature) (*JobResult, error) {
 
 // Decrypt sends the encrypted result to the server to decrypt it.
 func (c *Client) Decrypt(JobSignature JobSignature, encryptedResult string) (string, error) {
-	decryptReq := tee.EncryptedRequest{
+	decryptReq := EncryptedRequest{
 		EncryptedResult:  encryptedResult,
 		EncryptedRequest: string(JobSignature),
 	}
