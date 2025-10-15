@@ -70,10 +70,9 @@ var _ = Describe("LinkedInApifyClient", func() {
 
 	Describe("SearchProfiles", func() {
 		It("should construct the correct actor input", func() {
-			args := profileArgs.Arguments{
-				Query:    "software engineer",
-				MaxItems: 10,
-			}
+			args := profileArgs.NewArguments()
+			args.Query = "software engineer"
+			args.MaxItems = 10
 
 			mockClient.RunActorAndGetResponseFunc = func(actorID apify.ActorId, input any, cursor client.Cursor, limit uint) (*client.DatasetResponse, client.Cursor, error) {
 				Expect(actorID).To(Equal(apify.ActorIds.LinkedInSearchProfile))
@@ -97,10 +96,9 @@ var _ = Describe("LinkedInApifyClient", func() {
 				return nil, "", expectedErr
 			}
 
-			args := profileArgs.Arguments{
-				Query:    "test query",
-				MaxItems: 5,
-			}
+			args := profileArgs.NewArguments()
+			args.Query = "test query"
+			args.MaxItems = 5
 			_, _, _, err := linkedinClient.SearchProfiles("test-worker", &args, client.EmptyCursor)
 			Expect(err).To(MatchError(expectedErr))
 		})
@@ -116,10 +114,9 @@ var _ = Describe("LinkedInApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := profileArgs.Arguments{
-				Query:    "test query",
-				MaxItems: 1,
-			}
+			args := profileArgs.NewArguments()
+			args.Query = "test query"
+			args.MaxItems = 1
 			results, _, _, err := linkedinClient.SearchProfiles("test-worker", &args, client.EmptyCursor)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(results).To(BeEmpty()) // The invalid item should be skipped
@@ -147,10 +144,9 @@ var _ = Describe("LinkedInApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := profileArgs.Arguments{
-				Query:    "test query",
-				MaxItems: 2,
-			}
+			args := profileArgs.NewArguments()
+			args.Query = "test query"
+			args.MaxItems = 2
 			results, _, _, err := linkedinClient.SearchProfiles("test-worker", &args, client.EmptyCursor)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(results).To(HaveLen(2))
@@ -206,12 +202,11 @@ var _ = Describe("LinkedInApifyClient", func() {
 			realClient, err := linkedinapify.NewClient(apifyKey, statsCollector)
 			Expect(err).NotTo(HaveOccurred())
 
-			args := profileArgs.Arguments{
-				Type:        types.CapSearchByProfile,
-				Query:       "software engineer",
-				MaxItems:    1,
-				ScraperMode: profile.ScraperModeShort,
-			}
+			args := profileArgs.NewArguments()
+			args.Type = types.CapSearchByProfile
+			args.Query = "software engineer"
+			args.MaxItems = 1
+			args.ScraperMode = profile.ScraperModeShort
 
 			results, datasetId, cursor, err := realClient.SearchProfiles("test-worker", &args, client.EmptyCursor)
 			Expect(err).NotTo(HaveOccurred())

@@ -43,38 +43,51 @@ func DetectCapabilities(jc config.JobConfiguration, jobServer JobServerInterface
 	hasLLMKey := geminiApiKey.IsValid() || claudeApiKey.IsValid()
 
 	// Add Twitter capabilities based on available authentication
-	if hasAccounts || hasApiKeys {
-		var twitterCaps []types.Capability
+	var twitterCaps []types.Capability
 
-		// Add credential-based capabilities if we have accounts
-		if hasAccounts {
-			twitterCaps = append(twitterCaps,
-				types.CapSearchByQuery,
-				types.CapSearchByProfile,
-				types.CapGetById,
-				types.CapGetReplies,
-				types.CapGetRetweeters,
-				types.CapGetMedia,
-				types.CapGetProfileById,
-				types.CapGetTrends,
-				types.CapGetSpace,
-				types.CapGetProfile,
-				types.CapGetTweets,
-			)
-		}
+	// Add credential-based capabilities if we have accounts
+	if hasAccounts {
+		twitterCaps = append(twitterCaps,
+			types.CapSearchByQuery,
+			types.CapSearchByProfile,
+			types.CapGetById,
+			types.CapGetReplies,
+			types.CapGetRetweeters,
+			types.CapGetMedia,
+			types.CapGetProfileById,
+			types.CapGetTrends,
+			types.CapGetSpace,
+			types.CapGetProfile,
+			types.CapGetTweets,
+		)
+	}
 
-		// Add API-based capabilities if we have API keys
-		if hasApiKeys {
-			// Check for elevated API capabilities
-			if hasElevatedApiKey(apiKeys) {
-				twitterCaps = append(twitterCaps, types.CapSearchByFullArchive)
-			}
-		}
+	// Add API-based capabilities if we have API keys
+	if hasApiKeys {
+		// Add basic API capabilities for any valid API key
+		twitterCaps = append(twitterCaps,
+			types.CapSearchByQuery,
+			types.CapSearchByProfile,
+			types.CapGetById,
+			types.CapGetReplies,
+			types.CapGetRetweeters,
+			types.CapGetMedia,
+			types.CapGetProfileById,
+			types.CapGetTrends,
+			types.CapGetSpace,
+			types.CapGetProfile,
+			types.CapGetTweets,
+		)
 
-		// Only add capabilities if we have any supported capabilities
-		if len(twitterCaps) > 0 {
-			capabilities[types.TwitterJob] = twitterCaps
+		// Check for elevated API capabilities
+		if hasElevatedApiKey(apiKeys) {
+			twitterCaps = append(twitterCaps, types.CapSearchByFullArchive)
 		}
+	}
+
+	// Only add capabilities if we have any supported capabilities
+	if len(twitterCaps) > 0 {
+		capabilities[types.TwitterJob] = twitterCaps
 	}
 
 	if hasApifyKey {

@@ -67,10 +67,9 @@ var _ = Describe("LLMApifyClient", func() {
 
 	Describe("Process", func() {
 		It("should construct the correct actor input", func() {
-			llmArgs := process.Arguments{
-				DatasetId: "test-dataset-id",
-				Prompt:    "test-prompt",
-			}
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
 
 			// Marshal and unmarshal to apply defaults
 			jsonData, err := json.Marshal(llmArgs)
@@ -106,10 +105,9 @@ var _ = Describe("LLMApifyClient", func() {
 				return nil, "", expectedErr
 			}
 
-			llmArgs := process.Arguments{
-				DatasetId: "test-dataset-id",
-				Prompt:    "test-prompt",
-			}
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
 			_, _, err := llmClient.Process("test-worker", llmArgs, client.EmptyCursor)
 			Expect(err).To(MatchError(expectedErr))
 		})
@@ -125,10 +123,9 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			llmArgs := process.Arguments{
-				DatasetId: "test-dataset-id",
-				Prompt:    "test-prompt",
-			}
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
 			results, _, err := llmClient.Process("test-worker", llmArgs, client.EmptyCursor)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(results).To(BeEmpty()) // The invalid item should be skipped
@@ -147,10 +144,9 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			llmArgs := process.Arguments{
-				DatasetId: "test-dataset-id",
-				Prompt:    "test-prompt",
-			}
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
 			results, cursor, err := llmClient.Process("test-worker", llmArgs, client.EmptyCursor)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cursor).To(Equal(client.Cursor("next")))
@@ -174,10 +170,9 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			llmArgs := process.Arguments{
-				DatasetId: "test-dataset-id",
-				Prompt:    "test-prompt",
-			}
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
 			results, _, err := llmClient.Process("test-worker", llmArgs, client.EmptyCursor)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(results).To(HaveLen(2))
@@ -186,12 +181,11 @@ var _ = Describe("LLMApifyClient", func() {
 		})
 
 		It("should use custom values when provided", func() {
-			llmArgs := process.Arguments{
-				DatasetId:   "test-dataset-id",
-				Prompt:      "test-prompt",
-				MaxTokens:   500,
-				Temperature: 0.5,
-			}
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
+			llmArgs.MaxTokens = 500
+			llmArgs.Temperature = 0.5
 
 			mockClient.RunActorAndGetResponseFunc = func(actorID apify.ActorId, input any, cursor client.Cursor, limit uint) (*client.DatasetResponse, client.Cursor, error) {
 				request, ok := input.(types.LLMProcessorRequest)
@@ -257,10 +251,9 @@ var _ = Describe("LLMApifyClient", func() {
 			realClient, err := llmapify.NewClient(apifyKey, config.LlmConfig{GeminiApiKey: config.LlmApiKey(geminiKey)}, nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			llmArgs := process.Arguments{
-				DatasetId: "V6tyuuZIgfiETl1cl",
-				Prompt:    "summarize the content of this webpage ${markdown}",
-			}
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "V6tyuuZIgfiETl1cl"
+			llmArgs.Prompt = "summarize the content of this webpage ${markdown}"
 			// Marshal and unmarshal to apply defaults
 			jsonData, err := json.Marshal(llmArgs)
 			Expect(err).ToNot(HaveOccurred())

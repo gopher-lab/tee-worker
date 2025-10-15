@@ -107,13 +107,13 @@ var _ = Describe("DetectCapabilities", func() {
 				config.JobConfiguration{
 					"twitter_accounts": []string{"user1:pass1"},
 				},
-				[]string{"telemetry", "tiktok", "twitter", "twitter-credential"},
+				[]string{"telemetry", "tiktok", "twitter"},
 			),
 			Entry("With Twitter API keys",
 				config.JobConfiguration{
 					"twitter_api_keys": []string{"key1"},
 				},
-				[]string{"telemetry", "tiktok", "twitter", "twitter-api"},
+				[]string{"telemetry", "tiktok", "twitter"},
 			),
 		)
 	})
