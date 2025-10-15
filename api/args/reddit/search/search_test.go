@@ -1,4 +1,4 @@
-package args_test
+package search_test
 
 import (
 	"encoding/json"
@@ -7,17 +7,15 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/reddit/search"
 	"github.com/masa-finance/tee-worker/api/types"
 )
 
 var _ = Describe("RedditArguments", func() {
 	Describe("Marshalling and unmarshalling", func() {
 		It("should set default values", func() {
-			redditArgs := args.RedditArguments{
-				QueryType: types.RedditSearchPosts,
-				Queries:   []string{"Zaphod", "Ford"},
-			}
+			redditArgs := search.NewSearchPostsArguments()
+			redditArgs.Queries = []string{"Zaphod", "Ford"}
 			jsonData, err := json.Marshal(redditArgs)
 			Expect(err).ToNot(HaveOccurred())
 			err = json.Unmarshal([]byte(jsonData), &redditArgs)
@@ -32,16 +30,14 @@ var _ = Describe("RedditArguments", func() {
 		})
 
 		It("should override default values", func() {
-			redditArgs := args.RedditArguments{
-				QueryType:      types.RedditSearchPosts,
-				Queries:        []string{"Zaphod", "Ford"},
-				MaxItems:       20,
-				MaxPosts:       21,
-				MaxComments:    22,
-				MaxCommunities: 23,
-				MaxUsers:       24,
-				Sort:           types.RedditSortTop,
-			}
+			redditArgs := search.NewSearchPostsArguments()
+			redditArgs.Queries = []string{"Zaphod", "Ford"}
+			redditArgs.MaxItems = 20
+			redditArgs.MaxPosts = 21
+			redditArgs.MaxComments = 22
+			redditArgs.MaxCommunities = 23
+			redditArgs.MaxUsers = 24
+			redditArgs.Sort = types.RedditSortTop
 			jsonData, err := json.Marshal(redditArgs)
 			Expect(err).ToNot(HaveOccurred())
 			err = json.Unmarshal([]byte(jsonData), &redditArgs)
@@ -59,101 +55,86 @@ var _ = Describe("RedditArguments", func() {
 
 	Describe("Validation", func() {
 		It("should succeed with valid arguments", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: types.RedditSearchPosts,
-				Queries:   []string{"test"},
-				Sort:      types.RedditSortNew,
-			}
+			redditArgs := search.NewSearchPostsArguments()
+			redditArgs.Queries = []string{"test"}
+			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should succeed with valid scrapeurls arguments", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: types.RedditScrapeUrls,
-				URLs:      []string{"https://www.reddit.com/r/golang/comments/foo/bar"},
-				Sort:      types.RedditSortNew,
-			}
+			redditArgs := search.NewScrapeUrlsArguments()
+			redditArgs.URLs = []string{"https://www.reddit.com/r/golang/comments/foo/bar"}
+			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should fail with an invalid type", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: "invalidtype",
-				Queries:   []string{"test"},
-				Sort:      types.RedditSortNew,
-			}
+			redditArgs := search.NewSearchPostsArguments()
+			redditArgs.Type = "invalidtype" // Override the default
+			redditArgs.Queries = []string{"test"}
+			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
-			Expect(err).To(MatchError(args.ErrRedditInvalidType))
+			Expect(err).To(MatchError(search.ErrInvalidType))
 		})
 
 		It("should fail with an invalid sort", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: types.RedditSearchPosts,
-				Queries:   []string{"test"},
-				Sort:      "invalidsort",
-			}
+			redditArgs := search.NewSearchPostsArguments()
+			redditArgs.Queries = []string{"test"}
+			redditArgs.Sort = "invalidsort"
 			err := redditArgs.Validate()
-			Expect(err).To(MatchError(args.ErrRedditInvalidSort))
+			Expect(err).To(MatchError(search.ErrInvalidSort))
 		})
 
 		It("should fail if the after time is in the future", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: types.RedditSearchPosts,
-				Queries:   []string{"test"},
-				Sort:      types.RedditSortNew,
-				After:     time.Now().Add(24 * time.Hour),
+			redditArgs := &search.Arguments{
+				Type:    types.CapSearchPosts,
+				Queries: []string{"test"},
+				Sort:    types.RedditSortNew,
+				After:   time.Now().Add(24 * time.Hour),
 			}
 			err := redditArgs.Validate()
-			Expect(err).To(MatchError(args.ErrRedditTimeInTheFuture))
+			Expect(err).To(MatchError(search.ErrTimeInTheFuture))
 		})
 
 		It("should fail if queries are not provided for searchposts", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: types.RedditSearchPosts,
-				Sort:      types.RedditSortNew,
-			}
+			redditArgs := search.NewSearchPostsArguments()
+			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
-			Expect(err).To(MatchError(args.ErrRedditNoQueries))
+			Expect(err).To(MatchError(search.ErrNoQueries))
 		})
 
 		It("should fail if urls are not provided for scrapeurls", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: types.RedditScrapeUrls,
-				Sort:      types.RedditSortNew,
-			}
+			redditArgs := search.NewScrapeUrlsArguments()
+			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
-			Expect(err).To(MatchError(args.ErrRedditNoUrls))
+			Expect(err).To(MatchError(search.ErrNoUrls))
 		})
 
 		It("should fail if queries are provided for scrapeurls", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: types.RedditScrapeUrls,
-				Queries:   []string{"test"},
-				URLs:      []string{"https://www.reddit.com/r/golang/comments/foo/bar/"},
-				Sort:      types.RedditSortNew,
-			}
+			redditArgs := search.NewScrapeUrlsArguments()
+			redditArgs.Queries = []string{"test"}
+			redditArgs.URLs = []string{"https://www.reddit.com/r/golang/comments/foo/bar/"}
+			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
-			Expect(err).To(MatchError(args.ErrRedditQueriesNotAllowed))
+			Expect(err).To(MatchError(search.ErrQueriesNotAllowed))
 		})
 
 		It("should fail if urls are provided for searchposts", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: types.RedditSearchPosts,
-				Queries:   []string{"test"},
-				URLs:      []string{"https://www.reddit.com/r/golang/comments/foo/bar"},
-				Sort:      types.RedditSortNew,
-			}
+			redditArgs := search.NewSearchPostsArguments()
+			redditArgs.Queries = []string{"test"}
+			redditArgs.URLs = []string{"https://www.reddit.com/r/golang/comments/foo/bar"}
+			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
-			Expect(err).To(MatchError(args.ErrRedditUrlsNotAllowed))
+			Expect(err).To(MatchError(search.ErrUrlsNotAllowed))
 		})
 
 		It("should fail with an invalid URL", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: types.RedditScrapeUrls,
-				URLs:      []string{"ht tp://invalid-url.com"},
-				Sort:      types.RedditSortNew,
+			redditArgs := &search.Arguments{
+				Type: types.CapScrapeUrls,
+				URLs: []string{"ht tp://invalid-url.com"},
+				Sort: types.RedditSortNew,
 			}
 			err := redditArgs.Validate()
 			Expect(err).To(HaveOccurred())
@@ -161,22 +142,18 @@ var _ = Describe("RedditArguments", func() {
 		})
 
 		It("should fail with an invalid domain", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: types.RedditScrapeUrls,
-				URLs:      []string{"https://www.google.com"},
-				Sort:      types.RedditSortNew,
-			}
+			redditArgs := search.NewScrapeUrlsArguments()
+			redditArgs.URLs = []string{"https://www.google.com"}
+			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("invalid Reddit URL"))
 		})
 
 		It("should fail if the URL is not a post or comment", func() {
-			redditArgs := &args.RedditArguments{
-				QueryType: types.RedditScrapeUrls,
-				URLs:      []string{"https://www.reddit.com/r/golang/"},
-				Sort:      types.RedditSortNew,
-			}
+			redditArgs := search.NewScrapeUrlsArguments()
+			redditArgs.URLs = []string{"https://www.reddit.com/r/golang/"}
+			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("not a Reddit post or comment URL"))

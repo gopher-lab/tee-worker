@@ -11,6 +11,9 @@ import (
 	"time"
 
 	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/tiktok/query"
+	"github.com/masa-finance/tee-worker/api/args/tiktok/transcription"
+	"github.com/masa-finance/tee-worker/api/args/tiktok/trending"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
@@ -38,18 +41,6 @@ type TikTokTranscriber struct {
 	configuration TikTokTranscriptionConfiguration
 	stats         *stats.StatsCollector
 	httpClient    *http.Client
-}
-
-// GetStructuredCapabilities returns the structured capabilities supported by the TikTok transcriber
-func (t *TikTokTranscriber) GetStructuredCapabilities() types.WorkerCapabilities {
-	caps := make([]types.Capability, 0, len(types.AlwaysAvailableTiktokCaps)+len(types.TiktokSearchCaps))
-	caps = append(caps, types.AlwaysAvailableTiktokCaps...)
-	if t.configuration.ApifyApiKey != "" {
-		caps = append(caps, types.TiktokSearchCaps...)
-	}
-	return types.WorkerCapabilities{
-		types.TiktokJob: caps,
-	}
 }
 
 // NewTikTokTranscriber creates and initializes a new TikTokTranscriber.
@@ -110,11 +101,11 @@ func (ttt *TikTokTranscriber) ExecuteJob(j types.Job) (types.JobResult, error) {
 	}
 
 	// Branch by argument type (transcription vs search)
-	if transcriptionArgs, ok := jobArgs.(*args.TikTokTranscriptionArguments); ok {
+	if transcriptionArgs, ok := jobArgs.(*transcription.Arguments); ok {
 		return ttt.executeTranscription(j, transcriptionArgs)
-	} else if searchByQueryArgs, ok := jobArgs.(*args.TikTokSearchByQueryArguments); ok {
+	} else if searchByQueryArgs, ok := jobArgs.(*query.Arguments); ok {
 		return ttt.executeSearchByQuery(j, searchByQueryArgs)
-	} else if searchByTrendingArgs, ok := jobArgs.(*args.TikTokSearchByTrendingArguments); ok {
+	} else if searchByTrendingArgs, ok := jobArgs.(*trending.Arguments); ok {
 		return ttt.executeSearchByTrending(j, searchByTrendingArgs)
 	} else {
 		return types.JobResult{Error: "invalid argument type for TikTok job"}, fmt.Errorf("invalid argument type")
@@ -122,7 +113,7 @@ func (ttt *TikTokTranscriber) ExecuteJob(j types.Job) (types.JobResult, error) {
 }
 
 // executeTranscription calls the external transcription service and returns a normalized result
-func (ttt *TikTokTranscriber) executeTranscription(j types.Job, a *args.TikTokTranscriptionArguments) (types.JobResult, error) {
+func (ttt *TikTokTranscriber) executeTranscription(j types.Job, a *transcription.Arguments) (types.JobResult, error) {
 	logrus.WithField("job_uuid", j.UUID).Info("Starting ExecuteJob for TikTok transcription")
 
 	if ttt.configuration.TranscriptionEndpoint == "" {
@@ -137,7 +128,7 @@ func (ttt *TikTokTranscriber) executeTranscription(j types.Job, a *args.TikTokTr
 	}
 
 	// Type assert to TikTok arguments
-	tiktokArgs, ok := jobArgs.(*args.TikTokTranscriptionArguments)
+	tiktokArgs, ok := jobArgs.(*transcription.Arguments)
 	if !ok {
 		return types.JobResult{Error: "invalid argument type for TikTok job"}, fmt.Errorf("invalid argument type")
 	}
@@ -293,7 +284,7 @@ func (ttt *TikTokTranscriber) executeTranscription(j types.Job, a *args.TikTokTr
 }
 
 // executeSearchByQuery runs the epctex/tiktok-search-scraper actor and returns results
-func (ttt *TikTokTranscriber) executeSearchByQuery(j types.Job, a *args.TikTokSearchByQueryArguments) (types.JobResult, error) {
+func (ttt *TikTokTranscriber) executeSearchByQuery(j types.Job, a *query.Arguments) (types.JobResult, error) {
 	c, err := tiktokapify.NewTikTokApifyClient(ttt.configuration.ApifyApiKey)
 	if err != nil {
 		ttt.stats.Add(j.WorkerID, stats.TikTokAuthErrors, 1)
@@ -324,7 +315,7 @@ func (ttt *TikTokTranscriber) executeSearchByQuery(j types.Job, a *args.TikTokSe
 }
 
 // executeSearchByTrending runs the lexis-solutions/tiktok-trending-videos-scraper actor and returns results
-func (ttt *TikTokTranscriber) executeSearchByTrending(j types.Job, a *args.TikTokSearchByTrendingArguments) (types.JobResult, error) {
+func (ttt *TikTokTranscriber) executeSearchByTrending(j types.Job, a *trending.Arguments) (types.JobResult, error) {
 	c, err := tiktokapify.NewTikTokApifyClient(ttt.configuration.ApifyApiKey)
 	if err != nil {
 		ttt.stats.Add(j.WorkerID, stats.TikTokAuthErrors, 1)

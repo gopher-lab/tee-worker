@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/llm/process"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/config"
@@ -67,7 +67,7 @@ var _ = Describe("LLMApifyClient", func() {
 
 	Describe("Process", func() {
 		It("should construct the correct actor input", func() {
-			llmArgs := args.LLMProcessorArguments{
+			llmArgs := process.Arguments{
 				DatasetId: "test-dataset-id",
 				Prompt:    "test-prompt",
 			}
@@ -88,10 +88,10 @@ var _ = Describe("LLMApifyClient", func() {
 				Expect(request.InputDatasetId).To(Equal("test-dataset-id"))
 				Expect(request.Prompt).To(Equal("test-prompt"))
 				Expect(request.LLMProviderApiKey).To(Equal("test-claude-llm-key"))                                  // should be set from constructor
-				Expect(request.Model).To(Equal(args.LLMDefaultClaudeModel))                                         // default model
-				Expect(request.MultipleColumns).To(Equal(args.LLMDefaultMultipleColumns))                           // default value
-				Expect(request.MaxTokens).To(Equal(args.LLMDefaultMaxTokens))                                       // default value
-				Expect(request.Temperature).To(Equal(strconv.FormatFloat(args.LLMDefaultTemperature, 'f', -1, 64))) // default value
+				Expect(request.Model).To(Equal(process.DefaultClaudeModel))                                         // default model
+				Expect(request.MultipleColumns).To(Equal(process.DefaultMultipleColumns))                           // default value
+				Expect(request.MaxTokens).To(Equal(process.DefaultMaxTokens))                                       // default value
+				Expect(request.Temperature).To(Equal(strconv.FormatFloat(process.DefaultTemperature, 'f', -1, 64))) // default value
 
 				return &client.DatasetResponse{Data: client.ApifyDatasetData{Items: []json.RawMessage{}}}, "next", nil
 			}
@@ -106,7 +106,7 @@ var _ = Describe("LLMApifyClient", func() {
 				return nil, "", expectedErr
 			}
 
-			llmArgs := args.LLMProcessorArguments{
+			llmArgs := process.Arguments{
 				DatasetId: "test-dataset-id",
 				Prompt:    "test-prompt",
 			}
@@ -125,7 +125,7 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			llmArgs := args.LLMProcessorArguments{
+			llmArgs := process.Arguments{
 				DatasetId: "test-dataset-id",
 				Prompt:    "test-prompt",
 			}
@@ -147,7 +147,7 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			llmArgs := args.LLMProcessorArguments{
+			llmArgs := process.Arguments{
 				DatasetId: "test-dataset-id",
 				Prompt:    "test-prompt",
 			}
@@ -174,7 +174,7 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			llmArgs := args.LLMProcessorArguments{
+			llmArgs := process.Arguments{
 				DatasetId: "test-dataset-id",
 				Prompt:    "test-prompt",
 			}
@@ -186,7 +186,7 @@ var _ = Describe("LLMApifyClient", func() {
 		})
 
 		It("should use custom values when provided", func() {
-			llmArgs := args.LLMProcessorArguments{
+			llmArgs := process.Arguments{
 				DatasetId:   "test-dataset-id",
 				Prompt:      "test-prompt",
 				MaxTokens:   500,
@@ -257,7 +257,7 @@ var _ = Describe("LLMApifyClient", func() {
 			realClient, err := llmapify.NewClient(apifyKey, config.LlmConfig{GeminiApiKey: config.LlmApiKey(geminiKey)}, nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			llmArgs := args.LLMProcessorArguments{
+			llmArgs := process.Arguments{
 				DatasetId: "V6tyuuZIgfiETl1cl",
 				Prompt:    "summarize the content of this webpage ${markdown}",
 			}

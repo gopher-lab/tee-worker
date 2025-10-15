@@ -58,8 +58,8 @@ var Actors = []ActorConfig{
 	{
 		ActorId:      ActorIds.TwitterFollowers,
 		DefaultInput: defaultActorInput{"maxFollowers": 200, "maxFollowings": 200},
-		Capabilities: types.TwitterApifyCaps,
-		JobType:      types.TwitterApifyJob,
+		Capabilities: []types.Capability{types.CapGetFollowing, types.CapGetFollowers},
+		JobType:      types.TwitterJob,
 	},
 	{
 		ActorId:      ActorIds.WebScraper,

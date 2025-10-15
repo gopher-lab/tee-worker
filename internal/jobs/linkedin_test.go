@@ -130,7 +130,7 @@ var _ = Describe("LinkedInScraper", func() {
 				Expect(workerID).To(Equal("test-worker"))
 				Expect(args.Query).To(Equal("software engineer"))
 				Expect(args.MaxItems).To(Equal(uint(10)))
-				Expect(args.QueryType).To(Equal(types.CapSearchByProfile))
+				Expect(args.Type).To(Equal(types.CapSearchByProfile))
 				return expectedProfiles, "dataset-123", client.Cursor("next-cursor"), nil
 			}
 
@@ -244,37 +244,6 @@ var _ = Describe("LinkedInScraper", func() {
 		})
 	})
 
-	Context("GetStructuredCapabilities", func() {
-		It("should return LinkedIn capabilities when Apify API key is present", func() {
-			cfg := config.JobConfiguration{
-				"apify_api_key": "test-key",
-			}
-			scraper = jobs.NewLinkedInScraper(cfg, statsCollector)
-
-			capabilities := scraper.GetStructuredCapabilities()
-			Expect(capabilities).To(HaveKey(types.LinkedInJob))
-			Expect(capabilities[types.LinkedInJob]).To(ContainElement(types.CapSearchByProfile))
-		})
-
-		It("should return empty capabilities when Apify API key is missing", func() {
-			cfg := config.JobConfiguration{}
-			scraper = jobs.NewLinkedInScraper(cfg, statsCollector)
-
-			capabilities := scraper.GetStructuredCapabilities()
-			Expect(capabilities).NotTo(HaveKey(types.LinkedInJob))
-		})
-
-		It("should return empty capabilities when Apify API key is empty", func() {
-			cfg := config.JobConfiguration{
-				"apify_api_key": "",
-			}
-			scraper = jobs.NewLinkedInScraper(cfg, statsCollector)
-
-			capabilities := scraper.GetStructuredCapabilities()
-			Expect(capabilities).NotTo(HaveKey(types.LinkedInJob))
-		})
-	})
-
 	// Integration tests that use the real client
 	Context("Integration tests", func() {
 		var apifyKey string
@@ -300,12 +269,12 @@ var _ = Describe("LinkedInScraper", func() {
 			integrationScraper := jobs.NewLinkedInScraper(cfg, integrationStatsCollector)
 
 			jobArgs := profileArgs.Arguments{
-				QueryType: types.CapSearchByProfile,
-				Query:     "software engineer",
-				MaxItems:  10,
+				Type:     types.CapSearchByProfile,
+				Query:    "software engineer",
+				MaxItems: 10,
 			}
 
-			// Marshal jobArgs to map[string]any so it can be used as JobArguments
+			// Marshal jobArgs to map[string]any so it can be used as JobArgument
 			var jobArgsMap map[string]any
 			jobArgsBytes, err := json.Marshal(jobArgs)
 			Expect(err).NotTo(HaveOccurred())
@@ -337,22 +306,7 @@ var _ = Describe("LinkedInScraper", func() {
 			fmt.Println(string(prettyJSON))
 		})
 
-		It("should expose capabilities only when APIFY_API_KEY is present", func() {
-			cfg := config.JobConfiguration{
-				"apify_api_key": apifyKey,
-			}
-			integrationStatsCollector := stats.StartCollector(128, cfg)
-			integrationScraper := jobs.NewLinkedInScraper(cfg, integrationStatsCollector)
-
-			caps := integrationScraper.GetStructuredCapabilities()
-			if apifyKey != "" {
-				Expect(caps[types.LinkedInJob]).NotTo(BeEmpty())
-				Expect(caps[types.LinkedInJob]).To(ContainElement(types.CapSearchByProfile))
-			} else {
-				// Expect no capabilities when key is missing
-				_, ok := caps[types.LinkedInJob]
-				Expect(ok).To(BeFalse())
-			}
-		})
+		// Note: Capability detection is now centralized in capabilities/detector.go
+		// Individual scraper capability tests have been removed
 	})
 })

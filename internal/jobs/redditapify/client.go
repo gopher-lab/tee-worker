@@ -7,7 +7,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/reddit/search"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
@@ -25,7 +25,7 @@ type CommonArgs struct {
 	MaxUsers       uint
 }
 
-func (ca *CommonArgs) CopyFromArgs(a *args.RedditArguments) {
+func (ca *CommonArgs) CopyFromArgs(a *search.Arguments) {
 	ca.Sort = a.Sort
 	ca.IncludeNSFW = a.IncludeNSFW
 	ca.MaxItems = a.MaxItems
@@ -50,7 +50,7 @@ func (args *CommonArgs) ToActorRequest() RedditActorRequest {
 // RedditActorRequest represents the query parameters for the Apify Reddit Scraper actor.
 // Based on the input schema of https://apify.com/trudax/reddit-scraper
 type RedditActorRequest struct {
-	Type                types.RedditQueryType  `json:"type,omitempty"`
+	Type                types.Capability       `json:"type,omitempty"`
 	Searches            []string               `json:"searches,omitempty"`
 	StartUrls           []types.RedditStartURL `json:"startUrls,omitempty"`
 	Sort                types.RedditSortType   `json:"sort,omitempty"`

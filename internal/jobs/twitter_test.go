@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
@@ -105,7 +104,7 @@ var _ = Describe("Twitter Scraper", func() {
 				"data_dir":         tempDir,
 			}, statsCollector)
 			res, err := scraper.ExecuteJob(types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapSearchByQuery,
 					"query":       "NASA",
@@ -130,7 +129,7 @@ var _ = Describe("Twitter Scraper", func() {
 				"data_dir":         tempDir,
 			}, statsCollector)
 			res, err := scraper.ExecuteJob(types.Job{
-				Type: types.TwitterApiJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapSearchByQuery,
 					"query":       "NASA",
@@ -156,7 +155,7 @@ var _ = Describe("Twitter Scraper", func() {
 			}, statsCollector)
 			// Try to run credential-only job with only API key
 			res, err := scraper.ExecuteJob(types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapSearchByQuery,
 					"query":       "NASA",
@@ -199,7 +198,7 @@ var _ = Describe("Twitter Scraper", func() {
 				"data_dir": tempDir,
 			}, statsCollector)
 			res, err := scraper.ExecuteJob(types.Job{
-				Type: types.TwitterApiJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapSearchByQuery,
 					"query":       "NASA",
@@ -220,7 +219,7 @@ var _ = Describe("Twitter Scraper", func() {
 				"data_dir":         tempDir,
 			}, statsCollector)
 			res, err := scraper.ExecuteJob(types.Job{
-				Type: types.TwitterApiJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapSearchByFullArchive,
 					"query":       "NASA",
@@ -275,7 +274,7 @@ var _ = Describe("Twitter Scraper", func() {
 				Skip("TWITTER_ACCOUNTS is not set")
 			}
 			j := types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":  types.CapSearchByProfile,
 					"query": "NASA_Marshall",
@@ -325,7 +324,7 @@ var _ = Describe("Twitter Scraper", func() {
 				Skip("TWITTER_ACCOUNTS is not set")
 			}
 			j := types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":  types.CapGetReplies,
 					"query": "1234567890",
@@ -354,7 +353,7 @@ var _ = Describe("Twitter Scraper", func() {
 				Skip("TWITTER_ACCOUNTS is not set")
 			}
 			j := types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapGetRetweeters,
 					"query":       "1234567890",
@@ -384,7 +383,7 @@ var _ = Describe("Twitter Scraper", func() {
 				Skip("TWITTER_ACCOUNTS is not set")
 			}
 			j := types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapGetTweets,
 					"query":       "NASA",
@@ -414,7 +413,7 @@ var _ = Describe("Twitter Scraper", func() {
 				Skip("TWITTER_ACCOUNTS is not set")
 			}
 			res, err := twitterScraper.ExecuteJob(types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapGetMedia,
 					"query":       "NASA",
@@ -432,72 +431,12 @@ var _ = Describe("Twitter Scraper", func() {
 			Expect(len(media[0].Photos) + len(media[0].Videos)).ToNot(BeZero())
 		})
 
-		It("should fetch home tweets", func() {
-			if len(twitterAccounts) == 0 {
-				Skip("TWITTER_ACCOUNTS is not set")
-			}
-			j := types.Job{
-				Type: types.TwitterCredentialJob,
-				Arguments: map[string]interface{}{
-					"type":        types.CapGetHomeTweets,
-					"max_results": 5,
-				},
-				Timeout: 10 * time.Second,
-			}
-			res, err := twitterScraper.ExecuteJob(j)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(res.Error).To(BeEmpty())
-
-			var tweets []*types.TweetResult
-			err = res.Unmarshal(&tweets)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(len(tweets)).ToNot(BeZero())
-			Expect(tweets[0].Text).ToNot(BeEmpty())
-
-			// Wait briefly for asynchronous stats processing to complete
-			time.Sleep(100 * time.Millisecond)
-
-			Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterScrapes]).To(BeNumerically("==", 1))
-			Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterTweets]).To(BeNumerically("==", uint(len(tweets))))
-		})
-
-		It("should fetch for you tweets", func() {
-			if len(twitterAccounts) == 0 {
-				Skip("TWITTER_ACCOUNTS is not set")
-			}
-			j := types.Job{
-				Type: types.TwitterCredentialJob,
-				Arguments: map[string]interface{}{
-					"type":        types.CapGetForYouTweets,
-					"max_results": 5,
-				},
-				Timeout: 10 * time.Second,
-			}
-			res, err := twitterScraper.ExecuteJob(j)
-
-			Expect(err).NotTo(HaveOccurred())
-			Expect(res.Error).To(BeEmpty())
-
-			var tweets []*types.TweetResult
-			err = res.Unmarshal(&tweets)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(len(tweets)).ToNot(BeZero())
-			Expect(tweets).ToNot(BeEmpty())
-			Expect(tweets[0].Text).ToNot(BeEmpty())
-
-			// Wait briefly for asynchronous stats processing to complete
-			time.Sleep(100 * time.Millisecond)
-
-			Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterScrapes]).To(BeNumerically("==", 1))
-			Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterTweets]).To(BeNumerically("==", uint(len(tweets))))
-		})
-
 		It("should fetch profile by ID", func() {
 			if len(twitterAccounts) == 0 {
 				Skip("TWITTER_ACCOUNTS is not set")
 			}
 			j := types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":  types.CapGetProfileById,
 					"query": "44196397", // Elon Musk's Twitter ID
@@ -525,7 +464,7 @@ var _ = Describe("Twitter Scraper", func() {
 				Skip("TWITTER_ACCOUNTS is not set")
 			}
 			j := types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapGetFollowing,
 					"query":       "NASA",
@@ -555,7 +494,7 @@ var _ = Describe("Twitter Scraper", func() {
 				Skip("TWITTER_ACCOUNTS is not set")
 			}
 			j := types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":  types.CapGetFollowers,
 					"query": "NASA",
@@ -585,7 +524,7 @@ var _ = Describe("Twitter Scraper", func() {
 				Skip("TWITTER_ACCOUNTS is not set")
 			}
 			j := types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type": types.CapGetTrends,
 				},
@@ -613,7 +552,7 @@ var _ = Describe("Twitter Scraper", func() {
 				"data_dir":         tempDir,
 			}, statsCollector)
 			res, err := scraper.ExecuteJob(types.Job{
-				Type: types.TwitterApiJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":  types.CapGetById,
 					"query": "1881258110712492142",
@@ -655,7 +594,7 @@ var _ = Describe("Twitter Scraper", func() {
 				"data_dir":         tempDir,
 			}, statsCollector)
 			res, err := scraper.ExecuteJob(types.Job{
-				Type: types.TwitterApiJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":  types.CapGetProfileById,
 					"query": "44196397", // Elon Musk's Twitter ID
@@ -734,7 +673,7 @@ var _ = Describe("Twitter Scraper", func() {
 			Skip("Needs full archive key in TWITTER_API_KEYS to run")
 
 			j := types.Job{
-				Type: types.TwitterApiJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapSearchByFullArchive,
 					"query":       "AI",
@@ -763,7 +702,7 @@ var _ = Describe("Twitter Scraper", func() {
 			Skip("Needs full archive key (elevated) in TWITTER_API_KEYS to run")
 
 			j := types.Job{
-				Type: types.TwitterCredentialJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapSearchByFullArchive,
 					"query":       "#AI",
@@ -798,7 +737,7 @@ var _ = Describe("Twitter Scraper", func() {
 			}, statsCollector)
 
 			j := types.Job{
-				Type: types.TwitterApifyJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapGetFollowers,
 					"query":       "elonmusk",
@@ -829,7 +768,7 @@ var _ = Describe("Twitter Scraper", func() {
 			}, statsCollector)
 
 			j := types.Job{
-				Type: types.TwitterApifyJob,
+				Type: types.TwitterJob,
 				Arguments: map[string]interface{}{
 					"type":        types.CapGetFollowing,
 					"query":       "elonmusk",
@@ -913,7 +852,7 @@ var _ = Describe("Twitter Scraper", func() {
 
 		It("should handle invalid capability for job type", func() {
 			res, err := twitterScraper.ExecuteJob(types.Job{
-				Type: types.TwitterApiJob, // API job type
+				Type: types.TwitterJob, // API job type
 				Arguments: map[string]interface{}{
 					"type":  "invalidcapability", // Invalid capability
 					"query": "test",
@@ -927,9 +866,9 @@ var _ = Describe("Twitter Scraper", func() {
 
 		It("should handle capability not available for specific job type", func() {
 			res, err := twitterScraper.ExecuteJob(types.Job{
-				Type: types.TwitterApiJob, // API job type - doesn't support getfollowers
+				Type: types.TwitterJob, // API job type - doesn't support getfollowers
 				Arguments: map[string]interface{}{
-					"type":  types.CapGetFollowers, // Valid capability but not for TwitterApiJob
+					"type":  types.CapGetFollowers, // Valid capability but not for TwitterJob
 					"query": "test",
 				},
 				Timeout: 10 * time.Second,

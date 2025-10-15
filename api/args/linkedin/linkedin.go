@@ -4,4 +4,4 @@ import (
 	"github.com/masa-finance/tee-worker/api/args/linkedin/profile"
 )
 
-type ProfileArguments = profile.Arguments
+type Profile = profile.Arguments

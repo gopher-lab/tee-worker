@@ -8,16 +8,7 @@ import (
 	"github.com/masa-finance/tee-worker/pkg/util"
 )
 
-type RedditQueryType string
-
-const (
-	RedditScrapeUrls        RedditQueryType = "scrapeurls"
-	RedditSearchPosts       RedditQueryType = "searchposts"
-	RedditSearchUsers       RedditQueryType = "searchusers"
-	RedditSearchCommunities RedditQueryType = "searchcommunities"
-)
-
-var AllRedditQueryTypes = util.NewSet(RedditScrapeUrls, RedditSearchPosts, RedditSearchUsers, RedditSearchCommunities)
+var AllRedditQueryTypes = util.NewSet(CapScrapeUrls, CapSearchPosts, CapSearchUsers, CapSearchCommunities)
 
 type RedditSortType string
 

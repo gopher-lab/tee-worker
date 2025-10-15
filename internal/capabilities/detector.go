@@ -42,22 +42,39 @@ func DetectCapabilities(jc config.JobConfiguration, jobServer JobServerInterface
 	hasApifyKey := hasValidApifyKey(apifyApiKey)
 	hasLLMKey := geminiApiKey.IsValid() || claudeApiKey.IsValid()
 
-	// Add Twitter-specific capabilities based on available authentication
-	if hasAccounts {
-		capabilities[types.TwitterCredentialJob] = types.TwitterCredentialCaps
-	}
+	// Add Twitter capabilities based on available authentication
+	if hasAccounts || hasApiKeys {
+		var twitterCaps []types.Capability
 
-	if hasApiKeys {
-		// Start with basic API capabilities
-		apiCaps := make([]types.Capability, len(types.TwitterAPICaps))
-		copy(apiCaps, types.TwitterAPICaps)
-
-		// Check for elevated API keys and add searchbyfullarchive capability
-		if hasElevatedApiKey(apiKeys) {
-			apiCaps = append(apiCaps, types.CapSearchByFullArchive)
+		// Add credential-based capabilities if we have accounts
+		if hasAccounts {
+			twitterCaps = append(twitterCaps,
+				types.CapSearchByQuery,
+				types.CapSearchByProfile,
+				types.CapGetById,
+				types.CapGetReplies,
+				types.CapGetRetweeters,
+				types.CapGetMedia,
+				types.CapGetProfileById,
+				types.CapGetTrends,
+				types.CapGetSpace,
+				types.CapGetProfile,
+				types.CapGetTweets,
+			)
 		}
 
-		capabilities[types.TwitterApiJob] = apiCaps
+		// Add API-based capabilities if we have API keys
+		if hasApiKeys {
+			// Check for elevated API capabilities
+			if hasElevatedApiKey(apiKeys) {
+				twitterCaps = append(twitterCaps, types.CapSearchByFullArchive)
+			}
+		}
+
+		// Only add capabilities if we have any supported capabilities
+		if len(twitterCaps) > 0 {
+			capabilities[types.TwitterJob] = twitterCaps
+		}
 	}
 
 	if hasApifyKey {
@@ -92,32 +109,6 @@ func DetectCapabilities(jc config.JobConfiguration, jobServer JobServerInterface
 				capabilities[job] = existingCaps.Add(set.Items()...).Items()
 			}
 		}
-	}
-
-	// Add general TwitterJob capability if any Twitter auth is available
-	// TODO: this will get cleaned up with unique twitter capabilities
-	if hasAccounts || hasApiKeys || hasApifyKey {
-		var twitterJobCaps []types.Capability
-		// Use the most comprehensive capabilities available
-		if hasAccounts {
-			twitterJobCaps = types.TwitterCredentialCaps
-		} else {
-			// Use API capabilities if we only have keys
-			twitterJobCaps = make([]types.Capability, len(types.TwitterAPICaps))
-			copy(twitterJobCaps, types.TwitterAPICaps)
-
-			// Check for elevated API keys and add searchbyfullarchive capability
-			if hasElevatedApiKey(apiKeys) {
-				twitterJobCaps = append(twitterJobCaps, types.CapSearchByFullArchive)
-			}
-		}
-
-		// Add Apify capabilities if available
-		if hasApifyKey {
-			twitterJobCaps = append(twitterJobCaps, types.TwitterApifyCaps...)
-		}
-
-		capabilities[types.TwitterJob] = twitterJobCaps
 	}
 
 	return capabilities

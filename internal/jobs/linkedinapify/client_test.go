@@ -207,7 +207,7 @@ var _ = Describe("LinkedInApifyClient", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			args := profileArgs.Arguments{
-				QueryType:   types.CapSearchByProfile,
+				Type:        types.CapSearchByProfile,
 				Query:       "software engineer",
 				MaxItems:    1,
 				ScraperMode: profile.ScraperModeShort,

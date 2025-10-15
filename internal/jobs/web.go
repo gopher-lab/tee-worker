@@ -8,6 +8,9 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/llm"
+	"github.com/masa-finance/tee-worker/api/args/llm/process"
+	"github.com/masa-finance/tee-worker/api/args/web"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs/llmapify"
@@ -20,7 +23,7 @@ import (
 
 // WebApifyClient defines the interface for the Web Apify client to allow mocking in tests
 type WebApifyClient interface {
-	Scrape(workerID string, args args.WebArguments, cursor client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error)
+	Scrape(workerID string, args web.Page, cursor client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error)
 }
 
 // NewWebApifyClient is a function variable that can be replaced in tests.
@@ -32,7 +35,7 @@ var NewWebApifyClient = func(apiKey string, statsCollector *stats.StatsCollector
 // LLMApify is the interface for the LLM processor client
 // Only the Process method is required for this flow
 type LLMApify interface {
-	Process(workerID string, args args.LLMProcessorArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error)
+	Process(workerID string, args llm.Process, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error)
 }
 
 // NewLLMApifyClient is a function variable to allow injection in tests
@@ -71,7 +74,7 @@ func (w *WebScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		return types.JobResult{Error: msg.Error()}, msg
 	}
 
-	webArgs, ok := jobArgs.(*args.WebArguments)
+	webArgs, ok := jobArgs.(*web.Page)
 	if !ok {
 		return types.JobResult{Error: "invalid argument type for Web job"}, errors.New("invalid argument type")
 	}
@@ -97,11 +100,11 @@ func (w *WebScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		return types.JobResult{Error: "error creating LLM Apify client"}, fmt.Errorf("failed to create LLM Apify client: %w", err)
 	}
 
-	llmArgs := args.LLMProcessorArguments{
+	llmArgs := llm.Process{
 		DatasetId:   datasetId,
 		Prompt:      "summarize the content of this webpage, focusing on keywords and topics: ${markdown}",
-		MaxTokens:   args.LLMDefaultMaxTokens,
-		Temperature: args.LLMDefaultTemperature,
+		MaxTokens:   process.DefaultMaxTokens,
+		Temperature: process.DefaultTemperature,
 		Items:       uint(len(webResp)),
 	}
 	llmResp, _, llmErr := llmClient.Process(j.WorkerID, llmArgs, client.EmptyCursor)
@@ -130,16 +133,4 @@ func (w *WebScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		Job:        j,
 		NextCursor: cursor.String(),
 	}, nil
-}
-
-// GetStructuredCapabilities returns the structured capabilities supported by the Web scraper
-// based on the available credentials and API keys
-func (ws *WebScraper) GetStructuredCapabilities() types.WorkerCapabilities {
-	capabilities := make(types.WorkerCapabilities)
-
-	if ws.configuration.ApifyApiKey != "" && ws.configuration.GeminiApiKey.IsValid() {
-		capabilities[types.WebJob] = types.WebCaps
-	}
-
-	return capabilities
 }

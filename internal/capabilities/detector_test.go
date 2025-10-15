@@ -73,35 +73,9 @@ var _ = Describe("DetectCapabilities", func() {
 			},
 			nil,
 			types.WorkerCapabilities{
-				types.TelemetryJob:         {types.CapTelemetry},
-				types.TiktokJob:            {types.CapTranscription},
-				types.TwitterCredentialJob: types.TwitterCredentialCaps,
-				types.TwitterJob:           types.TwitterCredentialCaps,
-			},
-		),
-		Entry("With Twitter API keys - adds API capabilities",
-			config.JobConfiguration{
-				"twitter_api_keys": []string{"key1", "key2"},
-			},
-			nil,
-			types.WorkerCapabilities{
-				types.TelemetryJob:  {types.CapTelemetry},
-				types.TiktokJob:     {types.CapTranscription},
-				types.TwitterApiJob: types.TwitterAPICaps,
-				types.TwitterJob:    types.TwitterAPICaps,
-			},
-		),
-		Entry("With mock elevated Twitter API keys - only basic capabilities detected",
-			config.JobConfiguration{
-				"twitter_api_keys": []string{"Bearer abcd1234-ELEVATED"},
-			},
-			nil,
-			types.WorkerCapabilities{
 				types.TelemetryJob: {types.CapTelemetry},
 				types.TiktokJob:    {types.CapTranscription},
-				// Note: Mock elevated keys will be detected as basic since we can't make real API calls in tests
-				types.TwitterApiJob: types.TwitterAPICaps,
-				types.TwitterJob:    types.TwitterAPICaps,
+				types.TwitterJob:   types.TwitterCaps,
 			},
 		),
 	)
@@ -164,7 +138,7 @@ var _ = Describe("DetectCapabilities", func() {
 			Expect(tiktokCaps).To(ContainElement(types.CapSearchByTrending), "expected tiktok to include CapSearchByTrending capability")
 
 			// Twitter-Apify job should be present with follower/following capabilities
-			twitterApifyCaps, ok := caps[types.TwitterApifyJob]
+			twitterApifyCaps, ok := caps[types.TwitterJob]
 			Expect(ok).To(BeTrue(), "expected twitter-apify capabilities to be present")
 			Expect(twitterApifyCaps).To(ContainElement(types.CapGetFollowers), "expected twitter-apify to include CapGetFollowers capability")
 			Expect(twitterApifyCaps).To(ContainElement(types.CapGetFollowing), "expected twitter-apify to include CapGetFollowing capability")

@@ -13,6 +13,7 @@ type LinkedInConfig struct {
 	Seniorities *seniorities.SenioritiesConfig
 	Functions   *functions.FunctionsConfig
 	Industries  *industries.IndustriesConfig
+	Profile     *profile.Profile
 }
 
 var LinkedIn = LinkedInConfig{
@@ -20,6 +21,7 @@ var LinkedIn = LinkedInConfig{
 	Seniorities: &seniorities.Seniorities,
 	Functions:   &functions.Functions,
 	Industries:  &industries.Industries,
+	Profile:     &profile.Profile{},
 }
 
-type Profile = *profile.Profile
+type Profile = profile.Profile

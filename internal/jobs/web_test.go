@@ -8,7 +8,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/llm"
+	"github.com/masa-finance/tee-worker/api/args/web"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs"
@@ -20,10 +21,10 @@ import (
 
 // MockWebApifyClient is a mock implementation of the WebApifyClient.
 type MockWebApifyClient struct {
-	ScrapeFunc func(args args.WebArguments) ([]*types.WebScraperResult, string, client.Cursor, error)
+	ScrapeFunc func(args web.Page) ([]*types.WebScraperResult, string, client.Cursor, error)
 }
 
-func (m *MockWebApifyClient) Scrape(_ string, args args.WebArguments, _ client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error) {
+func (m *MockWebApifyClient) Scrape(_ string, args web.Page, _ client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error) {
 	if m != nil && m.ScrapeFunc != nil {
 		res, datasetId, next, err := m.ScrapeFunc(args)
 		return res, datasetId, next, err
@@ -34,10 +35,10 @@ func (m *MockWebApifyClient) Scrape(_ string, args args.WebArguments, _ client.C
 // MockLLMApifyClient is a mock implementation of the LLMApify interface
 // used to prevent external calls during unit tests.
 type MockLLMApifyClient struct {
-	ProcessFunc func(workerID string, args args.LLMProcessorArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error)
+	ProcessFunc func(workerID string, args llm.Process, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error)
 }
 
-func (m *MockLLMApifyClient) Process(workerID string, args args.LLMProcessorArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error) {
+func (m *MockLLMApifyClient) Process(workerID string, args llm.Process, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error) {
 	if m != nil && m.ProcessFunc != nil {
 		return m.ProcessFunc(workerID, args, cursor)
 	}
@@ -66,7 +67,7 @@ var _ = Describe("WebScraper", func() {
 		scraper = jobs.NewWebScraper(cfg, statsCollector)
 		mockClient = &MockWebApifyClient{}
 		mockLLM = &MockLLMApifyClient{
-			ProcessFunc: func(workerID string, args args.LLMProcessorArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error) {
+			ProcessFunc: func(workerID string, args llm.Process, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error) {
 				// Return a single empty summary to avoid changing expectations
 				return []*types.LLMProcessorResult{{LLMResponse: ""}}, client.EmptyCursor, nil
 			},
@@ -107,7 +108,7 @@ var _ = Describe("WebScraper", func() {
 				"max_pages": 2,
 			}
 
-			mockClient.ScrapeFunc = func(args args.WebArguments) ([]*types.WebScraperResult, string, client.Cursor, error) {
+			mockClient.ScrapeFunc = func(args web.Page) ([]*types.WebScraperResult, string, client.Cursor, error) {
 				Expect(args.URL).To(Equal("https://example.com"))
 				return []*types.WebScraperResult{{URL: "https://example.com", Markdown: "# Hello"}}, "dataset-123", client.Cursor("next-cursor"), nil
 			}
@@ -133,7 +134,7 @@ var _ = Describe("WebScraper", func() {
 			}
 
 			expectedErr := errors.New("client error")
-			mockClient.ScrapeFunc = func(args args.WebArguments) ([]*types.WebScraperResult, string, client.Cursor, error) {
+			mockClient.ScrapeFunc = func(args web.Page) ([]*types.WebScraperResult, string, client.Cursor, error) {
 				return nil, "", client.EmptyCursor, expectedErr
 			}
 
@@ -226,24 +227,6 @@ var _ = Describe("WebScraper", func() {
 				Expect(resp[i].LLMResponse).NotTo(BeEmpty())
 				Expect(resp[i].Markdown).NotTo(BeEmpty())
 				Expect(resp[i].Text).To(ContainSubstring("Bittensor"))
-			}
-		})
-
-		It("should expose capabilities only when both APIFY and GEMINI keys are present", func() {
-			cfg := config.JobConfiguration{
-				"apify_api_key":  apifyKey,
-				"gemini_api_key": geminiKey,
-			}
-			integrationStatsCollector := stats.StartCollector(128, cfg)
-			integrationScraper := jobs.NewWebScraper(cfg, integrationStatsCollector)
-
-			caps := integrationScraper.GetStructuredCapabilities()
-			if apifyKey != "" && geminiKey != "" {
-				Expect(caps[types.WebJob]).NotTo(BeEmpty())
-			} else {
-				// Expect no capabilities when either key is missing
-				_, ok := caps[types.WebJob]
-				Expect(ok).To(BeFalse())
 			}
 		})
 	})

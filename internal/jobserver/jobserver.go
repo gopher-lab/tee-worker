@@ -8,10 +8,10 @@ import (
 	"sync"
 
 	"github.com/sirupsen/logrus"
-	"golang.org/x/exp/maps"
 
 	"github.com/google/uuid"
 	"github.com/masa-finance/tee-worker/api/types"
+	"github.com/masa-finance/tee-worker/internal/capabilities"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
@@ -86,15 +86,6 @@ func NewJobServer(workers int, jc config.JobConfiguration) *JobServer {
 		types.TwitterJob: {
 			w: jobs.NewTwitterScraper(jc, s),
 		},
-		types.TwitterCredentialJob: {
-			w: jobs.NewTwitterScraper(jc, s), // Uses the same implementation as standard Twitter scraper
-		},
-		types.TwitterApiJob: {
-			w: jobs.NewTwitterScraper(jc, s), // Uses the same implementation as standard Twitter scraper
-		},
-		types.TwitterApifyJob: {
-			w: jobs.NewTwitterScraper(jc, s), // Register Apify job type with Twitter scraper
-		},
 		types.TiktokJob: {
 			w: jobs.NewTikTokScraper(jc, s),
 		},
@@ -153,31 +144,11 @@ func NewJobServer(workers int, jc config.JobConfiguration) *JobServer {
 	return js
 }
 
-// GetWorkerCapabilities returns the structured capabilities for all registered workers
+// GetWorkerCapabilities returns the structured capabilities using centralized detection
 func (js *JobServer) GetWorkerCapabilities() types.WorkerCapabilities {
-	// Use a map to deduplicate capabilities by job type
-	jobTypeCapMap := make(map[types.JobType]map[types.Capability]struct{})
-
-	for _, workerEntry := range js.jobWorkers {
-		workerCapabilities := workerEntry.w.GetStructuredCapabilities()
-		for jobType, capabilities := range workerCapabilities {
-			if _, exists := jobTypeCapMap[jobType]; !exists {
-				jobTypeCapMap[jobType] = make(map[types.Capability]struct{})
-			}
-			for _, capability := range capabilities {
-				jobTypeCapMap[jobType][capability] = struct{}{}
-			}
-		}
-	}
-
-	// Convert to final map format
-	allCapabilities := make(types.WorkerCapabilities)
-	for jobType, capabilitySet := range jobTypeCapMap {
-		capabilities := maps.Keys(capabilitySet)
-		allCapabilities[jobType] = capabilities
-	}
-
-	return allCapabilities
+	// Use centralized capability detection instead of aggregating from individual workers
+	// This ensures consistent, real capability detection across all job types
+	return capabilities.DetectCapabilities(js.jobConfiguration, js)
 }
 
 func (js *JobServer) Run(ctx context.Context) {

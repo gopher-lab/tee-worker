@@ -5,6 +5,11 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/reddit"
+	"github.com/masa-finance/tee-worker/api/args/telemetry"
+	"github.com/masa-finance/tee-worker/api/args/tiktok"
+	"github.com/masa-finance/tee-worker/api/args/twitter"
+	"github.com/masa-finance/tee-worker/api/args/web"
 	"github.com/masa-finance/tee-worker/api/types"
 )
 
@@ -18,7 +23,7 @@ var _ = Describe("Unmarshaller", func() {
 				}
 				jobArgs, err := args.UnmarshalJobArguments(types.WebJob, argsMap)
 				Expect(err).ToNot(HaveOccurred())
-				webArgs, ok := jobArgs.(*args.WebArguments)
+				webArgs, ok := jobArgs.(*web.Page)
 				Expect(ok).To(BeTrue())
 				Expect(webArgs.URL).To(Equal("https://example.com"))
 				Expect(webArgs.MaxDepth).To(Equal(2))
@@ -28,12 +33,13 @@ var _ = Describe("Unmarshaller", func() {
 		Context("with a TiktokJob", func() {
 			It("should unmarshal the arguments correctly", func() {
 				argsMap := map[string]any{
+					"type":      "transcription",
 					"video_url": "https://www.tiktok.com/@user/video/123",
 					"language":  "en-us",
 				}
 				jobArgs, err := args.UnmarshalJobArguments(types.TiktokJob, argsMap)
 				Expect(err).ToNot(HaveOccurred())
-				tiktokArgs, ok := jobArgs.(*args.TikTokTranscriptionArguments)
+				tiktokArgs, ok := jobArgs.(*tiktok.Transcription)
 				Expect(ok).To(BeTrue())
 				Expect(tiktokArgs.VideoURL).To(Equal("https://www.tiktok.com/@user/video/123"))
 				Expect(tiktokArgs.Language).To(Equal("en-us"))
@@ -49,20 +55,11 @@ var _ = Describe("Unmarshaller", func() {
 				}
 				jobArgs, err := args.UnmarshalJobArguments(types.TwitterJob, argsMap)
 				Expect(err).ToNot(HaveOccurred())
-				twitterArgs, ok := jobArgs.(*args.TwitterSearchArguments)
+				twitterArgs, ok := jobArgs.(*twitter.Search)
 				Expect(ok).To(BeTrue())
-				Expect(twitterArgs.QueryType).To(Equal(types.CapSearchByQuery))
+				Expect(twitterArgs.Type).To(Equal(types.CapSearchByQuery))
 				Expect(twitterArgs.Query).To(Equal("golang"))
 				Expect(twitterArgs.Count).To(Equal(10))
-			})
-
-			It("should set the default capability for TwitterApifyJob", func() {
-				argsMap := map[string]any{"query": "masa-finance"}
-				jobArgs, err := args.UnmarshalJobArguments(types.TwitterApifyJob, argsMap)
-				Expect(err).ToNot(HaveOccurred())
-				twitterArgs, ok := jobArgs.(*args.TwitterSearchArguments)
-				Expect(ok).To(BeTrue())
-				Expect(twitterArgs.GetCapability()).To(Equal(types.CapGetFollowers))
 			})
 		})
 
@@ -75,18 +72,18 @@ var _ = Describe("Unmarshaller", func() {
 				}
 				jobArgs, err := args.UnmarshalJobArguments(types.RedditJob, argsMap)
 				Expect(err).ToNot(HaveOccurred())
-				redditArgs, ok := jobArgs.(*args.RedditArguments)
+				redditArgs, ok := jobArgs.(*reddit.Search)
 				Expect(ok).To(BeTrue())
-				Expect(redditArgs.QueryType).To(Equal(types.RedditQueryType("searchposts")))
+				Expect(redditArgs.Type).To(Equal(types.CapSearchPosts))
 			})
 		})
 
 		Context("with a TelemetryJob", func() {
-			It("should return a TelemetryJobArguments struct", func() {
+			It("should return a TelemetryArguments struct", func() {
 				argsMap := map[string]any{}
 				jobArgs, err := args.UnmarshalJobArguments(types.TelemetryJob, argsMap)
 				Expect(err).ToNot(HaveOccurred())
-				_, ok := jobArgs.(*args.TelemetryJobArguments)
+				_, ok := jobArgs.(*telemetry.Arguments)
 				Expect(ok).To(BeTrue())
 			})
 		})

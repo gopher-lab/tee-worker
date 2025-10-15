@@ -99,14 +99,7 @@ var _ = Describe("Telemetry Job", func() {
 			logrus.WithField("error", result.Error).Info("Telemetry job handled missing stats collector correctly")
 		})
 
-		It("should return structured capabilities", func() {
-			capabilities := telemetryJob.GetStructuredCapabilities()
-
-			Expect(capabilities).NotTo(BeEmpty())
-			Expect(capabilities).To(HaveLen(1))
-			Expect(capabilities[types.TelemetryJob]).To(ContainElement(types.CapTelemetry))
-
-			logrus.WithField("capabilities", capabilities).Info("Telemetry job capabilities verified")
-		})
+		// Note: Capability detection is now centralized in capabilities/detector.go
+		// Individual scraper capability tests have been removed
 	})
 })

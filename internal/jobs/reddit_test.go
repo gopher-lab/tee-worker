@@ -97,7 +97,7 @@ var _ = Describe("RedditScraper", func() {
 				"https://www.reddit.com/r/HHGTTG/comments/1jynlrz/the_entire_series_after_restaurant_at_the_end_of/",
 			}
 			job.Arguments = map[string]any{
-				"type": types.RedditScrapeUrls,
+				"type": types.CapScrapeUrls,
 				"urls": testUrls,
 			}
 
@@ -121,7 +121,7 @@ var _ = Describe("RedditScraper", func() {
 
 		It("should call SearchUsers for the correct QueryType", func() {
 			job.Arguments = map[string]any{
-				"type":    types.RedditSearchUsers,
+				"type":    types.CapSearchUsers,
 				"queries": []string{"user-query"},
 			}
 
@@ -144,7 +144,7 @@ var _ = Describe("RedditScraper", func() {
 
 		It("should call SearchPosts for the correct QueryType", func() {
 			job.Arguments = map[string]any{
-				"type":    types.RedditSearchPosts,
+				"type":    types.CapSearchPosts,
 				"queries": []string{"post-query"},
 			}
 
@@ -167,7 +167,7 @@ var _ = Describe("RedditScraper", func() {
 
 		It("should call SearchCommunities for the correct QueryType", func() {
 			job.Arguments = map[string]any{
-				"type":    types.RedditSearchCommunities,
+				"type":    types.CapSearchCommunities,
 				"queries": []string{"community-query"},
 			}
 
@@ -201,7 +201,7 @@ var _ = Describe("RedditScraper", func() {
 
 		It("should handle errors from the reddit client", func() {
 			job.Arguments = map[string]any{
-				"type":    types.RedditSearchPosts,
+				"type":    types.CapSearchPosts,
 				"queries": []string{"post-query"},
 			}
 
@@ -221,7 +221,7 @@ var _ = Describe("RedditScraper", func() {
 				return nil, errors.New("client creation failed")
 			}
 			job.Arguments = map[string]any{
-				"type":    types.RedditSearchPosts,
+				"type":    types.CapSearchPosts,
 				"queries": []string{"post-query"},
 			}
 

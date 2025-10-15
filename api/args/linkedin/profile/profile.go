@@ -5,7 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	teetypes "github.com/masa-finance/tee-worker/api/types"
+	"github.com/masa-finance/tee-worker/api/args/base"
+	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/api/types/linkedin/experiences"
 	"github.com/masa-finance/tee-worker/api/types/linkedin/functions"
 	"github.com/masa-finance/tee-worker/api/types/linkedin/industries"
@@ -20,6 +21,7 @@ var (
 	ErrSeniorityNotSupported   = errors.New("seniority level not supported")
 	ErrFunctionNotSupported    = errors.New("function not supported")
 	ErrIndustryNotSupported    = errors.New("industry not supported")
+	ErrUnmarshalling           = errors.New("failed to unmarshal LinkedIn profile arguments")
 )
 
 const (
@@ -28,9 +30,12 @@ const (
 	MaxItems           = 1000 // 2500 on the actor, but we will run over 1MB memory limit on responses
 )
 
+// Verify interface implementation
+var _ base.JobArgument = (*Arguments)(nil)
+
 // Arguments defines args for LinkedIn profile operations
 type Arguments struct {
-	QueryType             teetypes.Capability `json:"type"`
+	Type                  types.Capability    `json:"type"`
 	ScraperMode           profile.ScraperMode `json:"profileScraperMode"`
 	Query                 string              `json:"searchQuery"`
 	MaxItems              uint                `json:"maxItems"`
@@ -51,24 +56,17 @@ type Arguments struct {
 	StartPage             uint                `json:"startPage,omitempty"`
 }
 
-func (a *Arguments) UnmarshalJSON(data []byte) error {
+func (t *Arguments) UnmarshalJSON(data []byte) error {
 	type Alias Arguments
-	aux := &struct {
-		*Alias
-	}{
-		Alias: (*Alias)(a),
-	}
-
+	aux := &struct{ *Alias }{Alias: (*Alias)(t)}
 	if err := json.Unmarshal(data, aux); err != nil {
-		return fmt.Errorf("failed to unmarshal LinkedIn profile arguments: %w", err)
+		return fmt.Errorf("%w: %w", ErrUnmarshalling, err)
 	}
-
-	a.setDefaultValues()
-
-	return a.Validate()
+	t.SetDefaultValues()
+	return t.Validate()
 }
 
-func (a *Arguments) setDefaultValues() {
+func (a *Arguments) SetDefaultValues() {
 	if a.MaxItems == 0 {
 		a.MaxItems = DefaultMaxItems
 	}
@@ -83,9 +81,16 @@ func (a *Arguments) Validate() error {
 	if a.MaxItems > MaxItems {
 		errs = append(errs, ErrMaxItemsTooLarge)
 	}
+
+	err := a.ValidateCapability(types.LinkedInJob)
+	if err != nil {
+		errs = append(errs, err)
+	}
+
 	if !profile.AllScraperModes.Contains(a.ScraperMode) {
 		errs = append(errs, ErrScraperModeNotSupported)
 	}
+
 	for _, yoe := range a.YearsOfExperience {
 		if !experiences.All.Contains(yoe) {
 			errs = append(errs, fmt.Errorf("%w: %v", ErrExperienceNotSupported, yoe))
@@ -119,14 +124,18 @@ func (a *Arguments) Validate() error {
 	return nil
 }
 
-func (a *Arguments) GetCapability() teetypes.Capability {
-	return a.QueryType
+func (a *Arguments) GetCapability() types.Capability {
+	return a.Type
 }
 
-func (a *Arguments) ValidateForJobType(jobType teetypes.JobType) error {
-	if err := a.Validate(); err != nil {
-		return err
-	}
+func (a *Arguments) ValidateCapability(jobType types.JobType) error {
+	return jobType.ValidateCapability(&a.Type)
+}
 
-	return jobType.ValidateCapability(a.QueryType)
+// NewArguments creates a new Arguments instance and applies default values immediately
+func NewArguments() Arguments {
+	args := Arguments{}
+	args.SetDefaultValues()
+	args.Validate() // This will set the default capability via ValidateCapability
+	return args
 }

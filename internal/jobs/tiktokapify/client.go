@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/tiktok/query"
+	"github.com/masa-finance/tee-worker/api/args/tiktok/trending"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/pkg/client"
@@ -43,7 +44,7 @@ func (c *TikTokApifyClient) ValidateApiKey() error {
 }
 
 // SearchByQuery runs the search actor and returns typed results
-func (c *TikTokApifyClient) SearchByQuery(input args.TikTokSearchByQueryArguments, cursor client.Cursor, limit uint) ([]*types.TikTokSearchByQueryResult, client.Cursor, error) {
+func (c *TikTokApifyClient) SearchByQuery(input query.Arguments, cursor client.Cursor, limit uint) ([]*types.TikTokSearchByQueryResult, client.Cursor, error) {
 	// Map snake_case fields to Apify actor's expected camelCase input
 	startUrls := input.StartUrls
 	if startUrls == nil {
@@ -92,7 +93,7 @@ func (c *TikTokApifyClient) SearchByQuery(input args.TikTokSearchByQueryArgument
 }
 
 // SearchByTrending runs the trending actor and returns typed results
-func (c *TikTokApifyClient) SearchByTrending(input args.TikTokSearchByTrendingArguments, cursor client.Cursor, limit uint) ([]*types.TikTokSearchByTrending, client.Cursor, error) {
+func (c *TikTokApifyClient) SearchByTrending(input trending.Arguments, cursor client.Cursor, limit uint) ([]*types.TikTokSearchByTrending, client.Cursor, error) {
 	request := TikTokSearchByTrendingRequest{
 		CountryCode: input.CountryCode,
 		SortBy:      input.SortBy,

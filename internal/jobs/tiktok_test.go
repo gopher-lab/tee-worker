@@ -44,14 +44,14 @@ var _ = Describe("TikTok", func() {
 	Context("when a valid TikTok URL is provided", func() {
 		It("should successfully transcribe the video and record success stats", func(ctx SpecContext) {
 			videoURL := "https://www.tiktok.com/@theblockrunner.com/video/7227579907361066282"
-			jobArguments := map[string]interface{}{
+			JobArgument := map[string]interface{}{
 				"type":      types.CapTranscription,
 				"video_url": videoURL,
 			}
 
 			job := types.Job{
 				Type:      types.TiktokJob,
-				Arguments: jobArguments,
+				Arguments: JobArgument,
 				WorkerID:  "tiktok-test-worker-happy",
 				UUID:      "test-uuid-happy",
 			}
@@ -114,14 +114,14 @@ var _ = Describe("TikTok", func() {
 
 	Context("when arguments are invalid", func() {
 		It("should return an error if VideoURL is empty and not record error stats", func() {
-			jobArguments := map[string]interface{}{
+			JobArgument := map[string]interface{}{
 				"type":      types.CapTranscription,
 				"video_url": "", // Empty URL
 			}
 
 			job := types.Job{
 				Type:      types.TiktokJob,
-				Arguments: jobArguments,
+				Arguments: JobArgument,
 				WorkerID:  "tiktok-test-worker-invalid",
 				UUID:      "test-uuid-invalid",
 			}

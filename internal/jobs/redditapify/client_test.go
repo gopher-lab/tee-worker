@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/reddit/search"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/jobs/redditapify"
@@ -97,7 +97,7 @@ var _ = Describe("RedditApifyClient", func() {
 				Expect(req.Searches).To(Equal(queries))
 				Expect(req.StartUrls).To(BeNil())
 				Expect(*req.PostDateLimit).To(BeTemporally("~", after, time.Second))
-				Expect(req.Type).To(Equal(types.RedditQueryType("posts")))
+				Expect(req.Type).To(Equal(types.CapSearchPosts))
 				Expect(req.SearchPosts).To(BeTrue())
 				Expect(req.SkipComments).To(BeFalse())
 				Expect(req.MaxComments).To(Equal(uint(5)))
@@ -119,7 +119,7 @@ var _ = Describe("RedditApifyClient", func() {
 				req := input.(redditapify.RedditActorRequest)
 				Expect(req.Searches).To(Equal(queries))
 				Expect(req.StartUrls).To(BeNil())
-				Expect(req.Type).To(Equal(types.RedditQueryType("communities")))
+				Expect(req.Type).To(Equal(types.CapSearchCommunities))
 				Expect(req.SearchCommunities).To(BeTrue())
 				return &client.DatasetResponse{Data: client.ApifyDatasetData{Items: []json.RawMessage{}}}, "next", nil
 			}
@@ -139,7 +139,7 @@ var _ = Describe("RedditApifyClient", func() {
 				req := input.(redditapify.RedditActorRequest)
 				Expect(req.Searches).To(Equal(queries))
 				Expect(req.StartUrls).To(BeNil())
-				Expect(req.Type).To(Equal(types.RedditQueryType("users")))
+				Expect(req.Type).To(Equal(types.CapSearchUsers))
 				Expect(req.SearchUsers).To(BeTrue())
 				Expect(req.SkipUserPosts).To(BeTrue())
 				return &client.DatasetResponse{Data: client.ApifyDatasetData{Items: []json.RawMessage{}}}, "next", nil
@@ -200,7 +200,7 @@ var _ = Describe("RedditApifyClient", func() {
 
 	Describe("CommonArgs", func() {
 		It("should copy from RedditArguments correctly", func() {
-			redditArgs := &args.RedditArguments{
+			redditArgs := &search.Arguments{
 				Sort:           types.RedditSortTop,
 				IncludeNSFW:    true,
 				MaxItems:       1,

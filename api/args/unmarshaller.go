@@ -2,19 +2,31 @@ package args
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
+	"github.com/masa-finance/tee-worker/api/args/base"
+	"github.com/masa-finance/tee-worker/api/args/linkedin"
+	"github.com/masa-finance/tee-worker/api/args/reddit"
+	"github.com/masa-finance/tee-worker/api/args/telemetry"
+	"github.com/masa-finance/tee-worker/api/args/tiktok"
+	"github.com/masa-finance/tee-worker/api/args/twitter"
+	"github.com/masa-finance/tee-worker/api/args/web"
 	"github.com/masa-finance/tee-worker/api/types"
 )
 
-// JobArguments defines the interface that all job arguments must implement
-type JobArguments interface {
-	GetCapability() types.Capability
-}
+var (
+	ErrUnknownJobType    = errors.New("unknown job type")
+	ErrUnknownCapability = errors.New("unknown capability")
+	ErrFailedToUnmarshal = errors.New("failed to unmarshal job arguments")
+	ErrFailedToMarshal   = errors.New("failed to marshal job arguments")
+)
+
+type Args = map[string]any
 
 // UnmarshalJobArguments unmarshals job arguments from a generic map into the appropriate typed struct
-// This works with both tee-indexer and tee-worker JobArguments types
-func UnmarshalJobArguments(jobType types.JobType, args map[string]any) (JobArguments, error) {
+// This works with both tee-indexer and tee-worker JobArgument types
+func UnmarshalJobArguments(jobType types.JobType, args Args) (base.JobArgument, error) {
 	switch jobType {
 	case types.WebJob:
 		return unmarshalWebArguments(args)
@@ -22,159 +34,104 @@ func UnmarshalJobArguments(jobType types.JobType, args map[string]any) (JobArgum
 	case types.TiktokJob:
 		return unmarshalTikTokArguments(args)
 
-	case types.TwitterJob, types.TwitterCredentialJob, types.TwitterApiJob, types.TwitterApifyJob:
-		return unmarshalTwitterArguments(jobType, args)
+	case types.TwitterJob:
+		return unmarshalTwitterArguments(args)
 
 	case types.LinkedInJob:
-		return unmarshalLinkedInArguments(jobType, args)
+		return unmarshalLinkedInArguments(args)
 
 	case types.RedditJob:
-		return unmarshalRedditArguments(jobType, args)
+		return unmarshalRedditArguments(args)
 
 	case types.TelemetryJob:
-		return &TelemetryJobArguments{}, nil
+		return unmarshalTelemetryArguments(args)
 
 	default:
-		return nil, fmt.Errorf("unknown job type: %s", jobType)
+		return nil, fmt.Errorf("%w: %s", ErrUnknownJobType, jobType)
 	}
 }
 
 // Helper functions for unmarshaling specific argument types
-func unmarshalWebArguments(args map[string]any) (*WebArguments, error) {
-	webArgs := &WebArguments{}
+func unmarshalWebArguments(args Args) (*web.Page, error) {
+	webArgs := &web.Page{}
 	if err := unmarshalToStruct(args, webArgs); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal web job arguments: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 	}
 	return webArgs, nil
 }
 
-func unmarshalTikTokArguments(args map[string]any) (JobArguments, error) {
-	// Unmarshal minimally to read QueryType like we do for Twitter
-	minimal := &QueryTypeArgument{}
-	if err := unmarshalToStruct(args, minimal); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal TikTok arguments: %w", err)
+func unmarshalTikTokArguments(args Args) (base.JobArgument, error) {
+	minimal := base.Arguments{}
+	if err := unmarshalToStruct(args, &minimal); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 	}
-	if minimal.QueryType == types.CapEmpty {
-		defaultCap, exists := types.JobDefaultCapabilityMap[types.TiktokJob]
-		if !exists {
-			return nil, fmt.Errorf("no default capability configured for job type: %s", types.TiktokJob)
-		}
-		minimal.QueryType = defaultCap
-	}
-
-	switch minimal.QueryType {
+	switch minimal.Type {
 	case types.CapSearchByQuery:
-		searchArgs := &TikTokSearchByQueryArguments{}
+		searchArgs := &tiktok.Query{}
 		if err := unmarshalToStruct(args, searchArgs); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal TikTok searchbyquery arguments: %w", err)
-		}
-		if err := searchArgs.ValidateForJobType(types.TiktokJob); err != nil {
-			return nil, fmt.Errorf("tiktok job validation failed: %w", err)
+			return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 		}
 		return searchArgs, nil
 	case types.CapSearchByTrending:
-		searchArgs := &TikTokSearchByTrendingArguments{}
+		searchArgs := &tiktok.Trending{}
 		if err := unmarshalToStruct(args, searchArgs); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal TikTok searchbytrending arguments: %w", err)
-		}
-		if err := searchArgs.ValidateForJobType(types.TiktokJob); err != nil {
-			return nil, fmt.Errorf("tiktok job validation failed: %w", err)
+			return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 		}
 		return searchArgs, nil
 	case types.CapTranscription:
-		transcriptionArgs := &TikTokTranscriptionArguments{}
+		transcriptionArgs := &tiktok.Transcription{}
 		if err := unmarshalToStruct(args, transcriptionArgs); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal TikTok transcription arguments: %w", err)
-		}
-		if err := transcriptionArgs.ValidateForJobType(types.TiktokJob); err != nil {
-			return nil, fmt.Errorf("tiktok job validation failed: %w", err)
+			return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 		}
 		return transcriptionArgs, nil
 	default:
-		return nil, fmt.Errorf("unknown tiktok type: %s", minimal.QueryType)
+		return nil, fmt.Errorf("%w: %s", ErrUnknownCapability, minimal.Type)
 	}
 }
 
-func unmarshalTwitterArguments(jobType types.JobType, args map[string]any) (*TwitterSearchArguments, error) {
-	twitterArgs := &TwitterSearchArguments{}
+func unmarshalTwitterArguments(args Args) (*twitter.Search, error) {
+	twitterArgs := &twitter.Search{}
 	if err := unmarshalToStruct(args, twitterArgs); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal Twitter job arguments: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 	}
-
-	// If no QueryType is specified, use the default capability for this job type
-	if twitterArgs.QueryType == "" {
-		if defaultCap, exists := types.JobDefaultCapabilityMap[jobType]; exists {
-			twitterArgs.QueryType = defaultCap
-		}
-	}
-
-	// Perform job-type-specific validation for Twitter
-	if err := twitterArgs.ValidateForJobType(jobType); err != nil {
-		return nil, fmt.Errorf("twitter job validation failed: %w", err)
-	}
-
 	return twitterArgs, nil
 }
 
-func unmarshalLinkedInArguments(jobType types.JobType, args map[string]any) (JobArguments, error) {
-	minimal := &QueryTypeArgument{}
-	if err := unmarshalToStruct(args, minimal); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal LinkedIn arguments: %w", err)
+func unmarshalLinkedInArguments(args Args) (*linkedin.Profile, error) {
+	linkedInArgs := &linkedin.Profile{}
+	if err := unmarshalToStruct(args, linkedInArgs); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 	}
-
-	if minimal.QueryType == types.CapEmpty {
-		if defaultCap, exists := types.JobDefaultCapabilityMap[jobType]; exists {
-			minimal.QueryType = defaultCap
-		}
-	}
-
-	switch minimal.QueryType {
-	case types.CapSearchByProfile:
-		linkedInArgs := &LinkedInProfileArguments{}
-		if err := unmarshalToStruct(args, linkedInArgs); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal LinkedIn job arguments: %w", err)
-		}
-		if err := linkedInArgs.ValidateForJobType(jobType); err != nil {
-			return nil, fmt.Errorf("linkedin job validation failed: %w", err)
-		}
-		return linkedInArgs, nil
-	default:
-		return nil, fmt.Errorf("unknown linkedin type: %s", minimal.QueryType)
-	}
+	return linkedInArgs, nil
 }
 
-func unmarshalRedditArguments(jobType types.JobType, args map[string]any) (*RedditArguments, error) {
-	redditArgs := &RedditArguments{}
+func unmarshalRedditArguments(args Args) (*reddit.Search, error) {
+	redditArgs := &reddit.Search{}
 	if err := unmarshalToStruct(args, redditArgs); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal Reddit job arguments: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 	}
-
-	// If no QueryType is specified, use the default capability for this job type
-	if redditArgs.QueryType == "" {
-		if defaultCap, exists := types.JobDefaultCapabilityMap[jobType]; exists {
-			redditArgs.QueryType = types.RedditQueryType(defaultCap)
-		}
-	}
-
-	// Perform job-type-specific validation for Reddit
-	if err := redditArgs.ValidateForJobType(jobType); err != nil {
-		return nil, fmt.Errorf("reddit job validation failed: %w", err)
-	}
-
 	return redditArgs, nil
 }
 
+func unmarshalTelemetryArguments(args Args) (*telemetry.Telemetry, error) {
+	telemetryArgs := &telemetry.Telemetry{}
+	if err := unmarshalToStruct(args, telemetryArgs); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
+	}
+	return telemetryArgs, nil
+}
+
 // unmarshalToStruct converts a map[string]any to a struct using JSON marshal/unmarshal
-// This provides the same functionality as the existing JobArguments.Unmarshal methods
-func unmarshalToStruct(args map[string]any, target any) error {
+// This provides the same functionality as the existing JobArgument.Unmarshal methods
+func unmarshalToStruct(args Args, target any) error {
 	// Use JSON marshal/unmarshal for conversion - this triggers our custom UnmarshalJSON methods
 	data, err := json.Marshal(args)
 	if err != nil {
-		return fmt.Errorf("failed to marshal arguments: %w", err)
+		return fmt.Errorf("%w: %w", ErrFailedToMarshal, err)
 	}
 
 	if err := json.Unmarshal(data, target); err != nil {
-		return fmt.Errorf("failed to unmarshal arguments: %w", err)
+		return fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 	}
 
 	return nil

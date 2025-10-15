@@ -10,10 +10,13 @@ import (
 )
 
 type JobType string
+type Capability string
 
-type JobArguments map[string]interface{}
+type WorkerCapabilities map[JobType][]Capability
 
-func (ja JobArguments) Unmarshal(i interface{}) error {
+type JobArguments map[string]any
+
+func (ja JobArguments) Unmarshal(i any) error {
 	dat, err := json.Marshal(ja)
 	if err != nil {
 		return err
@@ -35,24 +38,32 @@ func (j Job) String() string {
 	return fmt.Sprintf("UUID: %s Type: %s Arguments: %s", j.UUID, j.Type, j.Arguments)
 }
 
-type Capability string
-type WorkerCapabilities map[JobType][]Capability
-
 // String returns the string representation of the JobType
 func (j JobType) String() string {
 	return string(j)
 }
 
 // ValidateCapability validates that a capability is supported for this job type
-func (j JobType) ValidateCapability(capability Capability) error {
+// If the capability is CapEmpty, it will be set to the default capability for the job type
+func (j JobType) ValidateCapability(capability *Capability) error {
+	// Set default capability if empty
+	if *capability == CapEmpty {
+		defaultCap, exists := JobDefaultCapabilityMap[j]
+		if !exists {
+			return fmt.Errorf("no default capability configured for job type: %s", j)
+		}
+		*capability = defaultCap
+	}
+
+	// Validate the capability
 	validCaps, exists := JobCapabilityMap[j]
 	if !exists {
 		return fmt.Errorf("unknown job type: %s", j)
 	}
 
-	if !slices.Contains(validCaps, capability) {
+	if !slices.Contains(validCaps, *capability) {
 		return fmt.Errorf("capability '%s' is not valid for job type '%s'. valid capabilities: %v",
-			capability, j, validCaps)
+			*capability, j, validCaps)
 	}
 
 	return nil
@@ -69,39 +80,42 @@ func combineCapabilities(capSlices ...[]Capability) []Capability {
 
 // Job type constants - centralized from tee-indexer and tee-worker
 const (
-	WebJob               JobType = "web"
-	TelemetryJob         JobType = "telemetry"
-	TiktokJob            JobType = "tiktok"
-	TwitterJob           JobType = "twitter"            // General Twitter scraping (uses best available auth for capability)
-	TwitterCredentialJob JobType = "twitter-credential" // Twitter scraping with credentials
-	TwitterApiJob        JobType = "twitter-api"        // Twitter scraping with API keys
-	TwitterApifyJob      JobType = "twitter-apify"      // Twitter scraping with Apify
-	LinkedInJob          JobType = "linkedin"           // LinkedIn scraping, keeping for unmarshalling logic
-	RedditJob            JobType = "reddit"             // Reddit scraping with Apify
+	WebJob       JobType = "web"
+	TelemetryJob JobType = "telemetry"
+	TiktokJob    JobType = "tiktok"
+	TwitterJob   JobType = "twitter"
+	LinkedInJob  JobType = "linkedin"
+	RedditJob    JobType = "reddit"
 )
 
 // Capability constants - typed to prevent typos and enable discoverability
 const (
-	CapScraper             Capability = "scraper"
-	CapTelemetry           Capability = "telemetry"
-	CapTranscription       Capability = "transcription"
-	CapSearchByQuery       Capability = "searchbyquery"
-	CapSearchByTrending    Capability = "searchbytrending"
+
+	// Twitter (credential-based) capabilities
+	CapSearchByQuery   Capability = "searchbyquery"
+	CapSearchByProfile Capability = "searchbyprofile"
+	CapGetById         Capability = "getbyid"
+	CapGetReplies      Capability = "getreplies"
+	CapGetRetweeters   Capability = "getretweeters"
+	CapGetMedia        Capability = "getmedia"
+	CapGetProfileById  Capability = "getprofilebyid"
+	CapGetTrends       Capability = "gettrends"
+	CapGetSpace        Capability = "getspace"
+	CapGetProfile      Capability = "getprofile"
+	CapGetTweets       Capability = "gettweets"
+
+	// Twitter (apify-based) capabilities
+	CapGetFollowing Capability = "getfollowing"
+	CapGetFollowers Capability = "getfollowers"
+
+	// Twitter (api-based) capabilities
 	CapSearchByFullArchive Capability = "searchbyfullarchive"
-	CapSearchByProfile     Capability = "searchbyprofile"
-	CapGetById             Capability = "getbyid"
-	CapGetReplies          Capability = "getreplies"
-	CapGetRetweeters       Capability = "getretweeters"
-	CapGetTweets           Capability = "gettweets"
-	CapGetMedia            Capability = "getmedia"
-	CapGetHomeTweets       Capability = "gethometweets"
-	CapGetForYouTweets     Capability = "getforyoutweets"
-	CapGetProfileById      Capability = "getprofilebyid"
-	CapGetTrends           Capability = "gettrends"
-	CapGetFollowing        Capability = "getfollowing"
-	CapGetFollowers        Capability = "getfollowers"
-	CapGetSpace            Capability = "getspace"
-	CapGetProfile          Capability = "getprofile"
+
+	CapScraper          Capability = "scraper"
+	CapSearchByTrending Capability = "searchbytrending"
+	CapTelemetry        Capability = "telemetry"
+	CapTranscription    Capability = "transcription"
+
 	// Reddit capabilities
 	CapScrapeUrls        Capability = "scrapeurls"
 	CapSearchPosts       Capability = "searchposts"
@@ -122,20 +136,12 @@ var (
 		TiktokJob:    AlwaysAvailableTiktokCaps,
 	}
 
-	// TwitterCredentialCaps are all Twitter capabilities available with credential-based auth
-	TwitterCredentialCaps = []Capability{
-		CapSearchByQuery, CapSearchByProfile,
-		CapGetById, CapGetReplies, CapGetRetweeters, CapGetTweets, CapGetMedia,
-		CapGetHomeTweets, CapGetForYouTweets, CapGetProfileById,
-		CapGetTrends, CapGetFollowing, CapGetFollowers, CapGetSpace,
-		CapEmpty,
+	// Twitter capabilities
+	TwitterCaps = []Capability{
+		CapSearchByQuery, CapSearchByProfile, CapSearchByFullArchive,
+		CapGetById, CapGetReplies, CapGetRetweeters, CapGetTweets, CapGetMedia, CapGetProfileById,
+		CapGetTrends, CapGetFollowing, CapGetFollowers, CapGetSpace, CapEmpty,
 	}
-
-	// TwitterAPICaps are basic Twitter capabilities available with API keys
-	TwitterAPICaps = []Capability{CapSearchByQuery, CapGetById, CapGetProfileById, CapEmpty}
-
-	// TwitterApifyCaps are Twitter capabilities available with Apify
-	TwitterApifyCaps = []Capability{CapGetFollowers, CapGetFollowing, CapEmpty}
 
 	// TiktokSearchCaps are Tiktok capabilities available with Apify
 	TiktokSearchCaps = []Capability{CapSearchByQuery, CapSearchByTrending}
@@ -152,19 +158,8 @@ var (
 
 // JobCapabilityMap defines which capabilities are valid for each job type
 var JobCapabilityMap = map[JobType][]Capability{
-	// Twitter job types and their valid capabilities
-	TwitterJob: combineCapabilities(
-		TwitterCredentialCaps,
-		TwitterAPICaps,
-		TwitterApifyCaps,
-		[]Capability{CapSearchByFullArchive}, // Elevated API capability
-	),
-	TwitterCredentialJob: TwitterCredentialCaps,
-	TwitterApiJob: combineCapabilities(
-		TwitterAPICaps,
-		[]Capability{CapSearchByFullArchive}, // Elevated API capability
-	),
-	TwitterApifyJob: TwitterApifyCaps,
+	// Twitter job capabilities
+	TwitterJob: TwitterCaps,
 
 	// Web job capabilities
 	WebJob: WebCaps,
@@ -187,15 +182,12 @@ var JobCapabilityMap = map[JobType][]Capability{
 
 // if no capability is specified, use the default capability for the job type
 var JobDefaultCapabilityMap = map[JobType]Capability{
-	TwitterJob:           CapSearchByQuery,
-	TwitterCredentialJob: CapSearchByQuery,
-	TwitterApiJob:        CapSearchByQuery,
-	TwitterApifyJob:      CapGetFollowers,
-	WebJob:               CapScraper,
-	TiktokJob:            CapTranscription,
-	RedditJob:            CapScrapeUrls,
-	TelemetryJob:         CapTelemetry,
-	LinkedInJob:          CapSearchByProfile,
+	TwitterJob:   CapSearchByQuery,
+	WebJob:       CapScraper,
+	TiktokJob:    CapTranscription,
+	RedditJob:    CapScrapeUrls,
+	TelemetryJob: CapTelemetry,
+	LinkedInJob:  CapSearchByProfile,
 }
 
 // JobResponse represents a response to a job submission

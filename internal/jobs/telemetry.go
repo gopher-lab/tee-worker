@@ -15,13 +15,6 @@ func NewTelemetryJob(jc config.JobConfiguration, c *stats.StatsCollector) Teleme
 	return TelemetryJob{collector: c}
 }
 
-// GetStructuredCapabilities returns the structured capabilities supported by the telemetry job
-func (t TelemetryJob) GetStructuredCapabilities() types.WorkerCapabilities {
-	return types.WorkerCapabilities{
-		types.TelemetryJob: types.AlwaysAvailableTelemetryCaps,
-	}
-}
-
 func (t TelemetryJob) ExecuteJob(j types.Job) (types.JobResult, error) {
 	logrus.Debug("Executing telemetry job")
 

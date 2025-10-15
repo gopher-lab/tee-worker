@@ -13,7 +13,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 
-	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/llm/process"
 )
 
 var (
@@ -347,9 +347,9 @@ type LlmConfig struct {
 // GetModelAndKey returns the first available model and API key based on which keys are valid
 func (lc LlmConfig) GetModelAndKey() (model string, key string, err error) {
 	if lc.ClaudeApiKey.IsValid() {
-		return args.LLMDefaultClaudeModel, string(lc.ClaudeApiKey), nil
+		return process.DefaultClaudeModel, string(lc.ClaudeApiKey), nil
 	} else if lc.GeminiApiKey.IsValid() {
-		return args.LLMDefaultGeminiModel, string(lc.GeminiApiKey), nil
+		return process.DefaultGeminiModel, string(lc.GeminiApiKey), nil
 	}
 	return "", "", errors.New("no valid llm api key found")
 }

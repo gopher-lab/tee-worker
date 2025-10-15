@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/web"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
@@ -41,12 +41,12 @@ func (c *ApifyClient) ValidateApiKey() error {
 	return c.client.ValidateApiKey()
 }
 
-func (c *ApifyClient) Scrape(workerID string, args args.WebArguments, cursor client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error) {
+func (c *ApifyClient) Scrape(workerID string, args web.Page, cursor client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error) {
 	if c.statsCollector != nil {
 		c.statsCollector.Add(workerID, stats.WebQueries, 1)
 	}
 
-	input := args.ToWebScraperRequest()
+	input := args.ToScraperRequest()
 
 	limit := uint(args.MaxPages)
 	dataset, nextCursor, err := c.client.RunActorAndGetResponse(apify.ActorIds.WebScraper, input, cursor, limit)

@@ -1,4 +1,4 @@
-package args_test
+package trending_test
 
 import (
 	"testing"

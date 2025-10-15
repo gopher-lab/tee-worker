@@ -25,7 +25,6 @@ func (js *JobServer) worker(c context.Context) {
 }
 
 type worker interface {
-	GetStructuredCapabilities() types.WorkerCapabilities
 	ExecuteJob(j types.Job) (types.JobResult, error)
 }
 

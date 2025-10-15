@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/llm"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/config"
@@ -54,7 +54,7 @@ func (c *ApifyClient) ValidateApiKey() error {
 	return c.client.ValidateApiKey()
 }
 
-func (c *ApifyClient) Process(workerID string, args args.LLMProcessorArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error) {
+func (c *ApifyClient) Process(workerID string, args llm.Process, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error) {
 	if c.statsCollector != nil {
 		c.statsCollector.Add(workerID, stats.LLMQueries, 1)
 	}
@@ -64,7 +64,7 @@ func (c *ApifyClient) Process(workerID string, args args.LLMProcessorArguments, 
 		return nil, client.EmptyCursor, err
 	}
 
-	input, err := args.ToLLMProcessorRequest(model, key)
+	input, err := args.ToProcessorRequest(model, key)
 	if err != nil {
 		return nil, client.EmptyCursor, err
 	}

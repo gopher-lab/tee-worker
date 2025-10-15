@@ -14,13 +14,13 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	profileArgs "github.com/masa-finance/tee-worker/api/args/linkedin/profile"
-	profileTypes "github.com/masa-finance/tee-worker/api/types/linkedin/profile"
+	pArgs "github.com/masa-finance/tee-worker/api/args/linkedin/profile"
+	pTypes "github.com/masa-finance/tee-worker/api/types/linkedin/profile"
 )
 
 // LinkedInApifyClient defines the interface for the LinkedIn Apify client to allow mocking in tests
 type LinkedInApifyClient interface {
-	SearchProfiles(workerID string, args *profileArgs.Arguments, cursor client.Cursor) ([]*profileTypes.Profile, string, client.Cursor, error)
+	SearchProfiles(workerID string, args *pArgs.Arguments, cursor client.Cursor) ([]*pTypes.Profile, string, client.Cursor, error)
 	ValidateApiKey() error
 }
 
@@ -61,7 +61,7 @@ func (ls *LinkedInScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		return types.JobResult{Error: msg.Error()}, msg
 	}
 
-	linkedinArgs, ok := jobArgs.(*profileArgs.Arguments)
+	linkedinArgs, ok := jobArgs.(*pArgs.Arguments)
 	if !ok {
 		return types.JobResult{Error: "invalid argument type for LinkedIn job"}, errors.New("invalid argument type")
 	}
@@ -91,17 +91,4 @@ func (ls *LinkedInScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		Job:        j,
 		NextCursor: cursor.String(),
 	}, nil
-}
-
-// GetStructuredCapabilities returns the structured capabilities supported by the LinkedIn scraper
-// based on the available credentials and API keys
-func (ls *LinkedInScraper) GetStructuredCapabilities() types.WorkerCapabilities {
-	capabilities := make(types.WorkerCapabilities)
-
-	apifyApiKey := ls.configuration.GetString("apify_api_key", "")
-	if apifyApiKey != "" {
-		capabilities[types.LinkedInJob] = types.LinkedInCaps
-	}
-
-	return capabilities
 }
