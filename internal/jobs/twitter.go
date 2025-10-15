@@ -732,7 +732,7 @@ func (ts *TwitterScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 	}
 
 	// Check if raw data is empty
-	if jobResult.Data == nil || len(jobResult.Data) == 0 {
+	if len(jobResult.Data) == 0 {
 		logrus.Errorf("Job result data is empty for job ID %s, type %s", j.UUID, j.Type)
 		return types.JobResult{Error: "job result data is empty"}, fmt.Errorf("job result data is empty")
 	}

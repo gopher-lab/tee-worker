@@ -205,7 +205,7 @@ func (ttt *TikTokTranscriber) executeTranscription(j types.Job, a *transcription
 
 	// Sub-Step 3.2: Extract Transcription and Metadata
 	if len(parsedAPIResponse.Transcripts) == 0 {
-		errMsg := "No transcripts found in API response"
+		errMsg := "no transcripts found in API response"
 		logrus.WithField("job_uuid", j.UUID).Warn(errMsg)
 		ttt.stats.Add(j.WorkerID, stats.TikTokTranscriptionErrors, 1) // Or a different stat for "no_transcript_found"
 		return types.JobResult{Error: errMsg}, errors.New(errMsg)

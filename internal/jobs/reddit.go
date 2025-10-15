@@ -110,7 +110,7 @@ func processRedditResponse(j types.Job, resp []*types.RedditResponse, cursor cli
 
 	data, err := json.Marshal(resp)
 	if err != nil {
-		return types.JobResult{Error: fmt.Sprintf("error marshalling Reddit response")}, fmt.Errorf("error marshalling Reddit response: %w", err)
+		return types.JobResult{Error: "error marshalling Reddit response"}, fmt.Errorf("error marshalling Reddit response: %w", err)
 	}
 	return types.JobResult{
 		Data:       data,

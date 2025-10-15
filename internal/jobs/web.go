@@ -64,7 +64,7 @@ func (w *WebScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 
 	// Require Gemini key for LLM processing in Web flow
 	if !w.configuration.GeminiApiKey.IsValid() {
-		msg := errors.New("Gemini API key is required for Web job")
+		msg := errors.New("gemini API key is required for Web job")
 		return types.JobResult{Error: msg.Error()}, msg
 	}
 
@@ -121,7 +121,7 @@ func (w *WebScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 
 	data, err := json.Marshal(webResp)
 	if err != nil {
-		return types.JobResult{Error: fmt.Sprintf("error marshalling Web response")}, fmt.Errorf("error marshalling Web response: %w", err)
+		return types.JobResult{Error: "error marshalling Web response"}, fmt.Errorf("error marshalling Web response: %w", err)
 	}
 
 	if w.statsCollector != nil {
