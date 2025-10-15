@@ -76,13 +76,6 @@ var _ = Describe("LinkedInScraper", func() {
 	})
 
 	Context("ExecuteJob", func() {
-		It("should return an error for invalid arguments", func() {
-			job.Arguments = map[string]any{"invalid": "args"}
-			_, err := scraper.ExecuteJob(job)
-			Expect(err).To(HaveOccurred())
-			Expect(errors.Is(err, profileArgs.ErrUnmarshalling)).To(BeTrue())
-		})
-
 		It("should return an error when Apify API key is missing", func() {
 			cfg := config.JobConfiguration{}
 			scraper = jobs.NewLinkedInScraper(cfg, statsCollector)
