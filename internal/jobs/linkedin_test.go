@@ -78,9 +78,9 @@ var _ = Describe("LinkedInScraper", func() {
 	Context("ExecuteJob", func() {
 		It("should return an error for invalid arguments", func() {
 			job.Arguments = map[string]any{"invalid": "args"}
-			result, err := scraper.ExecuteJob(job)
+			_, err := scraper.ExecuteJob(job)
 			Expect(err).To(HaveOccurred())
-			Expect(result.Error).To(ContainSubstring("failed to unmarshal job arguments"))
+			Expect(errors.Is(err, profileArgs.ErrUnmarshalling)).To(BeTrue())
 		})
 
 		It("should return an error when Apify API key is missing", func() {
