@@ -9,24 +9,22 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/masa-finance/tee-worker/api/args"
+	"github.com/masa-finance/tee-worker/api/args/reddit/search"
 	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/api/types/reddit"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs/redditapify"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
-
-	teeargs "github.com/masa-finance/tee-types/args"
-	teetypes "github.com/masa-finance/tee-types/types"
 )
 
 // RedditApifyClient defines the interface for the Reddit Apify client.
 // This allows for mocking in tests.
 type RedditApifyClient interface {
-	ScrapeUrls(workerID string, urls []teetypes.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error)
-	SearchPosts(workerID string, queries []string, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error)
-	SearchCommunities(workerID string, queries []string, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error)
-	SearchUsers(workerID string, queries []string, skipPosts bool, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error)
+	ScrapeUrls(workerID string, urls []types.RedditStartURL, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
+	SearchPosts(workerID string, queries []string, after time.Time, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
+	SearchCommunities(workerID string, queries []string, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
+	SearchUsers(workerID string, queries []string, skipPosts bool, args redditapify.CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error)
 }
 
 // NewRedditApifyClient is a function variable that can be replaced in tests.
@@ -38,7 +36,7 @@ var NewRedditApifyClient = func(apiKey string, statsCollector *stats.StatsCollec
 type RedditScraper struct {
 	configuration  config.RedditConfig
 	statsCollector *stats.StatsCollector
-	capabilities   []teetypes.Capability
+	capabilities   []types.Capability
 }
 
 func NewRedditScraper(jc config.JobConfiguration, statsCollector *stats.StatsCollector) *RedditScraper {
@@ -47,21 +45,21 @@ func NewRedditScraper(jc config.JobConfiguration, statsCollector *stats.StatsCol
 	return &RedditScraper{
 		configuration:  config,
 		statsCollector: statsCollector,
-		capabilities:   teetypes.RedditCaps,
+		capabilities:   types.RedditCaps,
 	}
 }
 
 func (r *RedditScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 	logrus.WithField("job_uuid", j.UUID).Info("Starting ExecuteJob for Reddit scrape")
 
-	jobArgs, err := teeargs.UnmarshalJobArguments(teetypes.JobType(j.Type), map[string]any(j.Arguments))
+	jobArgs, err := args.UnmarshalJobArguments(types.JobType(j.Type), map[string]any(j.Arguments))
 	if err != nil {
 		msg := fmt.Errorf("failed to unmarshal job arguments: %w", err)
 		return types.JobResult{Error: msg.Error()}, msg
 	}
 
 	// Type assert to Reddit arguments
-	redditArgs, ok := jobArgs.(*teeargs.RedditArguments)
+	redditArgs, ok := jobArgs.(*search.Arguments)
 	if !ok {
 		return types.JobResult{Error: "invalid argument type for Reddit job"}, errors.New("invalid argument type")
 	}
@@ -75,11 +73,11 @@ func (r *RedditScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 	commonArgs := redditapify.CommonArgs{}
 	commonArgs.CopyFromArgs(redditArgs)
 
-	switch redditArgs.QueryType {
-	case teetypes.RedditScrapeUrls:
-		urls := make([]teetypes.RedditStartURL, 0, len(redditArgs.URLs))
+	switch redditArgs.Type {
+	case types.CapScrapeUrls:
+		urls := make([]types.RedditStartURL, 0, len(redditArgs.URLs))
 		for _, u := range redditArgs.URLs {
-			urls = append(urls, teetypes.RedditStartURL{
+			urls = append(urls, types.RedditStartURL{
 				URL:    u,
 				Method: "GET",
 			})
@@ -88,49 +86,35 @@ func (r *RedditScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		resp, cursor, err := redditClient.ScrapeUrls(j.WorkerID, urls, redditArgs.After, commonArgs, client.Cursor(redditArgs.NextCursor), redditArgs.MaxResults)
 		return processRedditResponse(j, resp, cursor, err)
 
-	case teetypes.RedditSearchUsers:
+	case types.CapSearchUsers:
 		resp, cursor, err := redditClient.SearchUsers(j.WorkerID, redditArgs.Queries, redditArgs.SkipPosts, commonArgs, client.Cursor(redditArgs.NextCursor), redditArgs.MaxResults)
 		return processRedditResponse(j, resp, cursor, err)
 
-	case teetypes.RedditSearchPosts:
+	case types.CapSearchPosts:
 		resp, cursor, err := redditClient.SearchPosts(j.WorkerID, redditArgs.Queries, redditArgs.After, commonArgs, client.Cursor(redditArgs.NextCursor), redditArgs.MaxResults)
 		return processRedditResponse(j, resp, cursor, err)
 
-	case teetypes.RedditSearchCommunities:
+	case types.CapSearchCommunities:
 		resp, cursor, err := redditClient.SearchCommunities(j.WorkerID, redditArgs.Queries, commonArgs, client.Cursor(redditArgs.NextCursor), redditArgs.MaxResults)
 		return processRedditResponse(j, resp, cursor, err)
 
 	default:
-		return types.JobResult{Error: "invalid type for Reddit job"}, fmt.Errorf("invalid type for Reddit job: %s", redditArgs.QueryType)
+		return types.JobResult{Error: "invalid type for Reddit job"}, fmt.Errorf("invalid type for Reddit job: %s", redditArgs.Type)
 	}
 }
 
-func processRedditResponse(j types.Job, resp []*reddit.Response, cursor client.Cursor, err error) (types.JobResult, error) {
+func processRedditResponse(j types.Job, resp []*types.RedditResponse, cursor client.Cursor, err error) (types.JobResult, error) {
 	if err != nil {
 		return types.JobResult{Error: fmt.Sprintf("error while scraping Reddit: %s", err.Error())}, fmt.Errorf("error scraping Reddit: %w", err)
 	}
 
 	data, err := json.Marshal(resp)
 	if err != nil {
-		return types.JobResult{Error: fmt.Sprintf("error marshalling Reddit response")}, fmt.Errorf("error marshalling Reddit response: %w", err)
+		return types.JobResult{Error: "error marshalling Reddit response"}, fmt.Errorf("error marshalling Reddit response: %w", err)
 	}
 	return types.JobResult{
 		Data:       data,
 		Job:        j,
 		NextCursor: cursor.String(),
 	}, nil
-}
-
-// GetStructuredCapabilities returns the structured capabilities supported by this Twitter scraper
-// based on the available credentials and API keys
-func (rs *RedditScraper) GetStructuredCapabilities() teetypes.WorkerCapabilities {
-	capabilities := make(teetypes.WorkerCapabilities)
-
-	// Add Apify-specific capabilities based on available API key
-	// TODO: We should verify whether each of the actors is actually available through this API key
-	if rs.configuration.ApifyApiKey != "" {
-		capabilities[teetypes.RedditJob] = teetypes.RedditCaps
-	}
-
-	return capabilities
 }

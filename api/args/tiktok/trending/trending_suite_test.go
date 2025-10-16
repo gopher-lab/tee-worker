@@ -1,4 +1,4 @@
-package reddit_test
+package trending_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestReddit(t *testing.T) {
+func TestArgs(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Reddit Suite")
+	RunSpecs(t, "Args Suite")
 }

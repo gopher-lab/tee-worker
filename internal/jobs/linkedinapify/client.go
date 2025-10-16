@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	profileArgs "github.com/masa-finance/tee-types/args/linkedin/profile"
-	profileTypes "github.com/masa-finance/tee-types/types/linkedin/profile"
+	profileArgs "github.com/masa-finance/tee-worker/api/args/linkedin/profile"
+	profileTypes "github.com/masa-finance/tee-worker/api/types/linkedin/profile"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"

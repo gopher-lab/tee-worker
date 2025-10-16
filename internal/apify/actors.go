@@ -1,6 +1,8 @@
 package apify
 
-import teetypes "github.com/masa-finance/tee-types/types"
+import (
+	"github.com/masa-finance/tee-worker/api/types"
+)
 
 type ActorId string
 
@@ -29,8 +31,8 @@ type defaultActorInput map[string]any
 type ActorConfig struct {
 	ActorId      ActorId
 	DefaultInput defaultActorInput
-	Capabilities []teetypes.Capability
-	JobType      teetypes.JobType
+	Capabilities []types.Capability
+	JobType      types.JobType
 }
 
 // Actors is a list of actor configurations for Apify.  Omitting LLM for now as it's not a standalone actor / has no dedicated capabilities
@@ -38,37 +40,37 @@ var Actors = []ActorConfig{
 	{
 		ActorId:      ActorIds.RedditScraper,
 		DefaultInput: defaultActorInput{},
-		Capabilities: teetypes.RedditCaps,
-		JobType:      teetypes.RedditJob,
+		Capabilities: types.RedditCaps,
+		JobType:      types.RedditJob,
 	},
 	{
 		ActorId:      ActorIds.TikTokSearchScraper,
 		DefaultInput: defaultActorInput{"proxy": map[string]any{"useApifyProxy": true}},
-		Capabilities: []teetypes.Capability{teetypes.CapSearchByQuery},
-		JobType:      teetypes.TiktokJob,
+		Capabilities: []types.Capability{types.CapSearchByQuery},
+		JobType:      types.TiktokJob,
 	},
 	{
 		ActorId:      ActorIds.TikTokTrendingScraper,
 		DefaultInput: defaultActorInput{},
-		Capabilities: []teetypes.Capability{teetypes.CapSearchByTrending},
-		JobType:      teetypes.TiktokJob,
+		Capabilities: []types.Capability{types.CapSearchByTrending},
+		JobType:      types.TiktokJob,
 	},
 	{
 		ActorId:      ActorIds.TwitterFollowers,
 		DefaultInput: defaultActorInput{"maxFollowers": 200, "maxFollowings": 200},
-		Capabilities: teetypes.TwitterApifyCaps,
-		JobType:      teetypes.TwitterApifyJob,
+		Capabilities: []types.Capability{types.CapGetFollowing, types.CapGetFollowers},
+		JobType:      types.TwitterJob,
 	},
 	{
 		ActorId:      ActorIds.WebScraper,
 		DefaultInput: defaultActorInput{"startUrls": []map[string]any{{"url": "https://docs.learnbittensor.org"}}},
-		Capabilities: teetypes.WebCaps,
-		JobType:      teetypes.WebJob,
+		Capabilities: types.WebCaps,
+		JobType:      types.WebJob,
 	},
 	{
 		ActorId:      ActorIds.LinkedInSearchProfile,
 		DefaultInput: defaultActorInput{},
-		Capabilities: teetypes.LinkedInCaps,
-		JobType:      teetypes.LinkedInJob,
+		Capabilities: types.LinkedInCaps,
+		JobType:      types.LinkedInJob,
 	},
 }

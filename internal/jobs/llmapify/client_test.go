@@ -10,13 +10,12 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/masa-finance/tee-worker/api/args/llm/process"
+	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs/llmapify"
 	"github.com/masa-finance/tee-worker/pkg/client"
-
-	teeargs "github.com/masa-finance/tee-types/args"
-	teetypes "github.com/masa-finance/tee-types/types"
 )
 
 // MockApifyClient is a mock implementation of the ApifyClient.
@@ -68,15 +67,14 @@ var _ = Describe("LLMApifyClient", func() {
 
 	Describe("Process", func() {
 		It("should construct the correct actor input", func() {
-			args := teeargs.LLMProcessorArguments{
-				DatasetId: "test-dataset-id",
-				Prompt:    "test-prompt",
-			}
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
 
 			// Marshal and unmarshal to apply defaults
-			jsonData, err := json.Marshal(args)
+			jsonData, err := json.Marshal(llmArgs)
 			Expect(err).ToNot(HaveOccurred())
-			err = json.Unmarshal(jsonData, &args)
+			err = json.Unmarshal(jsonData, &llmArgs)
 			Expect(err).ToNot(HaveOccurred())
 
 			mockClient.RunActorAndGetResponseFunc = func(actorID apify.ActorId, input any, cursor client.Cursor, limit uint) (*client.DatasetResponse, client.Cursor, error) {
@@ -84,20 +82,20 @@ var _ = Describe("LLMApifyClient", func() {
 				Expect(limit).To(Equal(uint(1)))
 
 				// Verify the input is correctly converted to LLMProcessorRequest
-				request, ok := input.(teetypes.LLMProcessorRequest)
+				request, ok := input.(types.LLMProcessorRequest)
 				Expect(ok).To(BeTrue())
 				Expect(request.InputDatasetId).To(Equal("test-dataset-id"))
 				Expect(request.Prompt).To(Equal("test-prompt"))
-				Expect(request.LLMProviderApiKey).To(Equal("test-claude-llm-key"))                                     // should be set from constructor
-				Expect(request.Model).To(Equal(teeargs.LLMDefaultClaudeModel))                                         // default model
-				Expect(request.MultipleColumns).To(Equal(teeargs.LLMDefaultMultipleColumns))                           // default value
-				Expect(request.MaxTokens).To(Equal(teeargs.LLMDefaultMaxTokens))                                       // default value
-				Expect(request.Temperature).To(Equal(strconv.FormatFloat(teeargs.LLMDefaultTemperature, 'f', -1, 64))) // default value
+				Expect(request.LLMProviderApiKey).To(Equal("test-claude-llm-key"))                                  // should be set from constructor
+				Expect(request.Model).To(Equal(process.DefaultClaudeModel))                                         // default model
+				Expect(request.MultipleColumns).To(Equal(process.DefaultMultipleColumns))                           // default value
+				Expect(request.MaxTokens).To(Equal(process.DefaultMaxTokens))                                       // default value
+				Expect(request.Temperature).To(Equal(strconv.FormatFloat(process.DefaultTemperature, 'f', -1, 64))) // default value
 
 				return &client.DatasetResponse{Data: client.ApifyDatasetData{Items: []json.RawMessage{}}}, "next", nil
 			}
 
-			_, _, processErr := llmClient.Process("test-worker", args, client.EmptyCursor)
+			_, _, processErr := llmClient.Process("test-worker", llmArgs, client.EmptyCursor)
 			Expect(processErr).NotTo(HaveOccurred())
 		})
 
@@ -107,11 +105,10 @@ var _ = Describe("LLMApifyClient", func() {
 				return nil, "", expectedErr
 			}
 
-			args := teeargs.LLMProcessorArguments{
-				DatasetId: "test-dataset-id",
-				Prompt:    "test-prompt",
-			}
-			_, _, err := llmClient.Process("test-worker", args, client.EmptyCursor)
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
+			_, _, err := llmClient.Process("test-worker", llmArgs, client.EmptyCursor)
 			Expect(err).To(MatchError(expectedErr))
 		})
 
@@ -126,11 +123,10 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := teeargs.LLMProcessorArguments{
-				DatasetId: "test-dataset-id",
-				Prompt:    "test-prompt",
-			}
-			results, _, err := llmClient.Process("test-worker", args, client.EmptyCursor)
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
+			results, _, err := llmClient.Process("test-worker", llmArgs, client.EmptyCursor)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(results).To(BeEmpty()) // The invalid item should be skipped
 		})
@@ -148,11 +144,10 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := teeargs.LLMProcessorArguments{
-				DatasetId: "test-dataset-id",
-				Prompt:    "test-prompt",
-			}
-			results, cursor, err := llmClient.Process("test-worker", args, client.EmptyCursor)
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
+			results, cursor, err := llmClient.Process("test-worker", llmArgs, client.EmptyCursor)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(cursor).To(Equal(client.Cursor("next")))
 			Expect(results).To(HaveLen(1))
@@ -175,11 +170,10 @@ var _ = Describe("LLMApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := teeargs.LLMProcessorArguments{
-				DatasetId: "test-dataset-id",
-				Prompt:    "test-prompt",
-			}
-			results, _, err := llmClient.Process("test-worker", args, client.EmptyCursor)
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
+			results, _, err := llmClient.Process("test-worker", llmArgs, client.EmptyCursor)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(results).To(HaveLen(2))
 			Expect(results[0].LLMResponse).To(Equal("First summary."))
@@ -187,15 +181,14 @@ var _ = Describe("LLMApifyClient", func() {
 		})
 
 		It("should use custom values when provided", func() {
-			args := teeargs.LLMProcessorArguments{
-				DatasetId:   "test-dataset-id",
-				Prompt:      "test-prompt",
-				MaxTokens:   500,
-				Temperature: 0.5,
-			}
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "test-dataset-id"
+			llmArgs.Prompt = "test-prompt"
+			llmArgs.MaxTokens = 500
+			llmArgs.Temperature = 0.5
 
 			mockClient.RunActorAndGetResponseFunc = func(actorID apify.ActorId, input any, cursor client.Cursor, limit uint) (*client.DatasetResponse, client.Cursor, error) {
-				request, ok := input.(teetypes.LLMProcessorRequest)
+				request, ok := input.(types.LLMProcessorRequest)
 				Expect(ok).To(BeTrue())
 				Expect(request.MaxTokens).To(Equal(uint(500)))
 				Expect(request.Temperature).To(Equal("0.5"))
@@ -204,7 +197,7 @@ var _ = Describe("LLMApifyClient", func() {
 				return &client.DatasetResponse{Data: client.ApifyDatasetData{Items: []json.RawMessage{}}}, "next", nil
 			}
 
-			_, _, err := llmClient.Process("test-worker", args, client.EmptyCursor)
+			_, _, err := llmClient.Process("test-worker", llmArgs, client.EmptyCursor)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -258,17 +251,16 @@ var _ = Describe("LLMApifyClient", func() {
 			realClient, err := llmapify.NewClient(apifyKey, config.LlmConfig{GeminiApiKey: config.LlmApiKey(geminiKey)}, nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			args := teeargs.LLMProcessorArguments{
-				DatasetId: "V6tyuuZIgfiETl1cl",
-				Prompt:    "summarize the content of this webpage ${markdown}",
-			}
+			llmArgs := process.NewArguments()
+			llmArgs.DatasetId = "V6tyuuZIgfiETl1cl"
+			llmArgs.Prompt = "summarize the content of this webpage ${markdown}"
 			// Marshal and unmarshal to apply defaults
-			jsonData, err := json.Marshal(args)
+			jsonData, err := json.Marshal(llmArgs)
 			Expect(err).ToNot(HaveOccurred())
-			err = json.Unmarshal(jsonData, &args)
+			err = json.Unmarshal(jsonData, &llmArgs)
 			Expect(err).ToNot(HaveOccurred())
 
-			results, cursor, err := realClient.Process("test-worker", args, client.EmptyCursor)
+			results, cursor, err := realClient.Process("test-worker", llmArgs, client.EmptyCursor)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(results).NotTo(BeEmpty())
 			Expect(results[0]).NotTo(BeNil())

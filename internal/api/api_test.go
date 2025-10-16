@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
 
-	teetypes "github.com/masa-finance/tee-types/types"
+	"github.com/masa-finance/tee-worker/api/types"
 	. "github.com/masa-finance/tee-worker/internal/api"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/pkg/client"
@@ -44,8 +44,8 @@ var _ = Describe("API", func() {
 				return err
 			}
 
-			signature, err := c.CreateJobSignature(teetypes.Job{
-				Type:      teetypes.WebJob,
+			signature, err := c.CreateJobSignature(types.Job{
+				Type:      types.WebJob,
 				Arguments: map[string]interface{}{},
 			})
 			if err != nil {
@@ -72,8 +72,8 @@ var _ = Describe("API", func() {
 	It("should submit a job and get the correct result", func() {
 		// Step 1: Create the job request
 		// we use TikTok transcription here as it's supported by all workers without any unique config
-		job := teetypes.Job{
-			Type: teetypes.TiktokJob,
+		job := types.Job{
+			Type: types.TiktokJob,
 			Arguments: map[string]interface{}{
 				"type":      "transcription",
 				"video_url": "https://www.tiktok.com/@theblockrunner.com/video/7227579907361066282",
@@ -107,7 +107,7 @@ var _ = Describe("API", func() {
 
 	It("bubble up errors", func() {
 		// Step 1: Create the job request
-		job := teetypes.Job{
+		job := types.Job{
 			Type: "not-existing scraper",
 			Arguments: map[string]interface{}{
 				"url": "google",

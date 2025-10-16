@@ -81,6 +81,9 @@ bp-todo.md
 # TEE
 tee/private.pem
 
-# LLML
+# LLM-related files
 .aider*
 GEMINI.md
+
+# Examples from tee-types
+/examples/*json

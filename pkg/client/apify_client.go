@@ -331,8 +331,8 @@ func (c *ApifyClient) ValidateApiKey() error {
 }
 
 var (
-	ErrActorFailed  = errors.New("Actor run failed")
-	ErrActorAborted = errors.New("Actor run aborted")
+	ErrActorFailed  = errors.New("actor run failed")
+	ErrActorAborted = errors.New("actor run aborted")
 )
 
 // runActorAndGetProfiles runs the actor and retrieves profiles from the dataset
