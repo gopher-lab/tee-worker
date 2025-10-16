@@ -88,7 +88,7 @@ var _ = Describe("LinkedInScraper", func() {
 
 			result, err := scraper.ExecuteJob(job)
 			Expect(err).To(HaveOccurred())
-			Expect(result.Error).To(ContainSubstring("Apify API key is required for LinkedIn job"))
+			Expect(result.Error).To(ContainSubstring("apify API key is required for LinkedIn job"))
 		})
 
 		It("should call SearchProfiles and return data and next cursor", func() {
