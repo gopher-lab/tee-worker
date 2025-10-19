@@ -64,21 +64,6 @@ func DetectCapabilities(jc config.JobConfiguration, jobServer JobServerInterface
 
 	// Add API-based capabilities if we have API keys
 	if hasApiKeys {
-		// Add basic API capabilities for any valid API key
-		twitterCaps = append(twitterCaps,
-			types.CapSearchByQuery,
-			types.CapSearchByProfile,
-			types.CapGetById,
-			types.CapGetReplies,
-			types.CapGetRetweeters,
-			types.CapGetMedia,
-			types.CapGetProfileById,
-			types.CapGetTrends,
-			types.CapGetSpace,
-			types.CapGetProfile,
-			types.CapGetTweets,
-		)
-
 		// Check for elevated API capabilities
 		if hasElevatedApiKey(apiKeys) {
 			twitterCaps = append(twitterCaps, types.CapSearchByFullArchive)
