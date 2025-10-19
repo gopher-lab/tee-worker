@@ -18,7 +18,8 @@ var (
 )
 
 const (
-	MaxResults = 1000
+	MaxResults        = 1000
+	DefaultMaxResults = 10
 )
 
 // Verify interface implementation
@@ -48,7 +49,7 @@ func (t *Arguments) UnmarshalJSON(data []byte) error {
 // SetDefaultValues sets default values for the arguments
 func (t *Arguments) SetDefaultValues() {
 	if t.MaxResults == 0 {
-		t.MaxResults = MaxResults
+		t.MaxResults = DefaultMaxResults
 	}
 }
 
@@ -104,9 +105,7 @@ func (t *Arguments) IsSingleProfileOperation() bool {
 
 func (t *Arguments) IsMultipleProfileOperation() bool {
 	c := t.GetCapability()
-	return c == types.CapGetFollowing ||
-		c == types.CapGetFollowers ||
-		c == types.CapGetRetweeters
+	return c == types.CapGetRetweeters
 }
 
 func (t *Arguments) IsSingleSpaceOperation() bool {
