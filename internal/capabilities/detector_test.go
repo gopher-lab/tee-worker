@@ -111,9 +111,9 @@ var _ = Describe("DetectCapabilities", func() {
 			),
 			Entry("With Twitter API keys",
 				config.JobConfiguration{
-					"twitter_api_keys": []string{"key1"},
+					"twitter_api_keys": []string{"key1"}, // Key not valid
 				},
-				[]string{"telemetry", "tiktok", "twitter"},
+				[]string{"telemetry", "tiktok"},
 			),
 		)
 	})
@@ -175,9 +175,3 @@ var _ = Describe("DetectCapabilities", func() {
 		})
 	})
 })
-
-// Helper function to check if a job type exists in capabilities
-func hasJobType(capabilities types.WorkerCapabilities, jobName string) bool {
-	_, exists := capabilities[types.JobType(jobName)]
-	return exists
-}
