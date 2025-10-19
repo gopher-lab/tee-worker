@@ -108,6 +108,6 @@ func (w Arguments) ToScraperRequest() types.WebScraperRequest {
 func NewArguments() Arguments {
 	args := Arguments{}
 	args.SetDefaultValues()
-	args.Validate() // This will set the default capability via ValidateCapability
+	args.Validate()
 	return args
 }

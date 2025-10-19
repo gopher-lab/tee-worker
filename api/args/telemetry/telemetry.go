@@ -58,6 +58,6 @@ func (t *Arguments) ValidateCapability(jobType types.JobType) error {
 func NewArguments() Arguments {
 	args := Arguments{}
 	args.SetDefaultValues()
-	args.Validate() // This will set the default capability via ValidateCapability
+	args.Validate()
 	return args
 }

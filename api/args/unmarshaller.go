@@ -122,9 +122,7 @@ func unmarshalTelemetryArguments(args Args) (*telemetry.Telemetry, error) {
 }
 
 // unmarshalToStruct converts a map[string]any to a struct using JSON marshal/unmarshal
-// This provides the same functionality as the existing JobArgument.Unmarshal methods
 func unmarshalToStruct(args Args, target any) error {
-	// Use JSON marshal/unmarshal for conversion - this triggers our custom UnmarshalJSON methods
 	data, err := json.Marshal(args)
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrFailedToMarshal, err)
