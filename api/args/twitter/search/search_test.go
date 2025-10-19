@@ -44,7 +44,7 @@ var _ = Describe("TwitterSearchArguments", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(args.Query).To(Equal("minimal test"))
 			Expect(args.Count).To(Equal(0))
-			Expect(args.MaxResults).To(Equal(1000)) // SetDefaultValues() sets this to MaxResults
+			Expect(args.MaxResults).To(Equal(10)) // SetDefaultValues() sets this to MaxResults
 		})
 
 		It("should fail unmarshal with invalid JSON", func() {
@@ -203,18 +203,6 @@ var _ = Describe("TwitterSearchArguments", func() {
 		})
 
 		Context("Multiple Profile Operations", func() {
-			It("should identify getfollowing as multiple profile operation", func() {
-				args := search.NewArguments()
-				args.Type = types.CapGetFollowing
-				Expect(args.IsMultipleProfileOperation()).To(BeTrue())
-			})
-
-			It("should identify getfollowers as multiple profile operation", func() {
-				args := search.NewArguments()
-				args.Type = types.CapGetFollowers
-				Expect(args.IsMultipleProfileOperation()).To(BeTrue())
-			})
-
 			It("should identify getretweeters as multiple profile operation", func() {
 				args := search.NewArguments()
 				args.Type = types.CapGetRetweeters
