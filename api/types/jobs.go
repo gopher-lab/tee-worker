@@ -127,8 +127,8 @@ const (
 
 // Capability group constants for easy reuse
 var (
-	AlwaysAvailableTelemetryCaps = []Capability{CapTelemetry, CapEmpty}
-	AlwaysAvailableTiktokCaps    = []Capability{CapTranscription, CapEmpty}
+	AlwaysAvailableTelemetryCaps = []Capability{CapTelemetry}
+	AlwaysAvailableTiktokCaps    = []Capability{CapTranscription}
 
 	// AlwaysAvailableCapabilities defines the job capabilities that are always available regardless of configuration
 	AlwaysAvailableCapabilities = WorkerCapabilities{
@@ -140,7 +140,7 @@ var (
 	TwitterCaps = []Capability{
 		CapSearchByQuery, CapSearchByProfile, CapSearchByFullArchive,
 		CapGetById, CapGetReplies, CapGetRetweeters, CapGetTweets, CapGetMedia, CapGetProfileById,
-		CapGetTrends, CapGetFollowing, CapGetFollowers, CapGetSpace, CapEmpty,
+		CapGetTrends, CapGetFollowing, CapGetFollowers, CapGetSpace, CapGetProfile,
 	}
 
 	// TiktokSearchCaps are Tiktok capabilities available with Apify
@@ -150,7 +150,7 @@ var (
 	RedditCaps = []Capability{CapScrapeUrls, CapSearchPosts, CapSearchUsers, CapSearchCommunities}
 
 	// WebCaps are all the Web capabilities (only available with Apify)
-	WebCaps = []Capability{CapScraper, CapEmpty}
+	WebCaps = []Capability{CapScraper}
 
 	// LinkedInCaps are all the LinkedIn capabilities (only available with Apify)
 	LinkedInCaps = []Capability{CapSearchByProfile}
