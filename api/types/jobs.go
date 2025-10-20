@@ -274,3 +274,8 @@ type Key struct {
 type KeyResponse struct {
 	Status string `json:"status"`
 }
+
+type ResultResponse struct {
+	UUID  string `json:"uuid"`
+	Error string `json:"error"`
+}
