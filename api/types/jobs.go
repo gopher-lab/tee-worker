@@ -322,3 +322,10 @@ type CollectionStats struct {
 	CollectionName string `json:"collection_name,omitempty"`
 	RowCount       uint   `json:"row_count"`
 }
+
+// JobResult is the struct that is stored in the NATS KV store
+type IndexerJobResult struct {
+	Status JobStatus  `json:"status"`
+	Docs   []Document `json:"docs,omitempty"`
+	Error  string     `json:"error"`
+}
