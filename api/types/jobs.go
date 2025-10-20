@@ -279,3 +279,20 @@ type ResultResponse struct {
 	UUID  string `json:"uuid"`
 	Error string `json:"error"`
 }
+
+// Document represents a document stored in the vector store. We need to put it in this package because of circular dependencies.
+type Document struct {
+	Id        string         `json:"id"`
+	Source    Source         `json:"source"`
+	Content   string         `json:"content"`
+	Metadata  map[string]any `json:"metadata"`
+	Embedding []float32      `json:"embedding,omitempty"`
+	Score     float32        `json:"score,omitempty"` // For similarity search results
+	UpdatedAt time.Time      `json:"updated_at"`
+	// SearchText is used only for embedding/indexing and SHOULD NOT be serialized or stored.
+	SearchText string `json:"-"`
+}
+
+func (d Document) String() string {
+	return fmt.Sprintf("%s/%s\n%s\n%s", d.Source, d.Id, d.Metadata, d.Content)
+}
