@@ -296,3 +296,9 @@ type Document struct {
 func (d Document) String() string {
 	return fmt.Sprintf("%s/%s\n%s\n%s", d.Source, d.Id, d.Metadata, d.Content)
 }
+
+// CollectionStats represents collection statistics from Milvus
+type CollectionStats struct {
+	CollectionName string `json:"collection_name,omitempty"`
+	RowCount       uint   `json:"row_count"`
+}
