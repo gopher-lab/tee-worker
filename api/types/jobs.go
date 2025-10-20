@@ -3,11 +3,52 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"slices"
 	"time"
 
 	"github.com/masa-finance/tee-worker/pkg/util"
 )
+
+// note, this could be combined with job type in a future PR / refactor...
+type Source string
+
+func (j Source) String() string {
+	return string(j)
+}
+
+// To add a new RouterType and/or JobType, you will need to add the JobType to tee-types and the Source below, and add the new mapping to the SourceFor function. This is necessary basically because of Twitter, which has 3 JobTypes but a single Router.
+const (
+	TwitterSource   Source = "twitter"
+	WebSource       Source = "web"
+	TiktokSource    Source = "tiktok"
+	RedditSource    Source = "reddit"
+	LinkedInSource  Source = "linkedin"
+	TelemetrySource Source = "telemetry"
+	UnknownSource   Source = ""
+)
+
+const UnknownJob = JobType("")
+
+var sourceMap = map[JobType]Source{
+	TwitterJob:   TwitterSource,
+	WebJob:       WebSource,
+	TiktokJob:    TiktokSource,
+	RedditJob:    RedditSource,
+	LinkedInJob:  LinkedInSource,
+	TelemetryJob: TelemetrySource,
+	UnknownJob:   UnknownSource,
+}
+
+var Sources = slices.Compact(slices.Sorted(maps.Values(sourceMap)))
+
+func SourceFor(j JobType) Source {
+	source, ok := sourceMap[j]
+	if ok {
+		return source
+	}
+	return UnknownSource
+}
 
 type JobType string
 type Capability string
