@@ -10,6 +10,26 @@ import (
 	"github.com/masa-finance/tee-worker/pkg/util"
 )
 
+type JobStatus string
+
+func (j JobStatus) String() string {
+	return string(j)
+}
+
+const (
+	JobStatusNotSaved   JobStatus = "done(not saved)"
+	JobStatusSaved      JobStatus = "done(saved)"
+	JobStatusDone       JobStatus = "done"
+	JobStatusActive     JobStatus = "in progress"
+	JobStatusReceived   JobStatus = "received"
+	JobStatusError      JobStatus = "error"
+	JobStatusRetryError JobStatus = "error(retrying)"
+)
+
+func (j JobStatus) IsDone() bool {
+	return j == JobStatusSaved || j == JobStatusDone || j == JobStatusNotSaved
+}
+
 // note, this could be combined with job type in a future PR / refactor...
 type Source string
 
