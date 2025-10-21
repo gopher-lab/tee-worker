@@ -30,7 +30,7 @@ type Params[T base.JobArgument] struct {
 	Args    T             `json:"arguments"`
 }
 
-func (p Params[T]) Validate(cfg *SearchConfig) error {
+func (p Params[T]) Validate(_ *SearchConfig) error {
 	return p.Args.Validate()
 }
 
