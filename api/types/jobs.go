@@ -30,7 +30,8 @@ func (j JobStatus) IsDone() bool {
 	return j == JobStatusSaved || j == JobStatusDone || j == JobStatusNotSaved
 }
 
-// note, this could be combined with job type in a future PR / refactor...
+// TODO: this could be combined with job type in a future PR / refactor...
+// note: these are now the same as job type after the twitter job type refactor
 type Source string
 
 func (j Source) String() string {

@@ -76,6 +76,7 @@ func (a *Arguments) SetDefaultValues() {
 }
 
 // TODO: use a validation library
+// TODO: should we return an error, or return the raw value, i.e. in the case where Linkedin modifies their catalogs?
 func (a *Arguments) Validate() error {
 	var errs []error
 

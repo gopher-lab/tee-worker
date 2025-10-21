@@ -1,27 +1,14 @@
 package jobs
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/masa-finance/tee-worker/api/args/reddit"
 	"github.com/masa-finance/tee-worker/api/types"
 )
 
-// Compile-time check to ensure RedditParams implements JobParameters
-var _ JobParameters = (*RedditParams)(nil)
-
 type RedditParams struct {
-	JobType types.JobType          `json:"type"`      // Type of search: 'reddit'
-	Args    reddit.SearchArguments `json:"arguments"` // Scrape arguments
-}
-
-func (r RedditParams) Validate(cfg *SearchConfig) error {
-	return r.Args.Validate()
-}
-
-func (r RedditParams) Type() types.JobType {
-	return r.JobType
+	Params[*reddit.SearchArguments]
 }
 
 func (r RedditParams) Timeout() time.Duration {
@@ -38,13 +25,4 @@ func (r RedditParams) PollInterval() time.Duration {
 		return 5 * time.Second
 	}
 	return 0
-}
-
-func (r RedditParams) Arguments(cfg *SearchConfig) map[string]any {
-	jsonData, _ := json.Marshal(r.Args)
-	var result map[string]any
-	if err := json.Unmarshal(jsonData, &result); err != nil {
-		return nil
-	}
-	return result
 }
