@@ -79,13 +79,12 @@ func (a *Arguments) SetDefaultValues() {
 func (a *Arguments) Validate() error {
 	var errs []error
 
-	if a.MaxItems > MaxItems {
-		errs = append(errs, ErrMaxItemsTooLarge)
+	if err := types.LinkedInJob.ValidateCapability(&a.Type); err != nil {
+		errs = append(errs, err)
 	}
 
-	err := a.ValidateCapability(types.LinkedInJob)
-	if err != nil {
-		errs = append(errs, err)
+	if a.MaxItems > MaxItems {
+		errs = append(errs, ErrMaxItemsTooLarge)
 	}
 
 	if !profile.AllScraperModes.Contains(a.ScraperMode) {

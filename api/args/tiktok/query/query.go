@@ -48,8 +48,7 @@ func (t *Arguments) SetDefaultValues() {
 
 // TODO: use a validation library
 func (t *Arguments) Validate() error {
-	err := t.ValidateCapability(types.TiktokJob)
-	if err != nil {
+	if err := types.TiktokJob.ValidateCapability(&t.Type); err != nil {
 		return err
 	}
 	if len(t.Search) == 0 && len(t.StartUrls) == 0 {

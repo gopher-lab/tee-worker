@@ -57,8 +57,7 @@ func (t *Arguments) SetDefaultValues() {
 // TODO: use a validation library
 func (t *Arguments) Validate() error {
 	// note, query is not required for all capabilities
-	err := t.ValidateCapability(types.TwitterJob)
-	if err != nil {
+	if err := types.TwitterJob.ValidateCapability(&t.Type); err != nil {
 		return err
 	}
 	if t.Count < 0 {

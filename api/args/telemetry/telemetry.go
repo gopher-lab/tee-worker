@@ -32,8 +32,7 @@ func (t *Arguments) UnmarshalJSON(data []byte) error {
 }
 
 func (t *Arguments) Validate() error {
-	err := t.ValidateCapability(types.TelemetryJob)
-	if err != nil {
+	if err := types.TelemetryJob.ValidateCapability(&t.Type); err != nil {
 		return err
 	}
 	return nil

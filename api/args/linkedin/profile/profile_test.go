@@ -159,34 +159,4 @@ var _ = Describe("LinkedIn Profile Arguments", func() {
 			Expect(args.GetCapability()).To(Equal(types.CapSearchByProfile))
 		})
 	})
-
-	Describe("ValidateCapability", func() {
-		It("should succeed with valid job type and capability", func() {
-			args := profile.NewArguments()
-			args.Query = "software engineer"
-			args.ScraperMode = ptypes.ScraperModeShort
-			args.MaxItems = 10
-			err := args.ValidateCapability(types.LinkedInJob)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		It("should fail with invalid job type", func() {
-			args := profile.NewArguments()
-			args.Type = types.CapSearchByQuery // Override the default
-			args.Query = "software engineer"
-			args.ScraperMode = ptypes.ScraperModeShort
-			args.MaxItems = 10
-			err := args.ValidateCapability(types.LinkedInJob)
-			Expect(err).To(HaveOccurred())
-		})
-
-		It("should fail if profile validation fails", func() {
-			args := profile.NewArguments()
-			args.Query = "software engineer"
-			args.ScraperMode = "InvalidMode"
-			args.MaxItems = 10
-			err := args.Validate()
-			Expect(err).To(HaveOccurred())
-		})
-	})
 })

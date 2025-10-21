@@ -316,35 +316,6 @@ var _ = Describe("TikTokTrendingArguments", func() {
 		})
 	})
 
-	Describe("Job capability", func() {
-		It("should return the searchbytrending capability", func() {
-			args := tiktok.NewTrendingArguments()
-			Expect(args.GetCapability()).To(Equal(types.CapSearchByTrending))
-		})
-
-		It("should validate capability for TiktokJob", func() {
-			args := tiktok.NewTrendingArguments()
-			args.Type = types.CapSearchByTrending
-			args.CountryCode = "US"
-			args.SortBy = "vv"
-			args.MaxItems = 50
-			args.Period = "7"
-			err := args.ValidateCapability(types.TiktokJob)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		It("should fail validation for incompatible job type", func() {
-			args := tiktok.NewTrendingArguments()
-			args.Type = types.CapSearchByTrending
-			args.CountryCode = "US"
-			args.SortBy = "vv"
-			args.MaxItems = 50
-			args.Period = "7"
-			err := args.ValidateCapability(types.TwitterJob)
-			Expect(err).To(HaveOccurred())
-		})
-	})
-
 	Describe("Edge cases", func() {
 		It("should handle mixed case country codes", func() {
 			args := tiktok.NewTrendingArguments()

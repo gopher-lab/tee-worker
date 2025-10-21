@@ -100,6 +100,10 @@ func (r *Arguments) SetDefaultValues() {
 func (r *Arguments) Validate() error {
 	var errs []error
 
+	if err := types.RedditJob.ValidateCapability(&r.Type); err != nil {
+		errs = append(errs, err)
+	}
+
 	if !types.AllRedditQueryTypes.Contains(r.Type) {
 		errs = append(errs, ErrInvalidType)
 	}

@@ -66,26 +66,6 @@ var _ = Describe("Telemetry Arguments", func() {
 		})
 	})
 
-	Describe("ValidateCapability", func() {
-		It("should succeed with valid job type and capability", func() {
-			args := telemetry.NewArguments()
-			err := args.ValidateCapability(types.TelemetryJob)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		It("should fail with invalid job type", func() {
-			args := telemetry.NewArguments()
-			err := args.ValidateCapability(types.LinkedInJob)
-			Expect(err).To(HaveOccurred())
-		})
-
-		It("should fail with invalid capability", func() {
-			args := telemetry.NewArguments()
-			err := args.ValidateCapability(types.TelemetryJob)
-			Expect(err).To(HaveOccurred())
-		})
-	})
-
 	Describe("SetDefaultValues", func() {
 		It("should not modify arguments", func() {
 			args := telemetry.NewArguments()

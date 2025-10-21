@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/masa-finance/tee-worker/api/args/tiktok/query"
-	"github.com/masa-finance/tee-worker/api/types"
 )
 
 var _ = Describe("TikTokQueryArguments", func() {
@@ -137,33 +136,6 @@ var _ = Describe("TikTokQueryArguments", func() {
 			args.MaxItems = 0
 			args.SetDefaultValues()
 			Expect(args.MaxItems).To(Equal(uint(10))) // Should set default
-		})
-	})
-
-	Describe("Job capability", func() {
-		It("should return the searchbyquery capability", func() {
-			args := query.NewArguments()
-			Expect(args.GetCapability()).To(Equal(types.CapSearchByQuery))
-		})
-
-		It("should validate capability for TiktokJob", func() {
-			args := query.NewArguments()
-			args.Search = []string{"test query"}
-			args.MaxItems = 10
-			err := args.ValidateCapability(types.TiktokJob)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		It("should fail validation for incompatible job type", func() {
-			args := query.NewArguments()
-			args.Search = []string{"test query"}
-			args.MaxItems = 10
-			// Set a different capability first
-			args.Type = types.CapTranscription
-			err := args.ValidateCapability(types.TwitterJob)
-			Expect(err).To(HaveOccurred())
-			// The capability should remain unchanged
-			Expect(args.Type).To(Equal(types.CapTranscription))
 		})
 	})
 

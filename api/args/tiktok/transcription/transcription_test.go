@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/masa-finance/tee-worker/api/args/tiktok/transcription"
-	"github.com/masa-finance/tee-worker/api/types"
 )
 
 var _ = Describe("TikTokTranscriptionArguments", func() {
@@ -188,21 +187,6 @@ var _ = Describe("TikTokTranscriptionArguments", func() {
 			args.Language = "english-us"
 			err := args.Validate()
 			Expect(errors.Is(err, transcription.ErrInvalidLanguageCode)).To(BeTrue())
-		})
-	})
-
-	Describe("Job capability", func() {
-		It("should return the transcription capability", func() {
-			args := transcription.NewArguments()
-			Expect(args.GetCapability()).To(Equal(types.CapTranscription))
-		})
-
-		It("should validate capability for TiktokJob", func() {
-			args := transcription.NewArguments()
-			args.VideoURL = "https://tiktok.com/@user/video/123"
-			args.Language = "en-us"
-			err := args.ValidateCapability(types.TiktokJob)
-			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 

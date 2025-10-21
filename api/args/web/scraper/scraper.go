@@ -55,8 +55,7 @@ func (w *Arguments) SetDefaultValues() {
 // Validate validates the  arguments
 // TODO: use a validation library
 func (w *Arguments) Validate() error {
-	err := w.ValidateCapability(types.WebJob)
-	if err != nil {
+	if err := types.WebJob.ValidateCapability(&w.Type); err != nil {
 		return err
 	}
 

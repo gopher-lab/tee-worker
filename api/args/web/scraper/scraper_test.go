@@ -9,7 +9,6 @@ import (
 
 	"github.com/masa-finance/tee-worker/api/args/web"
 	"github.com/masa-finance/tee-worker/api/args/web/scraper"
-	"github.com/masa-finance/tee-worker/api/types"
 )
 
 var _ = Describe("WebArguments", func() {
@@ -101,22 +100,6 @@ var _ = Describe("WebArguments", func() {
 			err := webArgs.Validate()
 			Expect(errors.Is(err, scraper.ErrMaxPages)).To(BeTrue())
 			Expect(err.Error()).To(ContainSubstring("got 0"))
-		})
-	})
-
-	Describe("Job capability", func() {
-		It("should return the scraper capability", func() {
-			webArgs := web.NewScraperArguments()
-			Expect(webArgs.GetCapability()).To(Equal(types.CapScraper))
-		})
-
-		It("should validate capability for WebJob", func() {
-			webArgs := web.NewScraperArguments()
-			webArgs.URL = "https://example.com"
-			webArgs.MaxDepth = 1
-			webArgs.MaxPages = 1
-			err := webArgs.ValidateCapability(types.WebJob)
-			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 

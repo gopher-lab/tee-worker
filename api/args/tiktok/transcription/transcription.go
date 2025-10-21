@@ -52,8 +52,7 @@ func (a *Arguments) SetDefaultValues() {
 // Validate validates the TikTok arguments
 // TODO: use a validation library
 func (t *Arguments) Validate() error {
-	err := t.ValidateCapability(types.TiktokJob)
-	if err != nil {
+	if err := types.TiktokJob.ValidateCapability(&t.Type); err != nil {
 		return err
 	}
 	if t.VideoURL == "" {
@@ -92,11 +91,13 @@ func (t *Arguments) HasLanguagePreference() bool {
 	return t.Language != ""
 }
 
+// TODO: do we need this getter when its already publically accessible?
 // GetVideoURL returns the source video URL
 func (t *Arguments) GetVideoURL() string {
 	return t.VideoURL
 }
 
+// TODO: do we need this getter when its already publically accessible?
 // GetLanguageCode returns the language code, defaulting to "en-us" if not specified
 func (t *Arguments) GetLanguageCode() string {
 	return t.Language

@@ -7,7 +7,6 @@ import (
 // JobArgument defines the interface that all job arguments must implement
 type JobArgument interface {
 	GetCapability() types.Capability
-	ValidateCapability(jobType types.JobType) error
 	SetDefaultValues()
 	Validate() error
 }
@@ -17,10 +16,6 @@ var _ JobArgument = (*Arguments)(nil)
 
 type Arguments struct {
 	Type types.Capability `json:"type"`
-}
-
-func (a *Arguments) ValidateCapability(jobType types.JobType) error {
-	return jobType.ValidateCapability(&a.Type)
 }
 
 func (a *Arguments) GetCapability() types.Capability {
