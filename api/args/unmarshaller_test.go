@@ -23,7 +23,7 @@ var _ = Describe("Unmarshaller", func() {
 				}
 				jobArgs, err := args.UnmarshalJobArguments(types.WebJob, argsMap)
 				Expect(err).ToNot(HaveOccurred())
-				webArgs, ok := jobArgs.(*web.Page)
+				webArgs, ok := jobArgs.(*web.ScraperArguments)
 				Expect(ok).To(BeTrue())
 				Expect(webArgs.URL).To(Equal("https://example.com"))
 				Expect(webArgs.MaxDepth).To(Equal(2))
@@ -39,7 +39,7 @@ var _ = Describe("Unmarshaller", func() {
 				}
 				jobArgs, err := args.UnmarshalJobArguments(types.TiktokJob, argsMap)
 				Expect(err).ToNot(HaveOccurred())
-				tiktokArgs, ok := jobArgs.(*tiktok.Transcription)
+				tiktokArgs, ok := jobArgs.(*tiktok.TranscriptionArguments)
 				Expect(ok).To(BeTrue())
 				Expect(tiktokArgs.VideoURL).To(Equal("https://www.tiktok.com/@user/video/123"))
 				Expect(tiktokArgs.Language).To(Equal("en-us"))
@@ -55,7 +55,7 @@ var _ = Describe("Unmarshaller", func() {
 				}
 				jobArgs, err := args.UnmarshalJobArguments(types.TwitterJob, argsMap)
 				Expect(err).ToNot(HaveOccurred())
-				twitterArgs, ok := jobArgs.(*twitter.Search)
+				twitterArgs, ok := jobArgs.(*twitter.SearchArguments)
 				Expect(ok).To(BeTrue())
 				Expect(twitterArgs.Type).To(Equal(types.CapSearchByQuery))
 				Expect(twitterArgs.Query).To(Equal("golang"))
@@ -72,7 +72,7 @@ var _ = Describe("Unmarshaller", func() {
 				}
 				jobArgs, err := args.UnmarshalJobArguments(types.RedditJob, argsMap)
 				Expect(err).ToNot(HaveOccurred())
-				redditArgs, ok := jobArgs.(*reddit.Search)
+				redditArgs, ok := jobArgs.(*reddit.SearchArguments)
 				Expect(ok).To(BeTrue())
 				Expect(redditArgs.Type).To(Equal(types.CapSearchPosts))
 			})

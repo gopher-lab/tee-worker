@@ -12,8 +12,8 @@ import (
 var _ JobParameters = (*WebParams)(nil)
 
 type WebParams struct {
-	JobType types.JobType `json:"type"`
-	Args    web.Page      `json:"arguments"`
+	JobType types.JobType        `json:"type"`
+	Args    web.ScraperArguments `json:"arguments"`
 }
 
 func (w WebParams) Validate(cfg *SearchConfig) error {

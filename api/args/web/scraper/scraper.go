@@ -1,4 +1,4 @@
-package page
+package scraper
 
 import (
 	"encoding/json"
@@ -53,6 +53,7 @@ func (w *Arguments) SetDefaultValues() {
 }
 
 // Validate validates the  arguments
+// TODO: use a validation library
 func (w *Arguments) Validate() error {
 	err := w.ValidateCapability(types.WebJob)
 	if err != nil {

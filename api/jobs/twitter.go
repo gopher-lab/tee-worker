@@ -12,8 +12,8 @@ import (
 var _ JobParameters = (*TwitterParams)(nil)
 
 type TwitterParams struct {
-	JobType types.JobType  `json:"type"`      // Any of the Twitter* job types
-	Args    twitter.Search `json:"arguments"` // Search arguments
+	JobType types.JobType           `json:"type"`      // Any of the Twitter* job types
+	Args    twitter.SearchArguments `json:"arguments"` // Search arguments
 }
 
 func (t TwitterParams) Validate(cfg *SearchConfig) error {

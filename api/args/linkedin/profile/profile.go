@@ -75,6 +75,7 @@ func (a *Arguments) SetDefaultValues() {
 	}
 }
 
+// TODO: use a validation library
 func (a *Arguments) Validate() error {
 	var errs []error
 

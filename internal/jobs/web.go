@@ -23,7 +23,7 @@ import (
 
 // WebApifyClient defines the interface for the Web Apify client to allow mocking in tests
 type WebApifyClient interface {
-	Scrape(workerID string, args web.Page, cursor client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error)
+	Scrape(workerID string, args web.ScraperArguments, cursor client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error)
 }
 
 // NewWebApifyClient is a function variable that can be replaced in tests.
@@ -35,7 +35,7 @@ var NewWebApifyClient = func(apiKey string, statsCollector *stats.StatsCollector
 // LLMApify is the interface for the LLM processor client
 // Only the Process method is required for this flow
 type LLMApify interface {
-	Process(workerID string, args llm.Process, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error)
+	Process(workerID string, args llm.ProcessArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error)
 }
 
 // NewLLMApifyClient is a function variable to allow injection in tests
@@ -74,7 +74,7 @@ func (w *WebScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		return types.JobResult{Error: msg.Error()}, msg
 	}
 
-	webArgs, ok := jobArgs.(*web.Page)
+	webArgs, ok := jobArgs.(*web.ScraperArguments)
 	if !ok {
 		return types.JobResult{Error: "invalid argument type for Web job"}, errors.New("invalid argument type")
 	}
@@ -100,7 +100,7 @@ func (w *WebScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		return types.JobResult{Error: "error creating LLM Apify client"}, fmt.Errorf("failed to create LLM Apify client: %w", err)
 	}
 
-	llmArgs := llm.Process{
+	llmArgs := llm.ProcessArguments{
 		DatasetId:   datasetId,
 		Prompt:      "summarize the content of this webpage, focusing on keywords and topics: ${markdown}",
 		MaxTokens:   process.DefaultMaxTokens,

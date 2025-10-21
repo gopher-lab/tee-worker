@@ -1,4 +1,4 @@
-package page_test
+package scraper_test
 
 import (
 	"encoding/json"
@@ -7,14 +7,15 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/args/web/page"
+	"github.com/masa-finance/tee-worker/api/args/web"
+	"github.com/masa-finance/tee-worker/api/args/web/scraper"
 	"github.com/masa-finance/tee-worker/api/types"
 )
 
 var _ = Describe("WebArguments", func() {
 	Describe("Marshalling and unmarshalling", func() {
 		It("should set default values", func() {
-			webArgs := page.NewArguments()
+			webArgs := web.NewScraperArguments()
 			webArgs.URL = "https://example.com"
 			webArgs.MaxDepth = 0
 			webArgs.MaxPages = 0
@@ -26,7 +27,7 @@ var _ = Describe("WebArguments", func() {
 		})
 
 		It("should override default values", func() {
-			webArgs := page.NewArguments()
+			webArgs := web.NewScraperArguments()
 			webArgs.URL = "https://example.com"
 			webArgs.MaxDepth = 2
 			webArgs.MaxPages = 5
@@ -38,16 +39,16 @@ var _ = Describe("WebArguments", func() {
 		})
 
 		It("should fail unmarshal when url is missing", func() {
-			var webArgs page.Arguments
+			var webArgs web.ScraperArguments
 			jsonData := []byte(`{"type":"scraper","max_depth":1,"max_pages":1}`)
 			err := json.Unmarshal(jsonData, &webArgs)
-			Expect(errors.Is(err, page.ErrURLRequired)).To(BeTrue())
+			Expect(errors.Is(err, scraper.ErrURLRequired)).To(BeTrue())
 		})
 	})
 
 	Describe("Validation", func() {
 		It("should succeed with valid arguments", func() {
-			webArgs := page.NewArguments()
+			webArgs := web.NewScraperArguments()
 			webArgs.URL = "https://example.com"
 			webArgs.MaxDepth = 2
 			webArgs.MaxPages = 3
@@ -56,61 +57,61 @@ var _ = Describe("WebArguments", func() {
 		})
 
 		It("should fail when url is missing", func() {
-			webArgs := page.NewArguments()
+			webArgs := web.NewScraperArguments()
 			webArgs.MaxDepth = 0
 			webArgs.MaxPages = 1
 			err := webArgs.Validate()
-			Expect(errors.Is(err, page.ErrURLRequired)).To(BeTrue())
+			Expect(errors.Is(err, scraper.ErrURLRequired)).To(BeTrue())
 		})
 
 		It("should fail with an invalid URL format", func() {
-			webArgs := page.NewArguments()
+			webArgs := web.NewScraperArguments()
 			webArgs.URL = "http:// invalid.com"
 			webArgs.MaxDepth = 0
 			webArgs.MaxPages = 1
 			err := webArgs.Validate()
-			Expect(errors.Is(err, page.ErrURLInvalid)).To(BeTrue())
+			Expect(errors.Is(err, scraper.ErrURLInvalid)).To(BeTrue())
 			Expect(err.Error()).To(ContainSubstring("invalid URL format"))
 		})
 
 		It("should fail when scheme is missing", func() {
-			webArgs := page.NewArguments()
+			webArgs := web.NewScraperArguments()
 			webArgs.URL = "example.com"
 			webArgs.MaxDepth = 0
 			webArgs.MaxPages = 1
 			err := webArgs.Validate()
-			Expect(errors.Is(err, page.ErrURLSchemeMissing)).To(BeTrue())
+			Expect(errors.Is(err, scraper.ErrURLSchemeMissing)).To(BeTrue())
 		})
 
 		It("should fail when max depth is negative", func() {
-			webArgs := page.NewArguments()
+			webArgs := web.NewScraperArguments()
 			webArgs.URL = "https://example.com"
 			webArgs.MaxDepth = -1
 			webArgs.MaxPages = 1
 			err := webArgs.Validate()
-			Expect(errors.Is(err, page.ErrMaxDepth)).To(BeTrue())
+			Expect(errors.Is(err, scraper.ErrMaxDepth)).To(BeTrue())
 			Expect(err.Error()).To(ContainSubstring("got -1"))
 		})
 
 		It("should fail when max pages is less than 1", func() {
-			webArgs := page.NewArguments()
+			webArgs := web.NewScraperArguments()
 			webArgs.URL = "https://example.com"
 			webArgs.MaxDepth = 0
 			webArgs.MaxPages = 0
 			err := webArgs.Validate()
-			Expect(errors.Is(err, page.ErrMaxPages)).To(BeTrue())
+			Expect(errors.Is(err, scraper.ErrMaxPages)).To(BeTrue())
 			Expect(err.Error()).To(ContainSubstring("got 0"))
 		})
 	})
 
 	Describe("Job capability", func() {
 		It("should return the scraper capability", func() {
-			webArgs := page.NewArguments()
+			webArgs := web.NewScraperArguments()
 			Expect(webArgs.GetCapability()).To(Equal(types.CapScraper))
 		})
 
 		It("should validate capability for WebJob", func() {
-			webArgs := page.NewArguments()
+			webArgs := web.NewScraperArguments()
 			webArgs.URL = "https://example.com"
 			webArgs.MaxDepth = 1
 			webArgs.MaxPages = 1
@@ -121,7 +122,7 @@ var _ = Describe("WebArguments", func() {
 
 	Describe("ToWebScraperRequest", func() {
 		It("should map fields correctly", func() {
-			webArgs := page.NewArguments()
+			webArgs := web.NewScraperArguments()
 			webArgs.URL = "https://example.com"
 			webArgs.MaxDepth = 2
 			webArgs.MaxPages = 3

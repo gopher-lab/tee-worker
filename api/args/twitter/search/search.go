@@ -54,6 +54,7 @@ func (t *Arguments) SetDefaultValues() {
 }
 
 // Validate validates the  arguments (general validation)
+// TODO: use a validation library
 func (t *Arguments) Validate() error {
 	// note, query is not required for all capabilities
 	err := t.ValidateCapability(types.TwitterJob)
@@ -104,8 +105,7 @@ func (t *Arguments) IsSingleProfileOperation() bool {
 }
 
 func (t *Arguments) IsMultipleProfileOperation() bool {
-	c := t.GetCapability()
-	return c == types.CapGetRetweeters
+	return t.GetCapability() == types.CapGetRetweeters
 }
 
 func (t *Arguments) IsSingleSpaceOperation() bool {

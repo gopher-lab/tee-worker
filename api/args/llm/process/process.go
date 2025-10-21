@@ -62,6 +62,7 @@ func (l *Arguments) SetDefaultValues() {
 	}
 }
 
+// TODO: use a validation library
 func (l *Arguments) Validate() error {
 	if l.DatasetId == "" {
 		return ErrDatasetIdRequired

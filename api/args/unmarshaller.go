@@ -52,8 +52,8 @@ func UnmarshalJobArguments(jobType types.JobType, args Args) (base.JobArgument, 
 }
 
 // Helper functions for unmarshaling specific argument types
-func unmarshalWebArguments(args Args) (*web.Page, error) {
-	webArgs := &web.Page{}
+func unmarshalWebArguments(args Args) (*web.ScraperArguments, error) {
+	webArgs := &web.ScraperArguments{}
 	if err := unmarshalToStruct(args, webArgs); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 	}
@@ -67,19 +67,19 @@ func unmarshalTikTokArguments(args Args) (base.JobArgument, error) {
 	}
 	switch minimal.Type {
 	case types.CapSearchByQuery:
-		searchArgs := &tiktok.Query{}
+		searchArgs := &tiktok.QueryArguments{}
 		if err := unmarshalToStruct(args, searchArgs); err != nil {
 			return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 		}
 		return searchArgs, nil
 	case types.CapSearchByTrending:
-		searchArgs := &tiktok.Trending{}
+		searchArgs := &tiktok.TrendingArguments{}
 		if err := unmarshalToStruct(args, searchArgs); err != nil {
 			return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 		}
 		return searchArgs, nil
 	case types.CapTranscription:
-		transcriptionArgs := &tiktok.Transcription{}
+		transcriptionArgs := &tiktok.TranscriptionArguments{}
 		if err := unmarshalToStruct(args, transcriptionArgs); err != nil {
 			return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 		}
@@ -89,32 +89,32 @@ func unmarshalTikTokArguments(args Args) (base.JobArgument, error) {
 	}
 }
 
-func unmarshalTwitterArguments(args Args) (*twitter.Search, error) {
-	twitterArgs := &twitter.Search{}
+func unmarshalTwitterArguments(args Args) (*twitter.SearchArguments, error) {
+	twitterArgs := &twitter.SearchArguments{}
 	if err := unmarshalToStruct(args, twitterArgs); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 	}
 	return twitterArgs, nil
 }
 
-func unmarshalLinkedInArguments(args Args) (*linkedin.Profile, error) {
-	linkedInArgs := &linkedin.Profile{}
+func unmarshalLinkedInArguments(args Args) (*linkedin.ProfileArguments, error) {
+	linkedInArgs := &linkedin.ProfileArguments{}
 	if err := unmarshalToStruct(args, linkedInArgs); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 	}
 	return linkedInArgs, nil
 }
 
-func unmarshalRedditArguments(args Args) (*reddit.Search, error) {
-	redditArgs := &reddit.Search{}
+func unmarshalRedditArguments(args Args) (*reddit.SearchArguments, error) {
+	redditArgs := &reddit.SearchArguments{}
 	if err := unmarshalToStruct(args, redditArgs); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 	}
 	return redditArgs, nil
 }
 
-func unmarshalTelemetryArguments(args Args) (*telemetry.Telemetry, error) {
-	telemetryArgs := &telemetry.Telemetry{}
+func unmarshalTelemetryArguments(args Args) (*telemetry.Arguments, error) {
+	telemetryArgs := &telemetry.Arguments{}
 	if err := unmarshalToStruct(args, telemetryArgs); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
 	}

@@ -1,4 +1,4 @@
-package page_test
+package scraper_test
 
 import (
 	"testing"

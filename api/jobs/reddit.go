@@ -12,8 +12,8 @@ import (
 var _ JobParameters = (*RedditParams)(nil)
 
 type RedditParams struct {
-	JobType types.JobType `json:"type"`      // Type of search: 'reddit'
-	Args    reddit.Search `json:"arguments"` // Scrape arguments
+	JobType types.JobType          `json:"type"`      // Type of search: 'reddit'
+	Args    reddit.SearchArguments `json:"arguments"` // Scrape arguments
 }
 
 func (r RedditParams) Validate(cfg *SearchConfig) error {

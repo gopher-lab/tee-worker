@@ -4,4 +4,6 @@ import (
 	"github.com/masa-finance/tee-worker/api/args/llm/process"
 )
 
-type Process = process.Arguments
+type ProcessArguments = process.Arguments
+
+var NewProcessArguments = process.NewArguments

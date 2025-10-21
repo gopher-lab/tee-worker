@@ -12,8 +12,8 @@ import (
 var _ JobParameters = (*LinkedInParams)(nil)
 
 type LinkedInParams struct {
-	JobType types.JobType    `json:"type"`
-	Args    linkedin.Profile `json:"arguments"`
+	JobType types.JobType             `json:"type"`
+	Args    linkedin.ProfileArguments `json:"arguments"`
 }
 
 func (l LinkedInParams) Validate(cfg *SearchConfig) error {

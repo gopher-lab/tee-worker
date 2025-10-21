@@ -65,7 +65,7 @@ var _ = Describe("WebApifyClient", func() {
 
 	Describe("Scrape", func() {
 		It("should construct the correct actor input", func() {
-			args := web.Page{
+			args := web.ScraperArguments{
 				URL:      "https://example.com",
 				MaxDepth: 1,
 				MaxPages: 2,
@@ -87,7 +87,7 @@ var _ = Describe("WebApifyClient", func() {
 				return nil, "", expectedErr
 			}
 
-			args := web.Page{
+			args := web.ScraperArguments{
 				URL:      "https://example.com",
 				MaxDepth: 0,
 				MaxPages: 1,
@@ -107,7 +107,7 @@ var _ = Describe("WebApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := web.Page{
+			args := web.ScraperArguments{
 				URL:      "https://example.com",
 				MaxDepth: 0,
 				MaxPages: 1,
@@ -132,7 +132,7 @@ var _ = Describe("WebApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := web.Page{
+			args := web.ScraperArguments{
 				URL:      "https://example.com",
 				MaxDepth: 0,
 				MaxPages: 1,
@@ -193,7 +193,7 @@ var _ = Describe("WebApifyClient", func() {
 			realClient, err := webapify.NewClient(apifyKey, nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			args := web.Page{
+			args := web.ScraperArguments{
 				URL:      "https://example.com",
 				MaxDepth: 0,
 				MaxPages: 1,

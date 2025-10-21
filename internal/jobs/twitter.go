@@ -633,7 +633,7 @@ func NewTwitterScraper(jc config.JobConfiguration, c *stats.StatsCollector) *Twi
 }
 
 // executeCapability routes the job to the appropriate method based on capability
-func (ts *TwitterScraper) executeCapability(j types.Job, jobArgs *twitterargs.Search) (types.JobResult, error) {
+func (ts *TwitterScraper) executeCapability(j types.Job, jobArgs *twitterargs.SearchArguments) (types.JobResult, error) {
 	capability := jobArgs.GetCapability()
 
 	switch capability {
@@ -715,7 +715,7 @@ func (ts *TwitterScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 	}
 
 	// Type assert to Twitter arguments
-	args, ok := jobArgs.(*twitterargs.Search)
+	args, ok := jobArgs.(*twitterargs.SearchArguments)
 	if !ok {
 		logrus.Errorf("Expected Twitter arguments for job ID %s, type %s", j.UUID, j.Type)
 		return types.JobResult{Error: "invalid argument type for Twitter job"}, fmt.Errorf("invalid argument type")

@@ -41,7 +41,7 @@ func (c *ApifyClient) ValidateApiKey() error {
 	return c.client.ValidateApiKey()
 }
 
-func (c *ApifyClient) Scrape(workerID string, args web.Page, cursor client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error) {
+func (c *ApifyClient) Scrape(workerID string, args web.ScraperArguments, cursor client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error) {
 	if c.statsCollector != nil {
 		c.statsCollector.Add(workerID, stats.WebQueries, 1)
 	}

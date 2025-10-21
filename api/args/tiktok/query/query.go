@@ -54,6 +54,7 @@ func (t *Arguments) ValidateCapability(jobType types.JobType) error {
 	return jobType.ValidateCapability(&t.Type)
 }
 
+// TODO: use a validation library
 func (t *Arguments) Validate() error {
 	err := t.ValidateCapability(types.TiktokJob)
 	if err != nil {

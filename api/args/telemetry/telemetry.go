@@ -13,8 +13,6 @@ var (
 	ErrUnmarshalling = errors.New("failed to unmarshal telemetry arguments")
 )
 
-type Telemetry = Arguments
-
 // Verify interface implementation
 var _ base.JobArgument = (*Arguments)(nil)
 

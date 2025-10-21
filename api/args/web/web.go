@@ -1,7 +1,9 @@
 package web
 
 import (
-	"github.com/masa-finance/tee-worker/api/args/web/page"
+	"github.com/masa-finance/tee-worker/api/args/web/scraper"
 )
 
-type Page = page.Arguments
+type ScraperArguments = scraper.Arguments
+
+var NewScraperArguments = scraper.NewArguments

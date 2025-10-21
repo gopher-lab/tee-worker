@@ -96,6 +96,7 @@ func (r *Arguments) SetDefaultValues() {
 	r.Sort = types.RedditSortType(strings.ToLower(string(r.Sort)))
 }
 
+// TODO: use a validation library
 func (r *Arguments) Validate() error {
 	var errs []error
 

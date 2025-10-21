@@ -50,6 +50,7 @@ func (a *Arguments) SetDefaultValues() {
 }
 
 // Validate validates the TikTok arguments
+// TODO: use a validation library
 func (t *Arguments) Validate() error {
 	err := t.ValidateCapability(types.TiktokJob)
 	if err != nil {

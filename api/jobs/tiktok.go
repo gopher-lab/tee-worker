@@ -14,18 +14,18 @@ import (
 var _ JobParameters = (*TikTokParams)(nil)
 
 type TikTokTranscriptionParams struct {
-	JobType types.JobType        `json:"type"`
-	Args    tiktok.Transcription `json:"arguments"`
+	JobType types.JobType                 `json:"type"`
+	Args    tiktok.TranscriptionArguments `json:"arguments"`
 }
 
 type TikTokSearchParams struct {
-	JobType types.JobType `json:"type"`
-	Args    tiktok.Query  `json:"arguments"`
+	JobType types.JobType         `json:"type"`
+	Args    tiktok.QueryArguments `json:"arguments"`
 }
 
 type TikTokTrendingParams struct {
-	JobType types.JobType   `json:"type"`
-	Args    tiktok.Trending `json:"arguments"`
+	JobType types.JobType            `json:"type"`
+	Args    tiktok.TrendingArguments `json:"arguments"`
 }
 
 // TikTokArguments is a flexible map that supports multiple unique capabilities

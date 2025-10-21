@@ -54,7 +54,7 @@ func (c *ApifyClient) ValidateApiKey() error {
 	return c.client.ValidateApiKey()
 }
 
-func (c *ApifyClient) Process(workerID string, args llm.Process, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error) {
+func (c *ApifyClient) Process(workerID string, args llm.ProcessArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error) {
 	if c.statsCollector != nil {
 		c.statsCollector.Add(workerID, stats.LLMQueries, 1)
 	}
