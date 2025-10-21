@@ -35,7 +35,7 @@ var _ base.JobArgument = (*Arguments)(nil)
 
 // Arguments defines args for LinkedIn profile operations
 type Arguments struct {
-	Type                  types.Capability    `json:"type"`
+	base.Arguments
 	ScraperMode           profile.ScraperMode `json:"profileScraperMode"`
 	Query                 string              `json:"searchQuery"`
 	MaxItems              uint                `json:"maxItems"`
@@ -123,14 +123,6 @@ func (a *Arguments) Validate() error {
 	}
 
 	return nil
-}
-
-func (a *Arguments) GetCapability() types.Capability {
-	return a.Type
-}
-
-func (a *Arguments) ValidateCapability(jobType types.JobType) error {
-	return jobType.ValidateCapability(&a.Type)
 }
 
 // NewArguments creates a new Arguments instance and applies default values immediately

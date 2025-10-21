@@ -17,17 +17,17 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
 
-	profileArgs "github.com/masa-finance/tee-worker/api/args/linkedin/profile"
-	profileTypes "github.com/masa-finance/tee-worker/api/types/linkedin/profile"
+	"github.com/masa-finance/tee-worker/api/args/linkedin"
+	"github.com/masa-finance/tee-worker/api/types/linkedin/profile"
 )
 
 // MockLinkedInApifyClient is a mock implementation of the LinkedInApifyClient.
 type MockLinkedInApifyClient struct {
-	SearchProfilesFunc func(workerID string, args *profileArgs.Arguments, cursor client.Cursor) ([]*profileTypes.Profile, string, client.Cursor, error)
+	SearchProfilesFunc func(workerID string, args *linkedin.ProfileArguments, cursor client.Cursor) ([]*profile.Profile, string, client.Cursor, error)
 	ValidateApiKeyFunc func() error
 }
 
-func (m *MockLinkedInApifyClient) SearchProfiles(workerID string, args *profileArgs.Arguments, cursor client.Cursor) ([]*profileTypes.Profile, string, client.Cursor, error) {
+func (m *MockLinkedInApifyClient) SearchProfiles(workerID string, args *linkedin.ProfileArguments, cursor client.Cursor) ([]*profile.Profile, string, client.Cursor, error) {
 	if m != nil && m.SearchProfilesFunc != nil {
 		return m.SearchProfilesFunc(workerID, args, cursor)
 	}
@@ -100,7 +100,7 @@ var _ = Describe("LinkedInScraper", func() {
 
 			headline := "Software Engineer"
 			headline2 := "Senior Software Engineer"
-			expectedProfiles := []*profileTypes.Profile{
+			expectedProfiles := []*profile.Profile{
 				{
 					ID:               "profile-1",
 					FirstName:        "John",
@@ -119,7 +119,7 @@ var _ = Describe("LinkedInScraper", func() {
 				},
 			}
 
-			mockClient.SearchProfilesFunc = func(workerID string, args *profileArgs.Arguments, cursor client.Cursor) ([]*profileTypes.Profile, string, client.Cursor, error) {
+			mockClient.SearchProfilesFunc = func(workerID string, args *linkedin.ProfileArguments, cursor client.Cursor) ([]*profile.Profile, string, client.Cursor, error) {
 				Expect(workerID).To(Equal("test-worker"))
 				Expect(args.Query).To(Equal("software engineer"))
 				Expect(args.MaxItems).To(Equal(uint(10)))
@@ -132,7 +132,7 @@ var _ = Describe("LinkedInScraper", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.NextCursor).To(Equal("next-cursor"))
 
-			var resp []*profileTypes.Profile
+			var resp []*profile.Profile
 			err = json.Unmarshal(result.Data, &resp)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp).To(HaveLen(2))
@@ -150,7 +150,7 @@ var _ = Describe("LinkedInScraper", func() {
 			}
 
 			expectedErr := errors.New("client error")
-			mockClient.SearchProfilesFunc = func(workerID string, args *profileArgs.Arguments, cursor client.Cursor) ([]*profileTypes.Profile, string, client.Cursor, error) {
+			mockClient.SearchProfilesFunc = func(workerID string, args *linkedin.ProfileArguments, cursor client.Cursor) ([]*profile.Profile, string, client.Cursor, error) {
 				return nil, "", client.EmptyCursor, expectedErr
 			}
 
@@ -182,8 +182,8 @@ var _ = Describe("LinkedInScraper", func() {
 				"maxItems":    10,
 			}
 
-			mockClient.SearchProfilesFunc = func(workerID string, args *profileArgs.Arguments, cursor client.Cursor) ([]*profileTypes.Profile, string, client.Cursor, error) {
-				return []*profileTypes.Profile{}, "", client.EmptyCursor, nil
+			mockClient.SearchProfilesFunc = func(workerID string, args *linkedin.ProfileArguments, cursor client.Cursor) ([]*profile.Profile, string, client.Cursor, error) {
+				return []*profile.Profile{}, "", client.EmptyCursor, nil
 			}
 
 			result, err := scraper.ExecuteJob(job)
@@ -199,14 +199,14 @@ var _ = Describe("LinkedInScraper", func() {
 			}
 
 			// Create a profile with a channel to cause JSON marshalling to fail
-			invalidProfile := &profileTypes.Profile{
+			invalidProfile := &profile.Profile{
 				ID:        "profile-1",
 				FirstName: "John",
 				LastName:  "Doe",
 			}
 
-			mockClient.SearchProfilesFunc = func(workerID string, args *profileArgs.Arguments, cursor client.Cursor) ([]*profileTypes.Profile, string, client.Cursor, error) {
-				return []*profileTypes.Profile{invalidProfile}, "dataset-123", client.EmptyCursor, nil
+			mockClient.SearchProfilesFunc = func(workerID string, args *linkedin.ProfileArguments, cursor client.Cursor) ([]*profile.Profile, string, client.Cursor, error) {
+				return []*profile.Profile{invalidProfile}, "dataset-123", client.EmptyCursor, nil
 			}
 
 			result, err := scraper.ExecuteJob(job)
@@ -222,15 +222,15 @@ var _ = Describe("LinkedInScraper", func() {
 				"maxItems":    10,
 			}
 
-			mockClient.SearchProfilesFunc = func(workerID string, args *profileArgs.Arguments, cursor client.Cursor) ([]*profileTypes.Profile, string, client.Cursor, error) {
-				return []*profileTypes.Profile{}, "dataset-123", client.EmptyCursor, nil
+			mockClient.SearchProfilesFunc = func(workerID string, args *linkedin.ProfileArguments, cursor client.Cursor) ([]*profile.Profile, string, client.Cursor, error) {
+				return []*profile.Profile{}, "dataset-123", client.EmptyCursor, nil
 			}
 
 			result, err := scraper.ExecuteJob(job)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.NextCursor).To(Equal(""))
 
-			var resp []*profileTypes.Profile
+			var resp []*profile.Profile
 			err = json.Unmarshal(result.Data, &resp)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp).To(HaveLen(0))
@@ -261,11 +261,10 @@ var _ = Describe("LinkedInScraper", func() {
 			integrationStatsCollector := stats.StartCollector(128, cfg)
 			integrationScraper := jobs.NewLinkedInScraper(cfg, integrationStatsCollector)
 
-			jobArgs := profileArgs.Arguments{
-				Type:     types.CapSearchByProfile,
-				Query:    "software engineer",
-				MaxItems: 10,
-			}
+			jobArgs := linkedin.NewProfileArguments()
+			jobArgs.Type = types.CapSearchByProfile
+			jobArgs.Query = "software engineer"
+			jobArgs.MaxItems = 10
 
 			// Marshal jobArgs to map[string]any so it can be used as JobArgument
 			var jobArgsMap map[string]any
@@ -287,7 +286,7 @@ var _ = Describe("LinkedInScraper", func() {
 			Expect(result.Error).To(BeEmpty())
 			Expect(result.Data).NotTo(BeEmpty())
 
-			var resp []*profileTypes.Profile
+			var resp []*profile.Profile
 			err = json.Unmarshal(result.Data, &resp)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp).NotTo(BeEmpty())

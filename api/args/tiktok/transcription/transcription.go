@@ -28,9 +28,9 @@ var _ base.JobArgument = (*Arguments)(nil)
 
 // Arguments defines args for TikTok transcriptions
 type Arguments struct {
-	Type     types.Capability `json:"type"`
-	VideoURL string           `json:"video_url"`
-	Language string           `json:"language,omitempty"`
+	base.Arguments
+	VideoURL string `json:"video_url"`
+	Language string `json:"language,omitempty"`
 }
 
 func (a *Arguments) UnmarshalJSON(data []byte) error {
@@ -81,14 +81,6 @@ func (t *Arguments) Validate() error {
 	return nil
 }
 
-func (t *Arguments) GetCapability() types.Capability {
-	return t.Type
-}
-
-func (t *Arguments) ValidateCapability(jobType types.JobType) error {
-	return jobType.ValidateCapability(&t.Type)
-}
-
 // IsTikTokURL validates if the URL is a TikTok URL
 func (t *Arguments) IsTikTokURL(parsedURL *url.URL) bool {
 	host := strings.ToLower(parsedURL.Host)
@@ -120,9 +112,8 @@ func (t *Arguments) validateLanguageCode() error {
 }
 
 func NewArguments() Arguments {
-	args := Arguments{
-		Type: types.CapTranscription,
-	}
+	args := Arguments{}
+	args.Type = types.CapTranscription
 	args.SetDefaultValues()
 	return args
 }

@@ -27,13 +27,13 @@ var _ base.JobArgument = (*Arguments)(nil)
 
 // Arguments defines args for Twitter searches
 type Arguments struct {
-	Type       types.Capability `json:"type"`
-	Query      string           `json:"query"` // Username or search query
-	Count      int              `json:"count"`
-	StartTime  string           `json:"start_time"`  // Optional ISO timestamp
-	EndTime    string           `json:"end_time"`    // Optional ISO timestamp
-	MaxResults int              `json:"max_results"` // Optional, max number of results
-	NextCursor string           `json:"next_cursor"`
+	base.Arguments
+	Query      string `json:"query"` // Username or search query
+	Count      int    `json:"count"`
+	StartTime  string `json:"start_time"`  // Optional ISO timestamp
+	EndTime    string `json:"end_time"`    // Optional ISO timestamp
+	MaxResults int    `json:"max_results"` // Optional, max number of results
+	NextCursor string `json:"next_cursor"`
 }
 
 func (t *Arguments) UnmarshalJSON(data []byte) error {
@@ -75,14 +75,6 @@ func (t *Arguments) Validate() error {
 	}
 
 	return nil
-}
-
-func (t *Arguments) GetCapability() types.Capability {
-	return t.Type
-}
-
-func (t *Arguments) ValidateCapability(jobType types.JobType) error {
-	return jobType.ValidateCapability(&t.Type)
 }
 
 func (t *Arguments) IsSingleTweetOperation() bool {

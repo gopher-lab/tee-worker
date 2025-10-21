@@ -41,7 +41,7 @@ var _ base.JobArgument = (*Arguments)(nil)
 // Arguments defines args for Reddit scrapes
 // see https://apify.com/trudax/reddit-scraper
 type Arguments struct {
-	Type           types.Capability     `json:"type"`
+	base.Arguments
 	Queries        []string             `json:"queries"`
 	URLs           []string             `json:"urls"`
 	Sort           types.RedditSortType `json:"sort"`
@@ -152,22 +152,11 @@ func (r *Arguments) Validate() error {
 	return errors.Join(errs...)
 }
 
-// GetCapability returns the capability of the arguments
-func (r *Arguments) GetCapability() types.Capability {
-	return r.Type
-}
-
-// ValidateCapability validates the capability of the arguments
-func (r *Arguments) ValidateCapability(jobType types.JobType) error {
-	return jobType.ValidateCapability(&r.Type)
-}
-
 // NewArguments creates a new Arguments instance with the specified capability
 // and applies default values immediately
 func NewArguments(capability types.Capability) Arguments {
-	args := Arguments{
-		Type: capability,
-	}
+	args := Arguments{}
+	args.Type = capability
 	args.SetDefaultValues()
 	return args
 }

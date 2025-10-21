@@ -23,11 +23,11 @@ const (
 var _ base.JobArgument = (*Arguments)(nil)
 
 type Arguments struct {
-	Type      types.Capability `json:"type"`
-	Search    []string         `json:"search,omitempty"`
-	StartUrls []string         `json:"start_urls,omitempty"`
-	MaxItems  uint             `json:"max_items,omitempty"`
-	EndPage   uint             `json:"end_page,omitempty"`
+	base.Arguments
+	Search    []string `json:"search,omitempty"`
+	StartUrls []string `json:"start_urls,omitempty"`
+	MaxItems  uint     `json:"max_items,omitempty"`
+	EndPage   uint     `json:"end_page,omitempty"`
 }
 
 func (t *Arguments) UnmarshalJSON(data []byte) error {
@@ -46,14 +46,6 @@ func (t *Arguments) SetDefaultValues() {
 	}
 }
 
-func (t *Arguments) GetCapability() types.Capability {
-	return t.Type
-}
-
-func (t *Arguments) ValidateCapability(jobType types.JobType) error {
-	return jobType.ValidateCapability(&t.Type)
-}
-
 // TODO: use a validation library
 func (t *Arguments) Validate() error {
 	err := t.ValidateCapability(types.TiktokJob)
@@ -67,9 +59,8 @@ func (t *Arguments) Validate() error {
 }
 
 func NewArguments() Arguments {
-	args := Arguments{
-		Type: types.CapSearchByQuery,
-	}
+	args := Arguments{}
+	args.Type = types.CapSearchByQuery
 	args.SetDefaultValues()
 	return args
 }

@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/masa-finance/tee-worker/api/args/reddit"
 	"github.com/masa-finance/tee-worker/api/args/reddit/search"
 	"github.com/masa-finance/tee-worker/api/types"
 )
@@ -14,7 +15,7 @@ import (
 var _ = Describe("RedditArguments", func() {
 	Describe("Marshalling and unmarshalling", func() {
 		It("should set default values", func() {
-			redditArgs := search.NewSearchPostsArguments()
+			redditArgs := reddit.NewSearchPostsArguments()
 			redditArgs.Queries = []string{"Zaphod", "Ford"}
 			jsonData, err := json.Marshal(redditArgs)
 			Expect(err).ToNot(HaveOccurred())
@@ -30,7 +31,7 @@ var _ = Describe("RedditArguments", func() {
 		})
 
 		It("should override default values", func() {
-			redditArgs := search.NewSearchPostsArguments()
+			redditArgs := reddit.NewSearchPostsArguments()
 			redditArgs.Queries = []string{"Zaphod", "Ford"}
 			redditArgs.MaxItems = 20
 			redditArgs.MaxPosts = 21
@@ -55,7 +56,7 @@ var _ = Describe("RedditArguments", func() {
 
 	Describe("Validation", func() {
 		It("should succeed with valid arguments", func() {
-			redditArgs := search.NewSearchPostsArguments()
+			redditArgs := reddit.NewSearchPostsArguments()
 			redditArgs.Queries = []string{"test"}
 			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
@@ -63,7 +64,7 @@ var _ = Describe("RedditArguments", func() {
 		})
 
 		It("should succeed with valid scrapeurls arguments", func() {
-			redditArgs := search.NewScrapeUrlsArguments()
+			redditArgs := reddit.NewScrapeUrlsArguments()
 			redditArgs.URLs = []string{"https://www.reddit.com/r/golang/comments/foo/bar"}
 			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
@@ -71,7 +72,7 @@ var _ = Describe("RedditArguments", func() {
 		})
 
 		It("should fail with an invalid type", func() {
-			redditArgs := search.NewSearchPostsArguments()
+			redditArgs := reddit.NewSearchPostsArguments()
 			redditArgs.Type = "invalidtype" // Override the default
 			redditArgs.Queries = []string{"test"}
 			redditArgs.Sort = types.RedditSortNew
@@ -88,12 +89,10 @@ var _ = Describe("RedditArguments", func() {
 		})
 
 		It("should fail if the after time is in the future", func() {
-			redditArgs := &search.Arguments{
-				Type:    types.CapSearchPosts,
-				Queries: []string{"test"},
-				Sort:    types.RedditSortNew,
-				After:   time.Now().Add(24 * time.Hour),
-			}
+			redditArgs := reddit.NewSearchPostsArguments()
+			redditArgs.Queries = []string{"test"}
+			redditArgs.Sort = types.RedditSortNew
+			redditArgs.After = time.Now().Add(24 * time.Hour)
 			err := redditArgs.Validate()
 			Expect(err).To(MatchError(search.ErrTimeInTheFuture))
 		})
@@ -131,11 +130,9 @@ var _ = Describe("RedditArguments", func() {
 		})
 
 		It("should fail with an invalid URL", func() {
-			redditArgs := &search.Arguments{
-				Type: types.CapScrapeUrls,
-				URLs: []string{"ht tp://invalid-url.com"},
-				Sort: types.RedditSortNew,
-			}
+			redditArgs := reddit.NewScrapeUrlsArguments()
+			redditArgs.URLs = []string{"ht tp://invalid-url.com"}
+			redditArgs.Sort = types.RedditSortNew
 			err := redditArgs.Validate()
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("is not a valid URL"))

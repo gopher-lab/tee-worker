@@ -13,9 +13,7 @@ import (
 var _ = Describe("Telemetry Arguments", func() {
 	Describe("Marshalling and unmarshalling", func() {
 		It("should set default values", func() {
-			args := &telemetry.Arguments{
-				Type: types.CapTelemetry,
-			}
+			args := telemetry.NewArguments()
 			jsonData, err := json.Marshal(args)
 			Expect(err).ToNot(HaveOccurred())
 			err = json.Unmarshal([]byte(jsonData), &args)
@@ -24,9 +22,7 @@ var _ = Describe("Telemetry Arguments", func() {
 		})
 
 		It("should preserve custom values", func() {
-			args := &telemetry.Arguments{
-				Type: types.CapTelemetry,
-			}
+			args := telemetry.NewArguments()
 			jsonData, err := json.Marshal(args)
 			Expect(err).ToNot(HaveOccurred())
 			err = json.Unmarshal([]byte(jsonData), &args)
@@ -46,9 +42,7 @@ var _ = Describe("Telemetry Arguments", func() {
 
 	Describe("Validation", func() {
 		It("should succeed with valid arguments", func() {
-			args := &telemetry.Arguments{
-				Type: types.CapTelemetry,
-			}
+			args := telemetry.NewArguments()
 			err := args.Validate()
 			Expect(err).ToNot(HaveOccurred())
 		})
@@ -62,9 +56,7 @@ var _ = Describe("Telemetry Arguments", func() {
 
 	Describe("GetCapability", func() {
 		It("should return the telemetry capability", func() {
-			args := &telemetry.Arguments{
-				Type: types.CapTelemetry,
-			}
+			args := telemetry.NewArguments()
 			Expect(args.GetCapability()).To(Equal(types.CapTelemetry))
 		})
 
@@ -76,25 +68,19 @@ var _ = Describe("Telemetry Arguments", func() {
 
 	Describe("ValidateCapability", func() {
 		It("should succeed with valid job type and capability", func() {
-			args := &telemetry.Arguments{
-				Type: types.CapTelemetry,
-			}
+			args := telemetry.NewArguments()
 			err := args.ValidateCapability(types.TelemetryJob)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should fail with invalid job type", func() {
-			args := &telemetry.Arguments{
-				Type: types.CapTelemetry,
-			}
+			args := telemetry.NewArguments()
 			err := args.ValidateCapability(types.LinkedInJob)
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("should fail with invalid capability", func() {
-			args := &telemetry.Arguments{
-				Type: types.CapSearchPosts, // Wrong capability
-			}
+			args := telemetry.NewArguments()
 			err := args.ValidateCapability(types.TelemetryJob)
 			Expect(err).To(HaveOccurred())
 		})
@@ -102,9 +88,7 @@ var _ = Describe("Telemetry Arguments", func() {
 
 	Describe("SetDefaultValues", func() {
 		It("should not modify arguments", func() {
-			args := &telemetry.Arguments{
-				Type: types.CapTelemetry,
-			}
+			args := telemetry.NewArguments()
 			originalType := args.Type
 			args.SetDefaultValues()
 			Expect(args.Type).To(Equal(originalType))

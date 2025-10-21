@@ -30,10 +30,10 @@ const (
 var _ base.JobArgument = (*Arguments)(nil)
 
 type Arguments struct {
-	Type     types.Capability `json:"type"`
-	URL      string           `json:"url"`
-	MaxDepth int              `json:"max_depth"`
-	MaxPages int              `json:"max_pages"`
+	base.Arguments
+	URL      string `json:"url"`
+	MaxDepth int    `json:"max_depth"`
+	MaxPages int    `json:"max_pages"`
 }
 
 func (t *Arguments) UnmarshalJSON(data []byte) error {
@@ -84,14 +84,6 @@ func (w *Arguments) Validate() error {
 	}
 
 	return nil
-}
-
-func (w *Arguments) GetCapability() types.Capability {
-	return w.Type
-}
-
-func (w *Arguments) ValidateCapability(jobType types.JobType) error {
-	return jobType.ValidateCapability(&w.Type)
 }
 
 func (w Arguments) ToScraperRequest() types.WebScraperRequest {

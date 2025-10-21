@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/masa-finance/tee-worker/api/args/tiktok"
 	"github.com/masa-finance/tee-worker/api/args/tiktok/trending"
 	"github.com/masa-finance/tee-worker/api/types"
 )
@@ -80,61 +81,56 @@ var _ = Describe("TikTokTrendingArguments", func() {
 
 	Describe("Validation", func() {
 		It("should succeed with valid arguments", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "vv",
-				MaxItems:    50,
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "vv"
+			args.MaxItems = 50
+			args.Period = "7"
 			err := args.Validate()
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should fail with invalid country code", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "INVALID",
-				SortBy:      "vv",
-				MaxItems:    50,
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "INVALID"
+			args.SortBy = "vv"
+			args.MaxItems = 50
+			args.Period = "7"
 			err := args.Validate()
 			Expect(errors.Is(err, trending.ErrTrendingCountryCodeRequired)).To(BeTrue())
 		})
 
 		It("should fail with invalid sort_by", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "invalid",
-				MaxItems:    50,
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "invalid"
+			args.MaxItems = 50
+			args.Period = "7"
 			err := args.Validate()
 			Expect(errors.Is(err, trending.ErrTrendingSortByRequired)).To(BeTrue())
 		})
 
 		It("should fail with invalid period", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "vv",
-				MaxItems:    50,
-				Period:      "invalid",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "vv"
+			args.MaxItems = 50
+			args.Period = "invalid"
 			err := args.Validate()
 			Expect(errors.Is(err, trending.ErrTrendingPeriodRequired)).To(BeTrue())
 		})
 
 		It("should fail with negative max_items", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "vv",
-				MaxItems:    -1,
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "vv"
+			args.MaxItems = -1
+			args.Period = "7"
 			err := args.Validate()
 			Expect(errors.Is(err, trending.ErrTrendingMaxItemsNegative)).To(BeTrue())
 		})
@@ -142,42 +138,38 @@ var _ = Describe("TikTokTrendingArguments", func() {
 
 	Describe("Default values", func() {
 		It("should set default country_code when not provided", func() {
-			args := &trending.Arguments{
-				Type:   types.CapSearchByTrending,
-				SortBy: "vv",
-				Period: "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.SortBy = "vv"
+			args.Period = "7"
 			args.SetDefaultValues()
 			Expect(args.CountryCode).To(Equal("US"))
 		})
 
 		It("should set default sort_by when not provided", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.Period = "7"
 			args.SetDefaultValues()
 			Expect(args.SortBy).To(Equal("vv"))
 		})
 
 		It("should set default period when not provided", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "vv",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "vv"
 			args.SetDefaultValues()
 			Expect(args.Period).To(Equal("7"))
 		})
 
 		It("should not override existing values", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "CA",
-				SortBy:      "like",
-				Period:      "30",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "CA"
+			args.SortBy = "like"
+			args.Period = "30"
 			args.SetDefaultValues()
 			Expect(args.CountryCode).To(Equal("CA"))
 			Expect(args.SortBy).To(Equal("like"))
@@ -189,24 +181,22 @@ var _ = Describe("TikTokTrendingArguments", func() {
 		It("should accept valid country codes", func() {
 			validCountries := []string{"US", "CA", "GB", "AU", "DE", "FR", "JP", "KR", "BR"}
 			for _, country := range validCountries {
-				args := &trending.Arguments{
-					Type:        types.CapSearchByTrending,
-					CountryCode: country,
-					SortBy:      "vv",
-					Period:      "7",
-				}
+				args := tiktok.NewTrendingArguments()
+				args.Type = types.CapSearchByTrending
+				args.CountryCode = country
+				args.SortBy = "vv"
+				args.Period = "7"
 				err := args.Validate()
 				Expect(err).ToNot(HaveOccurred(), "Country %s should be valid", country)
 			}
 		})
 
 		It("should accept lowercase country codes", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "us",
-				SortBy:      "vv",
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "us"
+			args.SortBy = "vv"
+			args.Period = "7"
 			err := args.Validate()
 			Expect(err).ToNot(HaveOccurred())
 		})
@@ -214,12 +204,11 @@ var _ = Describe("TikTokTrendingArguments", func() {
 		It("should reject invalid country codes", func() {
 			invalidCountries := []string{"INVALID", "XX", "123", ""}
 			for _, country := range invalidCountries {
-				args := &trending.Arguments{
-					Type:        types.CapSearchByTrending,
-					CountryCode: country,
-					SortBy:      "vv",
-					Period:      "7",
-				}
+				args := tiktok.NewTrendingArguments()
+				args.Type = types.CapSearchByTrending
+				args.CountryCode = country
+				args.SortBy = "vv"
+				args.Period = "7"
 				err := args.Validate()
 				Expect(err).To(HaveOccurred(), "Country %s should be invalid", country)
 			}
@@ -230,24 +219,22 @@ var _ = Describe("TikTokTrendingArguments", func() {
 		It("should accept valid sort options", func() {
 			validSorts := []string{"vv", "like", "comment", "repost"}
 			for _, sort := range validSorts {
-				args := &trending.Arguments{
-					Type:        types.CapSearchByTrending,
-					CountryCode: "US",
-					SortBy:      sort,
-					Period:      "7",
-				}
+				args := tiktok.NewTrendingArguments()
+				args.Type = types.CapSearchByTrending
+				args.CountryCode = "US"
+				args.SortBy = sort
+				args.Period = "7"
 				err := args.Validate()
 				Expect(err).ToNot(HaveOccurred(), "Sort %s should be valid", sort)
 			}
 		})
 
 		It("should accept uppercase sort options", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "LIKE",
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "LIKE"
+			args.Period = "7"
 			err := args.Validate()
 			Expect(err).ToNot(HaveOccurred())
 		})
@@ -255,12 +242,11 @@ var _ = Describe("TikTokTrendingArguments", func() {
 		It("should reject invalid sort options", func() {
 			invalidSorts := []string{"invalid", "views", "likes", ""}
 			for _, sort := range invalidSorts {
-				args := &trending.Arguments{
-					Type:        types.CapSearchByTrending,
-					CountryCode: "US",
-					SortBy:      sort,
-					Period:      "7",
-				}
+				args := tiktok.NewTrendingArguments()
+				args.Type = types.CapSearchByTrending
+				args.CountryCode = "US"
+				args.SortBy = sort
+				args.Period = "7"
 				err := args.Validate()
 				Expect(err).To(HaveOccurred(), "Sort %s should be invalid", sort)
 			}
@@ -271,12 +257,11 @@ var _ = Describe("TikTokTrendingArguments", func() {
 		It("should accept valid periods", func() {
 			validPeriods := []string{"7", "30"}
 			for _, period := range validPeriods {
-				args := &trending.Arguments{
-					Type:        types.CapSearchByTrending,
-					CountryCode: "US",
-					SortBy:      "vv",
-					Period:      period,
-				}
+				args := tiktok.NewTrendingArguments()
+				args.Type = types.CapSearchByTrending
+				args.CountryCode = "US"
+				args.SortBy = "vv"
+				args.Period = period
 				err := args.Validate()
 				Expect(err).ToNot(HaveOccurred(), "Period %s should be valid", period)
 			}
@@ -285,12 +270,11 @@ var _ = Describe("TikTokTrendingArguments", func() {
 		It("should reject invalid periods", func() {
 			invalidPeriods := []string{"1", "14", "60", "invalid", ""}
 			for _, period := range invalidPeriods {
-				args := &trending.Arguments{
-					Type:        types.CapSearchByTrending,
-					CountryCode: "US",
-					SortBy:      "vv",
-					Period:      period,
-				}
+				args := tiktok.NewTrendingArguments()
+				args.Type = types.CapSearchByTrending
+				args.CountryCode = "US"
+				args.SortBy = "vv"
+				args.Period = period
 				err := args.Validate()
 				Expect(err).To(HaveOccurred(), "Period %s should be invalid", period)
 			}
@@ -299,37 +283,34 @@ var _ = Describe("TikTokTrendingArguments", func() {
 
 	Describe("MaxItems validation", func() {
 		It("should accept zero max_items", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "vv",
-				MaxItems:    0,
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "vv"
+			args.MaxItems = 0
+			args.Period = "7"
 			err := args.Validate()
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should accept positive max_items", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "vv",
-				MaxItems:    100,
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "vv"
+			args.MaxItems = 100
+			args.Period = "7"
 			err := args.Validate()
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should reject negative max_items", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "vv",
-				MaxItems:    -1,
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "vv"
+			args.MaxItems = -1
+			args.Period = "7"
 			err := args.Validate()
 			Expect(errors.Is(err, trending.ErrTrendingMaxItemsNegative)).To(BeTrue())
 		})
@@ -337,30 +318,28 @@ var _ = Describe("TikTokTrendingArguments", func() {
 
 	Describe("Job capability", func() {
 		It("should return the searchbytrending capability", func() {
-			args := trending.NewArguments()
+			args := tiktok.NewTrendingArguments()
 			Expect(args.GetCapability()).To(Equal(types.CapSearchByTrending))
 		})
 
 		It("should validate capability for TiktokJob", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "vv",
-				MaxItems:    50,
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "vv"
+			args.MaxItems = 50
+			args.Period = "7"
 			err := args.ValidateCapability(types.TiktokJob)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should fail validation for incompatible job type", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "vv",
-				MaxItems:    50,
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "vv"
+			args.MaxItems = 50
+			args.Period = "7"
 			err := args.ValidateCapability(types.TwitterJob)
 			Expect(err).To(HaveOccurred())
 		})
@@ -368,35 +347,32 @@ var _ = Describe("TikTokTrendingArguments", func() {
 
 	Describe("Edge cases", func() {
 		It("should handle mixed case country codes", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "us",
-				SortBy:      "vv",
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "us"
+			args.SortBy = "vv"
+			args.Period = "7"
 			err := args.Validate()
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should handle mixed case sort options", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "LIKE",
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "LIKE"
+			args.Period = "7"
 			err := args.Validate()
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should handle large max_items values", func() {
-			args := &trending.Arguments{
-				Type:        types.CapSearchByTrending,
-				CountryCode: "US",
-				SortBy:      "vv",
-				MaxItems:    10000,
-				Period:      "7",
-			}
+			args := tiktok.NewTrendingArguments()
+			args.Type = types.CapSearchByTrending
+			args.CountryCode = "US"
+			args.SortBy = "vv"
+			args.MaxItems = 10000
+			args.Period = "7"
 			err := args.Validate()
 			Expect(err).ToNot(HaveOccurred())
 		})
@@ -408,12 +384,11 @@ var _ = Describe("TikTokTrendingArguments", func() {
 				"AE", "GB", "US", "VN",
 			}
 			for _, country := range supportedCountries {
-				args := &trending.Arguments{
-					Type:        types.CapSearchByTrending,
-					CountryCode: country,
-					SortBy:      "vv",
-					Period:      "7",
-				}
+				args := tiktok.NewTrendingArguments()
+				args.Type = types.CapSearchByTrending
+				args.CountryCode = country
+				args.SortBy = "vv"
+				args.Period = "7"
 				err := args.Validate()
 				Expect(err).ToNot(HaveOccurred(), "Country %s should be supported", country)
 			}

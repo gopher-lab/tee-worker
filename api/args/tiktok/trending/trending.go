@@ -36,11 +36,11 @@ var _ base.JobArgument = (*Arguments)(nil)
 
 // Arguments defines args for lexis-solutions/tiktok-trending-videos-scraper
 type Arguments struct {
-	Type        types.Capability `json:"type"`
-	CountryCode string           `json:"country_code,omitempty"`
-	SortBy      string           `json:"sort_by,omitempty"`
-	MaxItems    int              `json:"max_items,omitempty"`
-	Period      string           `json:"period,omitempty"`
+	base.Arguments
+	CountryCode string `json:"country_code,omitempty"`
+	SortBy      string `json:"sort_by,omitempty"`
+	MaxItems    int    `json:"max_items,omitempty"`
+	Period      string `json:"period,omitempty"`
 }
 
 func (t *Arguments) UnmarshalJSON(data []byte) error {
@@ -63,14 +63,6 @@ func (a *Arguments) SetDefaultValues() {
 	if a.Period == "" {
 		a.Period = periodWeek
 	}
-}
-
-func (t *Arguments) GetCapability() types.Capability {
-	return t.Type
-}
-
-func (t *Arguments) ValidateCapability(jobType types.JobType) error {
-	return jobType.ValidateCapability(&t.Type)
 }
 
 // TODO: use a validation library
@@ -115,9 +107,8 @@ func (t *Arguments) Validate() error {
 }
 
 func NewArguments() Arguments {
-	args := Arguments{
-		Type: types.CapSearchByTrending,
-	}
+	args := Arguments{}
+	args.Type = types.CapSearchByTrending
 	args.SetDefaultValues()
 	return args
 }

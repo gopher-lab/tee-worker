@@ -32,12 +32,12 @@ var SupportedModels = util.NewSet(DefaultGeminiModel, DefaultClaudeModel)
 var _ base.JobArgument = (*Arguments)(nil)
 
 type Arguments struct {
-	Type        types.Capability `json:"type"`
-	DatasetId   string           `json:"dataset_id"`
-	Prompt      string           `json:"prompt"`
-	MaxTokens   uint             `json:"max_tokens"`
-	Temperature float64          `json:"temperature"`
-	Items       uint             `json:"items"`
+	base.Arguments
+	DatasetId   string  `json:"dataset_id"`
+	Prompt      string  `json:"prompt"`
+	MaxTokens   uint    `json:"max_tokens"`
+	Temperature float64 `json:"temperature"`
+	Items       uint    `json:"items"`
 }
 
 func (t *Arguments) UnmarshalJSON(data []byte) error {
@@ -71,10 +71,6 @@ func (l *Arguments) Validate() error {
 		return ErrPromptRequired
 	}
 	return nil
-}
-
-func (l *Arguments) GetCapability() types.Capability {
-	return l.Type
 }
 
 func (l *Arguments) ValidateCapability(jobType types.JobType) error {

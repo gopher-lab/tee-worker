@@ -18,7 +18,7 @@ var _ base.JobArgument = (*Arguments)(nil)
 
 // Arguments defines args for Telemetry jobs
 type Arguments struct {
-	Type types.Capability `json:"type"`
+	base.Arguments
 }
 
 func (t *Arguments) UnmarshalJSON(data []byte) error {
@@ -31,25 +31,12 @@ func (t *Arguments) UnmarshalJSON(data []byte) error {
 	return t.Validate()
 }
 
-func (t *Arguments) SetDefaultValues() {
-}
-
 func (t *Arguments) Validate() error {
 	err := t.ValidateCapability(types.TelemetryJob)
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-// GetCapability returns the capability of the arguments
-func (t *Arguments) GetCapability() types.Capability {
-	return t.Type
-}
-
-// ValidateCapability validates the capability of the arguments
-func (t *Arguments) ValidateCapability(jobType types.JobType) error {
-	return jobType.ValidateCapability(&t.Type)
 }
 
 // NewArguments creates a new Arguments instance and applies default values immediately
