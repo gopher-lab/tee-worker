@@ -8,6 +8,7 @@ import (
 
 	"github.com/masa-finance/tee-worker/api/args/base"
 	"github.com/masa-finance/tee-worker/api/types"
+	"github.com/masa-finance/tee-worker/pkg/util"
 )
 
 var (
@@ -29,6 +30,21 @@ const (
 	sortLike     string = "like"
 	sortComment  string = "comment"
 	sortRepost   string = "repost"
+)
+
+// Global validation sets - created once at package initialization
+var (
+	allowedSorts = util.NewSet(
+		sortTrending, sortLike, sortComment, sortRepost,
+	)
+	allowedPeriods = util.NewSet(
+		periodWeek, periodMonth,
+	)
+	allowedCountries = util.NewSet(
+		"AU", "BR", "CA", "EG", "FR", "DE", "ID", "IL", "IT", "JP",
+		"MY", "PH", "RU", "SA", "SG", "KR", "ES", "TW", "TH", "TR",
+		"AE", "GB", "US", "VN",
+	)
 )
 
 // Verify interface implementation
@@ -70,33 +86,16 @@ func (t *Arguments) Validate() error {
 	if err := types.TiktokJob.ValidateCapability(&t.Type); err != nil {
 		return err
 	}
-	allowedSorts := map[string]struct{}{
-		sortTrending: {}, sortLike: {}, sortComment: {}, sortRepost: {},
-	}
 
-	allowedPeriods := map[string]struct{}{
-		periodWeek:  {},
-		periodMonth: {},
-	}
-
-	allowedCountries := map[string]struct{}{
-		"AU": {}, "BR": {}, "CA": {}, "EG": {}, "FR": {}, "DE": {}, "ID": {}, "IL": {}, "IT": {}, "JP": {},
-		"MY": {}, "PH": {}, "RU": {}, "SA": {}, "SG": {}, "KR": {}, "ES": {}, "TW": {}, "TH": {}, "TR": {},
-		"AE": {}, "GB": {}, "US": {}, "VN": {},
-	}
-
-	if _, ok := allowedCountries[strings.ToUpper(t.CountryCode)]; !ok {
+	if !allowedCountries.Contains(strings.ToUpper(t.CountryCode)) {
 		return fmt.Errorf("%w: '%s'", ErrTrendingCountryCodeRequired, t.CountryCode)
 	}
-	if _, ok := allowedSorts[strings.ToLower(t.SortBy)]; !ok {
+	if !allowedSorts.Contains(strings.ToLower(t.SortBy)) {
 		return fmt.Errorf("%w: '%s'", ErrTrendingSortByRequired, t.SortBy)
 	}
-	if _, ok := allowedPeriods[t.Period]; !ok {
+	if !allowedPeriods.Contains(t.Period) {
 		// Extract keys for error message
-		var validKeys []string
-		for key := range allowedPeriods {
-			validKeys = append(validKeys, key)
-		}
+		validKeys := allowedPeriods.Items()
 		return fmt.Errorf("%w: '%s' (allowed: %s)", ErrTrendingPeriodRequired, t.Period, strings.Join(validKeys, ", "))
 	}
 	if t.MaxItems < 0 {
