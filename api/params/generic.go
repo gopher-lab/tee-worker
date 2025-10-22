@@ -1,5 +1,12 @@
 package params
 
-import "github.com/masa-finance/tee-worker/api/args/base"
+import (
+	"github.com/masa-finance/tee-worker/api/args/base"
+)
 
-type Generic = Params[*base.Arguments]
+type GenericArgs struct {
+	base.Arguments
+	Data map[string]any `json:",inline"`
+}
+
+type Generic = Params[*GenericArgs]
