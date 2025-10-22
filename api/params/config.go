@@ -1,4 +1,4 @@
-package jobs
+package params
 
 type SearchConfig struct {
 	DefaultMaxResults uint `env:"DEFAULT_MAX_RESULTS,default=20"`

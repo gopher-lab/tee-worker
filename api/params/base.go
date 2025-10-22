@@ -1,4 +1,4 @@
-package jobs
+package params
 
 import (
 	"encoding/json"

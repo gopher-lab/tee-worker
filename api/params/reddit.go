@@ -1,4 +1,4 @@
-package jobs
+package params
 
 import (
 	"time"
@@ -7,11 +7,11 @@ import (
 	"github.com/masa-finance/tee-worker/api/types"
 )
 
-type RedditParams struct {
+type Reddit struct {
 	Params[*reddit.SearchArguments]
 }
 
-func (r RedditParams) Timeout() time.Duration {
+func (r Reddit) Timeout() time.Duration {
 	if r.Args.Type == types.CapSearchCommunities {
 		// Apify communities search takes 3-4 minutes
 		return 5 * time.Minute
@@ -19,7 +19,7 @@ func (r RedditParams) Timeout() time.Duration {
 	return 0
 }
 
-func (r RedditParams) PollInterval() time.Duration {
+func (r Reddit) PollInterval() time.Duration {
 	if r.Args.Type == types.CapSearchCommunities {
 		// Apify communities search takes 3-4 minutes, so don't poll as often
 		return 5 * time.Second

@@ -1,7 +1,7 @@
-package jobs
+package params
 
 import (
 	"github.com/masa-finance/tee-worker/api/args/web"
 )
 
-type WebParams = Params[*web.ScraperArguments]
+type Web = Params[*web.ScraperArguments]
