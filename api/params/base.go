@@ -22,7 +22,7 @@ type JobParameters interface {
 	PollInterval() time.Duration
 }
 
-// Compile-time check to ensure LinkedInParams implements JobParameters
+// Compile-time check to ensure Params implements JobParameters
 var _ JobParameters = (*Params[base.JobArgument])(nil)
 
 type Params[T base.JobArgument] struct {
