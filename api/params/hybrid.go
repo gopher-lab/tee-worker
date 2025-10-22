@@ -28,7 +28,7 @@ type HybridSearch struct {
 }
 
 // Validate validates the hybrid search parameters
-func (t HybridSearch) Validate(cfg *SearchConfig) error {
+func (t HybridSearch) Validate(cfg *types.SearchConfig) error {
 	if t.TextQuery.Weight <= 0 || t.TextQuery.Weight > 1 || t.SimilarityQuery.Weight <= 0 || t.SimilarityQuery.Weight > 1 {
 		return fmt.Errorf("weights must be greater than or equal to 0, and less than 1, got %f and %f", t.TextQuery.Weight, t.SimilarityQuery.Weight)
 	}
@@ -55,7 +55,7 @@ func (t HybridSearch) PollInterval() time.Duration {
 	return 0
 }
 
-func (t HybridSearch) Arguments(cfg *SearchConfig) map[string]any {
+func (t HybridSearch) Arguments(cfg *types.SearchConfig) map[string]any {
 	t.ApplyDefaults(cfg)
 
 	return map[string]any{
@@ -73,7 +73,7 @@ func (t HybridSearch) Type() types.JobType {
 }
 
 // ApplyDefaults applies default values to the hybrid search parameters
-func (t *HybridSearch) ApplyDefaults(cfg *SearchConfig) {
+func (t *HybridSearch) ApplyDefaults(cfg *types.SearchConfig) {
 	switch {
 	case t.MaxResults == 0:
 		t.MaxResults = int(cfg.DefaultMaxResults)

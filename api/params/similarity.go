@@ -20,7 +20,7 @@ type SimilaritySearch struct {
 	MaxResults      int            `json:"max_results"`      // Optional, max number of results for keyword search
 }
 
-func (t SimilaritySearch) Validate(cfg *SearchConfig) error {
+func (t SimilaritySearch) Validate(cfg *types.SearchConfig) error {
 	if t.Query == "" {
 		return errors.New("query is required")
 	}
@@ -51,7 +51,7 @@ func (t SimilaritySearch) Type() types.JobType {
 	return "similarity-search"
 }
 
-func (t SimilaritySearch) Arguments(cfg *SearchConfig) map[string]any {
+func (t SimilaritySearch) Arguments(cfg *types.SearchConfig) map[string]any {
 	t.ApplyDefaults(cfg)
 
 	return map[string]any{
@@ -63,7 +63,7 @@ func (t SimilaritySearch) Arguments(cfg *SearchConfig) map[string]any {
 	}
 }
 
-func (t *SimilaritySearch) ApplyDefaults(cfg *SearchConfig) {
+func (t *SimilaritySearch) ApplyDefaults(cfg *types.SearchConfig) {
 	switch {
 	case t.MaxResults == 0:
 		t.MaxResults = int(cfg.DefaultMaxResults)

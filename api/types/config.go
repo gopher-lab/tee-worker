@@ -1,4 +1,4 @@
-package params
+package types
 
 type SearchConfig struct {
 	DefaultMaxResults uint `env:"DEFAULT_MAX_RESULTS,default=20"`

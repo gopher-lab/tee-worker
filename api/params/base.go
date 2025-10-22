@@ -11,11 +11,11 @@ import (
 
 type JobParameters interface {
 	// Validate returns an error if the arguments are invalid
-	Validate(cfg *SearchConfig) error
+	Validate(cfg *types.SearchConfig) error
 	// Type returns the job type
 	Type() types.JobType
 	// Arguments converts the job parameter arguments to a Map
-	Arguments(cfg *SearchConfig) map[string]any
+	Arguments(cfg *types.SearchConfig) map[string]any
 	// Timeout() returns the timeout to wait when getting results from the tee-worker. Returning 0 means use the default.
 	Timeout() time.Duration
 	// PollInterval() returns how often to poll the tee-worker for a job's results. Returning 0 means use the default.
@@ -30,7 +30,7 @@ type Params[T base.JobArgument] struct {
 	Args    T             `json:"arguments"`
 }
 
-func (p Params[T]) Validate(_ *SearchConfig) error {
+func (p Params[T]) Validate(_ *types.SearchConfig) error {
 	return p.Args.Validate()
 }
 
@@ -51,7 +51,7 @@ func (l Params[T]) PollInterval() time.Duration {
 // 1. Convert generic T to map[string]any (for UnmarshalJobArguments)
 // 2. UnmarshalJobArguments validates/transforms the args based on job type
 // 3. Convert the validated args back to map[string]any for the final result
-func (l Params[T]) Arguments(cfg *SearchConfig) map[string]any {
+func (l Params[T]) Arguments(cfg *types.SearchConfig) map[string]any {
 	// Convert l.Args to map[string]any via JSON marshal/unmarshal
 	jsonData, _ := json.Marshal(l.Args)
 	var argsMap map[string]any
