@@ -14,11 +14,11 @@ type HybridQuery struct {
 	Weight float64 `json:"weight"`
 }
 
-var _ JobParameters = (*HybridSearchParams)(nil)
+var _ JobParameters = (*HybridSearch)(nil)
 
-// HybridSearchParams defines parameters for hybrid search
+// HybridSearch defines parameters for hybrid search
 // TODO: At some point we could replace `TextQuery` and `SimilarityQuery` with a single slice that receives N queries. The issue right now is that, because of the Milvus API, we can't have an arbitrary number of queries (see https://github.com/milvus-io/milvus/issues/41261). Once that issue is resolved we can fix this.
-type HybridSearchParams struct {
+type HybridSearch struct {
 	TextQuery       HybridQuery    `json:"text_query"`       // Optional, either TextQuery or SimilarityQuery must be specified
 	SimilarityQuery HybridQuery    `json:"similarity_query"` // Mandatory, 1 or more queries to execute
 	Keywords        []string       `json:"keywords"`         // Optional, keywords to filter for in keyword search
@@ -28,7 +28,7 @@ type HybridSearchParams struct {
 }
 
 // Validate validates the hybrid search parameters
-func (t HybridSearchParams) Validate(cfg *SearchConfig) error {
+func (t HybridSearch) Validate(cfg *SearchConfig) error {
 	if t.TextQuery.Weight <= 0 || t.TextQuery.Weight > 1 || t.SimilarityQuery.Weight <= 0 || t.SimilarityQuery.Weight > 1 {
 		return fmt.Errorf("weights must be greater than or equal to 0, and less than 1, got %f and %f", t.TextQuery.Weight, t.SimilarityQuery.Weight)
 	}
@@ -47,15 +47,15 @@ func (t HybridSearchParams) Validate(cfg *SearchConfig) error {
 	return nil
 }
 
-func (t HybridSearchParams) Timeout() time.Duration {
+func (t HybridSearch) Timeout() time.Duration {
 	return 0
 }
 
-func (t HybridSearchParams) PollInterval() time.Duration {
+func (t HybridSearch) PollInterval() time.Duration {
 	return 0
 }
 
-func (t HybridSearchParams) Arguments(cfg *SearchConfig) map[string]any {
+func (t HybridSearch) Arguments(cfg *SearchConfig) map[string]any {
 	t.ApplyDefaults(cfg)
 
 	return map[string]any{
@@ -68,12 +68,12 @@ func (t HybridSearchParams) Arguments(cfg *SearchConfig) map[string]any {
 	}
 }
 
-func (t HybridSearchParams) Type() types.JobType {
+func (t HybridSearch) Type() types.JobType {
 	return "hybrid-search"
 }
 
 // ApplyDefaults applies default values to the hybrid search parameters
-func (t *HybridSearchParams) ApplyDefaults(cfg *SearchConfig) {
+func (t *HybridSearch) ApplyDefaults(cfg *SearchConfig) {
 	switch {
 	case t.MaxResults == 0:
 		t.MaxResults = int(cfg.DefaultMaxResults)

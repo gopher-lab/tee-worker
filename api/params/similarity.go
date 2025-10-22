@@ -10,9 +10,9 @@ import (
 	"github.com/masa-finance/tee-worker/api/types"
 )
 
-var _ JobParameters = (*SimilaritySearchParams)(nil)
+var _ JobParameters = (*SimilaritySearch)(nil)
 
-type SimilaritySearchParams struct {
+type SimilaritySearch struct {
 	Query           string         `json:"query"`            // Mandatory, query for similarity search in keyword search
 	Keywords        []string       `json:"keywords"`         // Optional, keywords to filter for in keyword search
 	KeywordOperator string         `json:"keyword_operator"` // Optional, operator ("and" / "or") to use in keyword search. Default is "and"
@@ -20,7 +20,7 @@ type SimilaritySearchParams struct {
 	MaxResults      int            `json:"max_results"`      // Optional, max number of results for keyword search
 }
 
-func (t SimilaritySearchParams) Validate(cfg *SearchConfig) error {
+func (t SimilaritySearch) Validate(cfg *SearchConfig) error {
 	if t.Query == "" {
 		return errors.New("query is required")
 	}
@@ -39,19 +39,19 @@ func (t SimilaritySearchParams) Validate(cfg *SearchConfig) error {
 	return nil
 }
 
-func (t SimilaritySearchParams) Timeout() time.Duration {
+func (t SimilaritySearch) Timeout() time.Duration {
 	return 0
 }
 
-func (t SimilaritySearchParams) PollInterval() time.Duration {
+func (t SimilaritySearch) PollInterval() time.Duration {
 	return 0
 }
 
-func (t SimilaritySearchParams) Type() types.JobType {
+func (t SimilaritySearch) Type() types.JobType {
 	return "similarity-search"
 }
 
-func (t SimilaritySearchParams) Arguments(cfg *SearchConfig) map[string]any {
+func (t SimilaritySearch) Arguments(cfg *SearchConfig) map[string]any {
 	t.ApplyDefaults(cfg)
 
 	return map[string]any{
@@ -63,7 +63,7 @@ func (t SimilaritySearchParams) Arguments(cfg *SearchConfig) map[string]any {
 	}
 }
 
-func (t *SimilaritySearchParams) ApplyDefaults(cfg *SearchConfig) {
+func (t *SimilaritySearch) ApplyDefaults(cfg *SearchConfig) {
 	switch {
 	case t.MaxResults == 0:
 		t.MaxResults = int(cfg.DefaultMaxResults)
