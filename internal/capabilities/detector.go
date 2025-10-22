@@ -6,29 +6,29 @@ import (
 
 	"maps"
 
-	util "github.com/masa-finance/tee-types/pkg/util"
-	teetypes "github.com/masa-finance/tee-types/types"
+	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs/twitter"
 	"github.com/masa-finance/tee-worker/pkg/client"
+	util "github.com/masa-finance/tee-worker/pkg/util"
 	"github.com/sirupsen/logrus"
 )
 
 // JobServerInterface defines the methods we need from JobServer to avoid circular dependencies
 type JobServerInterface interface {
-	GetWorkerCapabilities() teetypes.WorkerCapabilities
+	GetWorkerCapabilities() types.WorkerCapabilities
 }
 
 // DetectCapabilities automatically detects available capabilities based on configuration
 // Always performs real capability detection by probing APIs and actors to ensure accurate reporting
-func DetectCapabilities(jc config.JobConfiguration, jobServer JobServerInterface) teetypes.WorkerCapabilities {
+func DetectCapabilities(jc config.JobConfiguration, jobServer JobServerInterface) types.WorkerCapabilities {
 	// Always perform real capability detection to ensure accurate reporting
 	// This guarantees miners report only capabilities they actually have access to
-	capabilities := make(teetypes.WorkerCapabilities)
+	capabilities := make(types.WorkerCapabilities)
 
 	// Start with always available capabilities
-	maps.Copy(capabilities, teetypes.AlwaysAvailableCapabilities)
+	maps.Copy(capabilities, types.AlwaysAvailableCapabilities)
 
 	// Check what Twitter authentication methods are available
 	accounts := jc.GetStringSlice("twitter_accounts", nil)
@@ -42,22 +42,37 @@ func DetectCapabilities(jc config.JobConfiguration, jobServer JobServerInterface
 	hasApifyKey := hasValidApifyKey(apifyApiKey)
 	hasLLMKey := geminiApiKey.IsValid() || claudeApiKey.IsValid()
 
-	// Add Twitter-specific capabilities based on available authentication
+	// Add Twitter capabilities based on available authentication
+	var twitterCaps []types.Capability
+
+	// Add credential-based capabilities if we have accounts
 	if hasAccounts {
-		capabilities[teetypes.TwitterCredentialJob] = teetypes.TwitterCredentialCaps
+		twitterCaps = append(twitterCaps,
+			types.CapSearchByQuery,
+			types.CapSearchByProfile,
+			types.CapGetById,
+			types.CapGetReplies,
+			types.CapGetRetweeters,
+			types.CapGetMedia,
+			types.CapGetProfileById,
+			types.CapGetTrends,
+			types.CapGetSpace,
+			types.CapGetProfile,
+			types.CapGetTweets,
+		)
 	}
 
+	// Add API-based capabilities if we have API keys
 	if hasApiKeys {
-		// Start with basic API capabilities
-		apiCaps := make([]teetypes.Capability, len(teetypes.TwitterAPICaps))
-		copy(apiCaps, teetypes.TwitterAPICaps)
-
-		// Check for elevated API keys and add searchbyfullarchive capability
+		// Check for elevated API capabilities
 		if hasElevatedApiKey(apiKeys) {
-			apiCaps = append(apiCaps, teetypes.CapSearchByFullArchive)
+			twitterCaps = append(twitterCaps, types.CapSearchByFullArchive)
 		}
+	}
 
-		capabilities[teetypes.TwitterApiJob] = apiCaps
+	// Only add capabilities if we have any supported capabilities
+	if len(twitterCaps) > 0 {
+		capabilities[types.TwitterJob] = twitterCaps
 	}
 
 	if hasApifyKey {
@@ -67,18 +82,18 @@ func DetectCapabilities(jc config.JobConfiguration, jobServer JobServerInterface
 			logrus.Errorf("Failed to create Apify client for access probes: %v", err)
 		} else {
 			// Aggregate capabilities per job from accessible actors
-			jobToSet := map[teetypes.JobType]*util.Set[teetypes.Capability]{}
+			jobToSet := map[types.JobType]*util.Set[types.Capability]{}
 
 			for _, actor := range apify.Actors {
 				// Web requires a valid Gemini API key
-				if actor.JobType == teetypes.WebJob && !hasLLMKey {
+				if actor.JobType == types.WebJob && !hasLLMKey {
 					logrus.Debug("Skipping Web actor due to missing Gemini key")
 					continue
 				}
 
 				if ok, _ := c.ProbeActorAccess(actor.ActorId, actor.DefaultInput); ok {
 					if _, exists := jobToSet[actor.JobType]; !exists {
-						jobToSet[actor.JobType] = util.NewSet[teetypes.Capability]()
+						jobToSet[actor.JobType] = util.NewSet[types.Capability]()
 					}
 					jobToSet[actor.JobType].Add(actor.Capabilities...)
 				} else {
@@ -92,32 +107,6 @@ func DetectCapabilities(jc config.JobConfiguration, jobServer JobServerInterface
 				capabilities[job] = existingCaps.Add(set.Items()...).Items()
 			}
 		}
-	}
-
-	// Add general TwitterJob capability if any Twitter auth is available
-	// TODO: this will get cleaned up with unique twitter capabilities
-	if hasAccounts || hasApiKeys || hasApifyKey {
-		var twitterJobCaps []teetypes.Capability
-		// Use the most comprehensive capabilities available
-		if hasAccounts {
-			twitterJobCaps = teetypes.TwitterCredentialCaps
-		} else {
-			// Use API capabilities if we only have keys
-			twitterJobCaps = make([]teetypes.Capability, len(teetypes.TwitterAPICaps))
-			copy(twitterJobCaps, teetypes.TwitterAPICaps)
-
-			// Check for elevated API keys and add searchbyfullarchive capability
-			if hasElevatedApiKey(apiKeys) {
-				twitterJobCaps = append(twitterJobCaps, teetypes.CapSearchByFullArchive)
-			}
-		}
-
-		// Add Apify capabilities if available
-		if hasApifyKey {
-			twitterJobCaps = append(twitterJobCaps, teetypes.TwitterApifyCaps...)
-		}
-
-		capabilities[teetypes.TwitterJob] = twitterJobCaps
 	}
 
 	return capabilities

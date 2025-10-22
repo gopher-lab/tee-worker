@@ -8,11 +8,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/masa-finance/tee-worker/api/args/web"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/jobs/webapify"
 	"github.com/masa-finance/tee-worker/pkg/client"
-
-	teeargs "github.com/masa-finance/tee-types/args"
 )
 
 // MockApifyClient is a mock implementation of the ApifyClient.
@@ -66,7 +65,7 @@ var _ = Describe("WebApifyClient", func() {
 
 	Describe("Scrape", func() {
 		It("should construct the correct actor input", func() {
-			args := teeargs.WebArguments{
+			args := web.ScraperArguments{
 				URL:      "https://example.com",
 				MaxDepth: 1,
 				MaxPages: 2,
@@ -88,7 +87,7 @@ var _ = Describe("WebApifyClient", func() {
 				return nil, "", expectedErr
 			}
 
-			args := teeargs.WebArguments{
+			args := web.ScraperArguments{
 				URL:      "https://example.com",
 				MaxDepth: 0,
 				MaxPages: 1,
@@ -108,7 +107,7 @@ var _ = Describe("WebApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := teeargs.WebArguments{
+			args := web.ScraperArguments{
 				URL:      "https://example.com",
 				MaxDepth: 0,
 				MaxPages: 1,
@@ -133,7 +132,7 @@ var _ = Describe("WebApifyClient", func() {
 				return dataset, "next", nil
 			}
 
-			args := teeargs.WebArguments{
+			args := web.ScraperArguments{
 				URL:      "https://example.com",
 				MaxDepth: 0,
 				MaxPages: 1,
@@ -194,7 +193,7 @@ var _ = Describe("WebApifyClient", func() {
 			realClient, err := webapify.NewClient(apifyKey, nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			args := teeargs.WebArguments{
+			args := web.ScraperArguments{
 				URL:      "https://example.com",
 				MaxDepth: 0,
 				MaxPages: 1,

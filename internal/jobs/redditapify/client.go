@@ -7,18 +7,16 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/masa-finance/tee-worker/api/types/reddit"
+	"github.com/masa-finance/tee-worker/api/args/reddit/search"
+	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/apify"
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/pkg/client"
-
-	teeargs "github.com/masa-finance/tee-types/args"
-	teetypes "github.com/masa-finance/tee-types/types"
 )
 
 // CommonArgs holds the parameters that all Reddit searches support, in a single struct
 type CommonArgs struct {
-	Sort           teetypes.RedditSortType
+	Sort           types.RedditSortType
 	IncludeNSFW    bool
 	MaxItems       uint
 	MaxPosts       uint
@@ -27,7 +25,7 @@ type CommonArgs struct {
 	MaxUsers       uint
 }
 
-func (ca *CommonArgs) CopyFromArgs(a *teeargs.RedditArguments) {
+func (ca *CommonArgs) CopyFromArgs(a *search.Arguments) {
 	ca.Sort = a.Sort
 	ca.IncludeNSFW = a.IncludeNSFW
 	ca.MaxItems = a.MaxItems
@@ -52,23 +50,23 @@ func (args *CommonArgs) ToActorRequest() RedditActorRequest {
 // RedditActorRequest represents the query parameters for the Apify Reddit Scraper actor.
 // Based on the input schema of https://apify.com/trudax/reddit-scraper
 type RedditActorRequest struct {
-	Type                teetypes.RedditQueryType  `json:"type,omitempty"`
-	Searches            []string                  `json:"searches,omitempty"`
-	StartUrls           []teetypes.RedditStartURL `json:"startUrls,omitempty"`
-	Sort                teetypes.RedditSortType   `json:"sort,omitempty"`
-	PostDateLimit       *time.Time                `json:"postDateLimit,omitempty"`
-	IncludeNSFW         bool                      `json:"includeNSFW"`
-	MaxItems            uint                      `json:"maxItems,omitempty"`            // Total number of items to scrape
-	MaxPostCount        uint                      `json:"maxPostCount,omitempty"`        // Max number of posts per page
-	MaxComments         uint                      `json:"maxComments,omitempty"`         // Max number of comments per page
-	MaxCommunitiesCount uint                      `json:"maxCommunitiesCount,omitempty"` // Max number of communities per page
-	MaxUserCount        uint                      `json:"maxUserCount,omitempty"`        // Max number of users per page
-	SearchComments      bool                      `json:"searchComments"`
-	SearchCommunities   bool                      `json:"searchCommunities"`
-	SearchPosts         bool                      `json:"searchPosts"`
-	SearchUsers         bool                      `json:"searchUsers"`
-	SkipUserPosts       bool                      `json:"skipUserPosts"`
-	SkipComments        bool                      `json:"skipComments"`
+	Type                types.Capability       `json:"type,omitempty"`
+	Searches            []string               `json:"searches,omitempty"`
+	StartUrls           []types.RedditStartURL `json:"startUrls,omitempty"`
+	Sort                types.RedditSortType   `json:"sort,omitempty"`
+	PostDateLimit       *time.Time             `json:"postDateLimit,omitempty"`
+	IncludeNSFW         bool                   `json:"includeNSFW"`
+	MaxItems            uint                   `json:"maxItems,omitempty"`            // Total number of items to scrape
+	MaxPostCount        uint                   `json:"maxPostCount,omitempty"`        // Max number of posts per page
+	MaxComments         uint                   `json:"maxComments,omitempty"`         // Max number of comments per page
+	MaxCommunitiesCount uint                   `json:"maxCommunitiesCount,omitempty"` // Max number of communities per page
+	MaxUserCount        uint                   `json:"maxUserCount,omitempty"`        // Max number of users per page
+	SearchComments      bool                   `json:"searchComments"`
+	SearchCommunities   bool                   `json:"searchCommunities"`
+	SearchPosts         bool                   `json:"searchPosts"`
+	SearchUsers         bool                   `json:"searchUsers"`
+	SkipUserPosts       bool                   `json:"skipUserPosts"`
+	SkipComments        bool                   `json:"skipComments"`
 }
 
 // RedditApifyClient wraps the generic Apify client for Reddit-specific operations
@@ -102,7 +100,7 @@ func (c *RedditApifyClient) ValidateApiKey() error {
 }
 
 // ScrapeUrls scrapes Reddit URLs
-func (c *RedditApifyClient) ScrapeUrls(workerID string, urls []teetypes.RedditStartURL, after time.Time, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error) {
+func (c *RedditApifyClient) ScrapeUrls(workerID string, urls []types.RedditStartURL, after time.Time, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	input := args.ToActorRequest()
 	input.StartUrls = urls
 	input.Searches = nil
@@ -119,7 +117,7 @@ func (c *RedditApifyClient) ScrapeUrls(workerID string, urls []teetypes.RedditSt
 }
 
 // SearchPosts searches Reddit posts
-func (c *RedditApifyClient) SearchPosts(workerID string, queries []string, after time.Time, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error) {
+func (c *RedditApifyClient) SearchPosts(workerID string, queries []string, after time.Time, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	input := args.ToActorRequest()
 	input.Searches = queries
 	input.StartUrls = nil
@@ -136,7 +134,7 @@ func (c *RedditApifyClient) SearchPosts(workerID string, queries []string, after
 }
 
 // SearchCommunities searches Reddit communities
-func (c *RedditApifyClient) SearchCommunities(workerID string, queries []string, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error) {
+func (c *RedditApifyClient) SearchCommunities(workerID string, queries []string, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	input := args.ToActorRequest()
 	input.Searches = queries
 	input.StartUrls = nil
@@ -147,7 +145,7 @@ func (c *RedditApifyClient) SearchCommunities(workerID string, queries []string,
 }
 
 // SearchUsers searches Reddit users
-func (c *RedditApifyClient) SearchUsers(workerID string, queries []string, skipPosts bool, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*reddit.Response, client.Cursor, error) {
+func (c *RedditApifyClient) SearchUsers(workerID string, queries []string, skipPosts bool, args CommonArgs, cursor client.Cursor, maxResults uint) ([]*types.RedditResponse, client.Cursor, error) {
 	input := args.ToActorRequest()
 	input.Searches = queries
 	input.StartUrls = nil
@@ -159,7 +157,7 @@ func (c *RedditApifyClient) SearchUsers(workerID string, queries []string, skipP
 }
 
 // getProfiles runs the actor and retrieves profiles from the dataset
-func (c *RedditApifyClient) queryReddit(workerID string, input RedditActorRequest, cursor client.Cursor, limit uint) ([]*reddit.Response, client.Cursor, error) {
+func (c *RedditApifyClient) queryReddit(workerID string, input RedditActorRequest, cursor client.Cursor, limit uint) ([]*types.RedditResponse, client.Cursor, error) {
 	if c.statsCollector != nil {
 		c.statsCollector.Add(workerID, stats.RedditQueries, 1)
 	}
@@ -172,9 +170,9 @@ func (c *RedditApifyClient) queryReddit(workerID string, input RedditActorReques
 		return nil, client.EmptyCursor, err
 	}
 
-	response := make([]*reddit.Response, 0, len(dataset.Data.Items))
+	response := make([]*types.RedditResponse, 0, len(dataset.Data.Items))
 	for i, item := range dataset.Data.Items {
-		var resp reddit.Response
+		var resp types.RedditResponse
 		if err := json.Unmarshal(item, &resp); err != nil {
 			logrus.Warnf("Failed to unmarshal profile at index %d: %v", i, err)
 			continue

@@ -10,7 +10,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	teetypes "github.com/masa-finance/tee-types/types"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/config"
 	. "github.com/masa-finance/tee-worker/internal/jobs"
@@ -45,14 +44,14 @@ var _ = Describe("TikTok", func() {
 	Context("when a valid TikTok URL is provided", func() {
 		It("should successfully transcribe the video and record success stats", func(ctx SpecContext) {
 			videoURL := "https://www.tiktok.com/@theblockrunner.com/video/7227579907361066282"
-			jobArguments := map[string]interface{}{
-				"type":      teetypes.CapTranscription,
+			JobArgument := map[string]interface{}{
+				"type":      types.CapTranscription,
 				"video_url": videoURL,
 			}
 
 			job := types.Job{
-				Type:      teetypes.TiktokJob,
-				Arguments: jobArguments,
+				Type:      types.TiktokJob,
+				Arguments: JobArgument,
 				WorkerID:  "tiktok-test-worker-happy",
 				UUID:      "test-uuid-happy",
 			}
@@ -69,7 +68,7 @@ var _ = Describe("TikTok", func() {
 			Expect(res.Data).NotTo(BeNil())
 			Expect(res.Data).NotTo(BeEmpty())
 
-			var transcriptionResult teetypes.TikTokTranscriptionResult
+			var transcriptionResult types.TikTokTranscriptionResult
 			err = json.Unmarshal(res.Data, &transcriptionResult)
 			Expect(err).NotTo(HaveOccurred(), "Failed to unmarshal result data")
 
@@ -115,14 +114,14 @@ var _ = Describe("TikTok", func() {
 
 	Context("when arguments are invalid", func() {
 		It("should return an error if VideoURL is empty and not record error stats", func() {
-			jobArguments := map[string]interface{}{
-				"type":      teetypes.CapTranscription,
+			JobArgument := map[string]interface{}{
+				"type":      types.CapTranscription,
 				"video_url": "", // Empty URL
 			}
 
 			job := types.Job{
-				Type:      teetypes.TiktokJob,
-				Arguments: jobArguments,
+				Type:      types.TiktokJob,
+				Arguments: JobArgument,
 				WorkerID:  "tiktok-test-worker-invalid",
 				UUID:      "test-uuid-invalid",
 			}
@@ -174,9 +173,9 @@ var _ = Describe("TikTok", func() {
 			t := NewTikTokTranscriber(jobConfig, statsCollector)
 
 			j := types.Job{
-				Type: teetypes.TiktokJob,
+				Type: types.TiktokJob,
 				Arguments: map[string]interface{}{
-					"type":      teetypes.CapSearchByQuery,
+					"type":      types.CapSearchByQuery,
 					"search":    []string{"crypto", "ai"},
 					"max_items": 5,
 					"end_page":  1,
@@ -190,7 +189,7 @@ var _ = Describe("TikTok", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.Error).To(BeEmpty())
 
-			var items []*teetypes.TikTokSearchByQueryResult
+			var items []*types.TikTokSearchByQueryResult
 			err = json.Unmarshal(res.Data, &items)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(items).NotTo(BeEmpty())
@@ -235,9 +234,9 @@ var _ = Describe("TikTok", func() {
 			t := NewTikTokTranscriber(jobConfig, statsCollector)
 
 			j := types.Job{
-				Type: teetypes.TiktokJob,
+				Type: types.TiktokJob,
 				Arguments: map[string]interface{}{
-					"type":         teetypes.CapSearchByTrending,
+					"type":         types.CapSearchByTrending,
 					"country_code": "US",
 					"sort_by":      "repost",
 					"max_items":    5,
@@ -251,7 +250,7 @@ var _ = Describe("TikTok", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.Error).To(BeEmpty())
 
-			var items []*teetypes.TikTokSearchByTrending
+			var items []*types.TikTokSearchByTrending
 			err = json.Unmarshal(res.Data, &items)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(items).NotTo(BeEmpty())
@@ -290,9 +289,9 @@ var _ = Describe("TikTok", func() {
 			t := NewTikTokTranscriber(jobConfig, statsCollector)
 
 			j := types.Job{
-				Type: teetypes.TiktokJob,
+				Type: types.TiktokJob,
 				Arguments: map[string]interface{}{
-					"type":      teetypes.CapSearchByQuery,
+					"type":      types.CapSearchByQuery,
 					"search":    []string{"tiktok"},
 					"max_items": 1,
 					"end_page":  1,

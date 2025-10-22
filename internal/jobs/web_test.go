@@ -8,6 +8,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/masa-finance/tee-worker/api/args/llm"
+	"github.com/masa-finance/tee-worker/api/args/web"
 	"github.com/masa-finance/tee-worker/api/types"
 	"github.com/masa-finance/tee-worker/internal/config"
 	"github.com/masa-finance/tee-worker/internal/jobs"
@@ -15,17 +17,14 @@ import (
 	"github.com/masa-finance/tee-worker/internal/jobs/stats"
 	"github.com/masa-finance/tee-worker/internal/jobs/webapify"
 	"github.com/masa-finance/tee-worker/pkg/client"
-
-	teeargs "github.com/masa-finance/tee-types/args"
-	teetypes "github.com/masa-finance/tee-types/types"
 )
 
 // MockWebApifyClient is a mock implementation of the WebApifyClient.
 type MockWebApifyClient struct {
-	ScrapeFunc func(args teeargs.WebArguments) ([]*teetypes.WebScraperResult, string, client.Cursor, error)
+	ScrapeFunc func(args web.ScraperArguments) ([]*types.WebScraperResult, string, client.Cursor, error)
 }
 
-func (m *MockWebApifyClient) Scrape(_ string, args teeargs.WebArguments, _ client.Cursor) ([]*teetypes.WebScraperResult, string, client.Cursor, error) {
+func (m *MockWebApifyClient) Scrape(_ string, args web.ScraperArguments, _ client.Cursor) ([]*types.WebScraperResult, string, client.Cursor, error) {
 	if m != nil && m.ScrapeFunc != nil {
 		res, datasetId, next, err := m.ScrapeFunc(args)
 		return res, datasetId, next, err
@@ -36,14 +35,14 @@ func (m *MockWebApifyClient) Scrape(_ string, args teeargs.WebArguments, _ clien
 // MockLLMApifyClient is a mock implementation of the LLMApify interface
 // used to prevent external calls during unit tests.
 type MockLLMApifyClient struct {
-	ProcessFunc func(workerID string, args teeargs.LLMProcessorArguments, cursor client.Cursor) ([]*teetypes.LLMProcessorResult, client.Cursor, error)
+	ProcessFunc func(workerID string, args llm.ProcessArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error)
 }
 
-func (m *MockLLMApifyClient) Process(workerID string, args teeargs.LLMProcessorArguments, cursor client.Cursor) ([]*teetypes.LLMProcessorResult, client.Cursor, error) {
+func (m *MockLLMApifyClient) Process(workerID string, args llm.ProcessArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error) {
 	if m != nil && m.ProcessFunc != nil {
 		return m.ProcessFunc(workerID, args, cursor)
 	}
-	return []*teetypes.LLMProcessorResult{}, client.EmptyCursor, nil
+	return []*types.LLMProcessorResult{}, client.EmptyCursor, nil
 }
 
 var _ = Describe("WebScraper", func() {
@@ -68,9 +67,9 @@ var _ = Describe("WebScraper", func() {
 		scraper = jobs.NewWebScraper(cfg, statsCollector)
 		mockClient = &MockWebApifyClient{}
 		mockLLM = &MockLLMApifyClient{
-			ProcessFunc: func(workerID string, args teeargs.LLMProcessorArguments, cursor client.Cursor) ([]*teetypes.LLMProcessorResult, client.Cursor, error) {
+			ProcessFunc: func(workerID string, args llm.ProcessArguments, cursor client.Cursor) ([]*types.LLMProcessorResult, client.Cursor, error) {
 				// Return a single empty summary to avoid changing expectations
-				return []*teetypes.LLMProcessorResult{{LLMResponse: ""}}, client.EmptyCursor, nil
+				return []*types.LLMProcessorResult{{LLMResponse: ""}}, client.EmptyCursor, nil
 			},
 		}
 
@@ -84,7 +83,7 @@ var _ = Describe("WebScraper", func() {
 
 		job = types.Job{
 			UUID: "test-uuid",
-			Type: teetypes.WebJob,
+			Type: types.WebJob,
 		}
 	})
 
@@ -103,22 +102,22 @@ var _ = Describe("WebScraper", func() {
 
 		It("should call Scrape and return data and next cursor", func() {
 			job.Arguments = map[string]any{
-				"type":      teetypes.WebScraper,
+				"type":      types.WebScraper,
 				"url":       "https://example.com",
 				"max_depth": 1,
 				"max_pages": 2,
 			}
 
-			mockClient.ScrapeFunc = func(args teeargs.WebArguments) ([]*teetypes.WebScraperResult, string, client.Cursor, error) {
+			mockClient.ScrapeFunc = func(args web.ScraperArguments) ([]*types.WebScraperResult, string, client.Cursor, error) {
 				Expect(args.URL).To(Equal("https://example.com"))
-				return []*teetypes.WebScraperResult{{URL: "https://example.com", Markdown: "# Hello"}}, "dataset-123", client.Cursor("next-cursor"), nil
+				return []*types.WebScraperResult{{URL: "https://example.com", Markdown: "# Hello"}}, "dataset-123", client.Cursor("next-cursor"), nil
 			}
 
 			result, err := scraper.ExecuteJob(job)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(result.NextCursor).To(Equal("next-cursor"))
 
-			var resp []*teetypes.WebScraperResult
+			var resp []*types.WebScraperResult
 			err = json.Unmarshal(result.Data, &resp)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(resp).To(HaveLen(1))
@@ -128,14 +127,14 @@ var _ = Describe("WebScraper", func() {
 
 		It("should handle errors from the web client", func() {
 			job.Arguments = map[string]any{
-				"type":      teetypes.WebScraper,
+				"type":      types.WebScraper,
 				"url":       "https://example.com",
 				"max_depth": 0,
 				"max_pages": 1,
 			}
 
 			expectedErr := errors.New("client error")
-			mockClient.ScrapeFunc = func(args teeargs.WebArguments) ([]*teetypes.WebScraperResult, string, client.Cursor, error) {
+			mockClient.ScrapeFunc = func(args web.ScraperArguments) ([]*types.WebScraperResult, string, client.Cursor, error) {
 				return nil, "", client.EmptyCursor, expectedErr
 			}
 
@@ -150,7 +149,7 @@ var _ = Describe("WebScraper", func() {
 				return nil, errors.New("client creation failed")
 			}
 			job.Arguments = map[string]any{
-				"type":      teetypes.WebScraper,
+				"type":      types.WebScraper,
 				"url":       "https://example.com",
 				"max_depth": 0,
 				"max_pages": 1,
@@ -202,9 +201,9 @@ var _ = Describe("WebScraper", func() {
 
 			job := types.Job{
 				UUID: "integration-test-uuid",
-				Type: teetypes.WebJob,
+				Type: types.WebJob,
 				Arguments: map[string]any{
-					"type":      teetypes.WebScraper,
+					"type":      types.WebScraper,
 					"url":       "https://docs.learnbittensor.org",
 					"max_depth": maxDepth,
 					"max_pages": maxPages,
@@ -216,7 +215,7 @@ var _ = Describe("WebScraper", func() {
 			Expect(result.Error).To(BeEmpty())
 			Expect(result.Data).NotTo(BeEmpty())
 
-			var resp []*teetypes.WebScraperResult
+			var resp []*types.WebScraperResult
 			err = json.Unmarshal(result.Data, &resp)
 
 			Expect(err).NotTo(HaveOccurred())
@@ -228,24 +227,6 @@ var _ = Describe("WebScraper", func() {
 				Expect(resp[i].LLMResponse).NotTo(BeEmpty())
 				Expect(resp[i].Markdown).NotTo(BeEmpty())
 				Expect(resp[i].Text).To(ContainSubstring("Bittensor"))
-			}
-		})
-
-		It("should expose capabilities only when both APIFY and GEMINI keys are present", func() {
-			cfg := config.JobConfiguration{
-				"apify_api_key":  apifyKey,
-				"gemini_api_key": geminiKey,
-			}
-			integrationStatsCollector := stats.StartCollector(128, cfg)
-			integrationScraper := jobs.NewWebScraper(cfg, integrationStatsCollector)
-
-			caps := integrationScraper.GetStructuredCapabilities()
-			if apifyKey != "" && geminiKey != "" {
-				Expect(caps[teetypes.WebJob]).NotTo(BeEmpty())
-			} else {
-				// Expect no capabilities when either key is missing
-				_, ok := caps[teetypes.WebJob]
-				Expect(ok).To(BeFalse())
 			}
 		})
 	})

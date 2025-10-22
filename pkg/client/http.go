@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	teetypes "github.com/masa-finance/tee-types/types"
 	"github.com/masa-finance/tee-worker/api/types"
 )
 
@@ -17,6 +16,13 @@ type Client struct {
 	BaseURL    string
 	options    *Options
 	HTTPClient *http.Client
+}
+
+// EncryptedRequest represents an encrypted request/response pair
+// note, this is copied from api/tee/encrypted.go to avoid TEE dependencies in client code
+type EncryptedRequest struct {
+	EncryptedResult  string `json:"encrypted_result"`
+	EncryptedRequest string `json:"encrypted_request"`
 }
 
 // setAPIKeyHeader sets the API key on the request if configured.
@@ -44,7 +50,7 @@ func NewClient(baseURL string, opts ...Option) (*Client, error) {
 
 // CreateJobSignature sends a job to the server to generate a job signature.
 // The server will attach its worker ID to the job before generating the signature.
-func (c *Client) CreateJobSignature(job teetypes.Job) (JobSignature, error) {
+func (c *Client) CreateJobSignature(job types.Job) (JobSignature, error) {
 	jobJSON, err := json.Marshal(job)
 	if err != nil {
 		return JobSignature(""), fmt.Errorf("error marshaling job: %w", err)
@@ -115,7 +121,7 @@ func (c *Client) SubmitJob(JobSignature JobSignature) (*JobResult, error) {
 
 // Decrypt sends the encrypted result to the server to decrypt it.
 func (c *Client) Decrypt(JobSignature JobSignature, encryptedResult string) (string, error) {
-	decryptReq := types.EncryptedRequest{
+	decryptReq := EncryptedRequest{
 		EncryptedResult:  encryptedResult,
 		EncryptedRequest: string(JobSignature),
 	}
