@@ -31,7 +31,21 @@ type Params[T base.JobArgument] struct {
 }
 
 func (p Params[T]) Validate(_ *types.SearchConfig) error {
-	return p.Args.Validate()
+	// Convert Args (generic T) to map[string]any
+	jsonData, err := json.Marshal(p.Args)
+	if err != nil {
+		return err
+	}
+	var argsMap map[string]any
+	if err := json.Unmarshal(jsonData, &argsMap); err != nil {
+		return err
+	}
+
+	// Force typed unmarshal by job type which triggers defaults + Validate()
+	if _, err := args.UnmarshalJobArguments(p.JobType, argsMap); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p Params[T]) Type() types.JobType {
@@ -60,8 +74,9 @@ func (l Params[T]) Arguments(cfg *types.SearchConfig) map[string]any {
 	// Use UnmarshalJobArguments to get properly typed arguments with correct type
 	ja, err := args.UnmarshalJobArguments(l.JobType, argsMap)
 	if err != nil {
-		// Fallback to original args if unmarshaling fails
-		return argsMap
+		// Validation should have already occurred in Validate(); avoid silently
+		// proceeding with potentially invalid arguments here.
+		return nil
 	}
 
 	// Convert ja to map[string]any

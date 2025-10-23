@@ -739,6 +739,12 @@ func (ts *TwitterScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 
 	// Validate the result based on operation type
 	switch {
+	case args.Type == types.CapGetFollowers || args.Type == types.CapGetFollowing:
+		var results []*types.ProfileResultApify
+		if err := jobResult.Unmarshal(&results); err != nil {
+			logrus.Errorf("Error while unmarshalling followers/following result for job ID %s, type %s: %v", j.UUID, j.Type, err)
+			return types.JobResult{Error: "error unmarshalling followers/following result for final validation"}, err
+		}
 	case args.IsSingleTweetOperation():
 		var result *types.TweetResult
 		if err := jobResult.Unmarshal(&result); err != nil {
