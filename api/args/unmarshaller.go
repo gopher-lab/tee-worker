@@ -55,7 +55,7 @@ func UnmarshalJobArguments(jobType types.JobType, args Args) (base.JobArgument, 
 func unmarshalWebArguments(args Args) (*web.ScraperArguments, error) {
 	webArgs := &web.ScraperArguments{}
 	if err := unmarshalToStruct(args, webArgs); err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
+		return nil, fmt.Errorf("%w", err)
 	}
 	return webArgs, nil
 }
@@ -63,25 +63,25 @@ func unmarshalWebArguments(args Args) (*web.ScraperArguments, error) {
 func unmarshalTikTokArguments(args Args) (base.JobArgument, error) {
 	minimal := base.Arguments{}
 	if err := unmarshalToStruct(args, &minimal); err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
+		return nil, fmt.Errorf("%w", err)
 	}
 	switch minimal.Type {
 	case types.CapSearchByQuery:
 		searchArgs := &tiktok.QueryArguments{}
 		if err := unmarshalToStruct(args, searchArgs); err != nil {
-			return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
+			return nil, fmt.Errorf("%w", err)
 		}
 		return searchArgs, nil
 	case types.CapSearchByTrending:
 		searchArgs := &tiktok.TrendingArguments{}
 		if err := unmarshalToStruct(args, searchArgs); err != nil {
-			return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
+			return nil, fmt.Errorf("%w", err)
 		}
 		return searchArgs, nil
 	case types.CapTranscription:
 		transcriptionArgs := &tiktok.TranscriptionArguments{}
 		if err := unmarshalToStruct(args, transcriptionArgs); err != nil {
-			return nil, fmt.Errorf("%w: %w", ErrFailedToUnmarshal, err)
+			return nil, fmt.Errorf("%w", err)
 		}
 		return transcriptionArgs, nil
 	default:
