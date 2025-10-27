@@ -2,7 +2,7 @@ package twitter
 
 import (
 	"fmt"
-	"github.com/masa-finance/tee-worker/pkg/client"
+	"github.com/masa-finance/tee-worker/v2/pkg/client"
 	"strings"
 	"sync"
 	"time"

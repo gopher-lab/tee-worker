@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/masa-finance/tee-worker/api/args/web"
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/internal/apify"
-	"github.com/masa-finance/tee-worker/internal/jobs/stats"
-	"github.com/masa-finance/tee-worker/pkg/client"
+	"github.com/masa-finance/tee-worker/v2/api/args/web"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/internal/apify"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/stats"
+	"github.com/masa-finance/tee-worker/v2/pkg/client"
 	"github.com/sirupsen/logrus"
 )
 

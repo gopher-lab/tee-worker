@@ -8,10 +8,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/args/web"
-	"github.com/masa-finance/tee-worker/internal/apify"
-	"github.com/masa-finance/tee-worker/internal/jobs/webapify"
-	"github.com/masa-finance/tee-worker/pkg/client"
+	"github.com/masa-finance/tee-worker/v2/api/args/web"
+	"github.com/masa-finance/tee-worker/v2/internal/apify"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/webapify"
+	"github.com/masa-finance/tee-worker/v2/pkg/client"
 )
 
 // MockApifyClient is a mock implementation of the ApifyClient.

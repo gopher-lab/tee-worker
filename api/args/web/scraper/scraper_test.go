@@ -7,8 +7,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/args/web"
-	"github.com/masa-finance/tee-worker/api/args/web/scraper"
+	"github.com/masa-finance/tee-worker/v2/api/args/web"
+	"github.com/masa-finance/tee-worker/v2/api/args/web/scraper"
 )
 
 var _ = Describe("WebArguments", func() {

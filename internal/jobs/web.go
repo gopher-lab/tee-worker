@@ -7,18 +7,18 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/masa-finance/tee-worker/api/args"
-	"github.com/masa-finance/tee-worker/api/args/llm"
-	"github.com/masa-finance/tee-worker/api/args/llm/process"
-	"github.com/masa-finance/tee-worker/api/args/web"
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/internal/config"
-	"github.com/masa-finance/tee-worker/internal/jobs/llmapify"
-	"github.com/masa-finance/tee-worker/internal/jobs/stats"
-	"github.com/masa-finance/tee-worker/internal/jobs/webapify"
-	"github.com/masa-finance/tee-worker/pkg/client"
+	"github.com/masa-finance/tee-worker/v2/api/args"
+	"github.com/masa-finance/tee-worker/v2/api/args/llm"
+	"github.com/masa-finance/tee-worker/v2/api/args/llm/process"
+	"github.com/masa-finance/tee-worker/v2/api/args/web"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/internal/config"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/llmapify"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/stats"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/webapify"
+	"github.com/masa-finance/tee-worker/v2/pkg/client"
 
-	"github.com/masa-finance/tee-worker/pkg/util"
+	"github.com/masa-finance/tee-worker/v2/pkg/util"
 )
 
 // WebApifyClient defines the interface for the Web Apify client to allow mocking in tests

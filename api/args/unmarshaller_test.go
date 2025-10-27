@@ -4,13 +4,13 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/args"
-	"github.com/masa-finance/tee-worker/api/args/reddit"
-	"github.com/masa-finance/tee-worker/api/args/telemetry"
-	"github.com/masa-finance/tee-worker/api/args/tiktok"
-	"github.com/masa-finance/tee-worker/api/args/twitter"
-	"github.com/masa-finance/tee-worker/api/args/web"
-	"github.com/masa-finance/tee-worker/api/types"
+	"github.com/masa-finance/tee-worker/v2/api/args"
+	"github.com/masa-finance/tee-worker/v2/api/args/reddit"
+	"github.com/masa-finance/tee-worker/v2/api/args/telemetry"
+	"github.com/masa-finance/tee-worker/v2/api/args/tiktok"
+	"github.com/masa-finance/tee-worker/v2/api/args/twitter"
+	"github.com/masa-finance/tee-worker/v2/api/args/web"
+	"github.com/masa-finance/tee-worker/v2/api/types"
 )
 
 var _ = Describe("Unmarshaller", func() {

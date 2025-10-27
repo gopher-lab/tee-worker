@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/masa-finance/tee-worker/internal/config"
+	"github.com/masa-finance/tee-worker/v2/internal/config"
 )
 
 const HealthCheckPath = "/healthz"

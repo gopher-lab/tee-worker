@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/masa-finance/tee-worker/api/types"
-	util "github.com/masa-finance/tee-worker/pkg/util"
-	"github.com/masa-finance/tee-worker/internal/apify"
-	"github.com/masa-finance/tee-worker/pkg/client"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	util "github.com/masa-finance/tee-worker/v2/pkg/util"
+	"github.com/masa-finance/tee-worker/v2/internal/apify"
+	"github.com/masa-finance/tee-worker/v2/pkg/client"
 	"github.com/sirupsen/logrus"
 )
 

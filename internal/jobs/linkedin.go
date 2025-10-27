@@ -7,15 +7,15 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/masa-finance/tee-worker/api/args"
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/internal/config"
-	"github.com/masa-finance/tee-worker/internal/jobs/linkedinapify"
-	"github.com/masa-finance/tee-worker/internal/jobs/stats"
-	"github.com/masa-finance/tee-worker/pkg/client"
+	"github.com/masa-finance/tee-worker/v2/api/args"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/internal/config"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/linkedinapify"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/stats"
+	"github.com/masa-finance/tee-worker/v2/pkg/client"
 
-	pArgs "github.com/masa-finance/tee-worker/api/args/linkedin/profile"
-	pTypes "github.com/masa-finance/tee-worker/api/types/linkedin/profile"
+	pArgs "github.com/masa-finance/tee-worker/v2/api/args/linkedin/profile"
+	pTypes "github.com/masa-finance/tee-worker/v2/api/types/linkedin/profile"
 )
 
 // LinkedInApifyClient defines the interface for the LinkedIn Apify client to allow mocking in tests

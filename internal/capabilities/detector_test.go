@@ -7,9 +7,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/types"
-	. "github.com/masa-finance/tee-worker/internal/capabilities"
-	"github.com/masa-finance/tee-worker/internal/config"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	. "github.com/masa-finance/tee-worker/v2/internal/capabilities"
+	"github.com/masa-finance/tee-worker/v2/internal/config"
 )
 
 // MockJobServer implements JobServerInterface for testing

@@ -7,7 +7,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/masa-finance/tee-worker/pkg/util"
+	"github.com/masa-finance/tee-worker/v2/pkg/util"
 )
 
 type JobStatus string

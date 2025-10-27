@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/masa-finance/tee-worker/pkg/util"
+	"github.com/masa-finance/tee-worker/v2/pkg/util"
 )
 
 var AllRedditQueryTypes = util.NewSet(CapScrapeUrls, CapSearchPosts, CapSearchUsers, CapSearchCommunities)

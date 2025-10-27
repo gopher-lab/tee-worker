@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/masa-finance/tee-worker/pkg/client"
+	"github.com/masa-finance/tee-worker/v2/pkg/client"
 	"github.com/sirupsen/logrus"
 )
 

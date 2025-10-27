@@ -7,8 +7,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/args/twitter/search"
-	"github.com/masa-finance/tee-worker/api/types"
+	"github.com/masa-finance/tee-worker/v2/api/args/twitter/search"
+	"github.com/masa-finance/tee-worker/v2/api/types"
 )
 
 var _ = Describe("TwitterSearchArguments", func() {

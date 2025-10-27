@@ -1,6 +1,6 @@
 package experiences
 
-import "github.com/masa-finance/tee-worker/pkg/util"
+import "github.com/masa-finance/tee-worker/v2/pkg/util"
 
 // id represents a LinkedIn experience level identifier
 type Id string

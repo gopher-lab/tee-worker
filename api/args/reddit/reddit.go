@@ -1,7 +1,7 @@
 package reddit
 
 import (
-	"github.com/masa-finance/tee-worker/api/args/reddit/search"
+	"github.com/masa-finance/tee-worker/v2/api/args/reddit/search"
 )
 
 type SearchArguments = search.Arguments

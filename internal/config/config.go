@@ -13,7 +13,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 
-	"github.com/masa-finance/tee-worker/api/args/llm/process"
+	"github.com/masa-finance/tee-worker/v2/api/args/llm/process"
 )
 
 var (

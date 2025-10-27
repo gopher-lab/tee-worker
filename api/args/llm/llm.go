@@ -1,7 +1,7 @@
 package llm
 
 import (
-	"github.com/masa-finance/tee-worker/api/args/llm/process"
+	"github.com/masa-finance/tee-worker/v2/api/args/llm/process"
 )
 
 type ProcessArguments = process.Arguments

@@ -1,6 +1,6 @@
 package industries
 
-import "github.com/masa-finance/tee-worker/pkg/util"
+import "github.com/masa-finance/tee-worker/v2/pkg/util"
 
 // Id represents a LinkedIn industry identifier
 type Id string

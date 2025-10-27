@@ -10,15 +10,15 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/internal/config"
-	"github.com/masa-finance/tee-worker/internal/jobs"
-	"github.com/masa-finance/tee-worker/internal/jobs/linkedinapify"
-	"github.com/masa-finance/tee-worker/internal/jobs/stats"
-	"github.com/masa-finance/tee-worker/pkg/client"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/internal/config"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/linkedinapify"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/stats"
+	"github.com/masa-finance/tee-worker/v2/pkg/client"
 
-	"github.com/masa-finance/tee-worker/api/args/linkedin"
-	"github.com/masa-finance/tee-worker/api/types/linkedin/profile"
+	"github.com/masa-finance/tee-worker/v2/api/args/linkedin"
+	"github.com/masa-finance/tee-worker/v2/api/types/linkedin/profile"
 )
 
 // MockLinkedInApifyClient is a mock implementation of the LinkedInApifyClient.
