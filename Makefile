@@ -20,7 +20,7 @@ docker-compose-up:
 	@docker compose up --build
 
 build:
-	@ego-go build -v -gcflags=all="-N -l" -ldflags '-linkmode=external -extldflags=-static' -ldflags "-X github.com/masa-finance/tee-worker/internal/versioning.ApplicationVersion=${VERSION} -X github.com/masa-finance/tee-worker/pkg/tee.KeyDistributorPubKey=${DISTRIBUTOR_PUBKEY} -X github.com/masa-finance/tee-worker/internal/config.MinersWhiteList=${MINERS_WHITE_LIST}" -o ./bin/masa-tee-worker ./cmd/tee-worker
+	@ego-go build -v -gcflags=all="-N -l" -ldflags '-linkmode=external -extldflags=-static' -ldflags "-X github.com/masa-finance/tee-worker/v2/internal/versioning.ApplicationVersion=${VERSION} -X github.com/masa-finance/tee-worker/v2/pkg/tee.KeyDistributorPubKey=${DISTRIBUTOR_PUBKEY} -X github.com/masa-finance/tee-worker/v2/internal/config.MinersWhiteList=${MINERS_WHITE_LIST}" -o ./bin/masa-tee-worker ./cmd/tee-worker
 
 sign: tee/private.pem
 	@ego sign ./tee/masa-tee-worker.json
