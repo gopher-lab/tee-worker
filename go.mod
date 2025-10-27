@@ -1,4 +1,4 @@
-module github.com/masa-finance/tee-worker
+module github.com/masa-finance/tee-worker/v2
 
 go 1.24.0
 

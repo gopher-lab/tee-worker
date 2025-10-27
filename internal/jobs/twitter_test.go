@@ -12,11 +12,11 @@ import (
 	"github.com/sirupsen/logrus"
 
 	twitterscraper "github.com/imperatrona/twitter-scraper"
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/internal/config"
-	. "github.com/masa-finance/tee-worker/internal/jobs"
-	"github.com/masa-finance/tee-worker/internal/jobs/stats"
-	"github.com/masa-finance/tee-worker/internal/jobs/twitterx"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/internal/config"
+	. "github.com/masa-finance/tee-worker/v2/internal/jobs"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/stats"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/twitterx"
 )
 
 // parseTwitterAccounts parses TWITTER_ACCOUNTS environment variable like production does

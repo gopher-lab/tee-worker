@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"math/rand/v2"
 
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/pkg/tee"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/pkg/tee"
 )
 
 var letterRunes = []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+")

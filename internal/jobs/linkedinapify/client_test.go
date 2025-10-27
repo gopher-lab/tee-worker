@@ -8,14 +8,14 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/internal/apify"
-	"github.com/masa-finance/tee-worker/internal/jobs/linkedinapify"
-	"github.com/masa-finance/tee-worker/internal/jobs/stats"
-	"github.com/masa-finance/tee-worker/pkg/client"
+	"github.com/masa-finance/tee-worker/v2/internal/apify"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/linkedinapify"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/stats"
+	"github.com/masa-finance/tee-worker/v2/pkg/client"
 
-	profileArgs "github.com/masa-finance/tee-worker/api/args/linkedin/profile"
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/api/types/linkedin/profile"
+	profileArgs "github.com/masa-finance/tee-worker/v2/api/args/linkedin/profile"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/api/types/linkedin/profile"
 )
 
 // MockApifyClient is a mock implementation of the ApifyClient.

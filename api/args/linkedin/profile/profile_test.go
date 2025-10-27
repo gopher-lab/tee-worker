@@ -7,13 +7,13 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/args/linkedin/profile"
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/api/types/linkedin/experiences"
-	"github.com/masa-finance/tee-worker/api/types/linkedin/functions"
-	"github.com/masa-finance/tee-worker/api/types/linkedin/industries"
-	ptypes "github.com/masa-finance/tee-worker/api/types/linkedin/profile"
-	"github.com/masa-finance/tee-worker/api/types/linkedin/seniorities"
+	"github.com/masa-finance/tee-worker/v2/api/args/linkedin/profile"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/api/types/linkedin/experiences"
+	"github.com/masa-finance/tee-worker/v2/api/types/linkedin/functions"
+	"github.com/masa-finance/tee-worker/v2/api/types/linkedin/industries"
+	ptypes "github.com/masa-finance/tee-worker/v2/api/types/linkedin/profile"
+	"github.com/masa-finance/tee-worker/v2/api/types/linkedin/seniorities"
 )
 
 var _ = Describe("LinkedIn Profile Arguments", func() {

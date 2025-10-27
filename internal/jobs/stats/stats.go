@@ -5,10 +5,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/internal/capabilities"
-	"github.com/masa-finance/tee-worker/internal/config"
-	"github.com/masa-finance/tee-worker/internal/versioning"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/internal/capabilities"
+	"github.com/masa-finance/tee-worker/v2/internal/config"
+	"github.com/masa-finance/tee-worker/v2/internal/versioning"
 	"github.com/sirupsen/logrus"
 )
 

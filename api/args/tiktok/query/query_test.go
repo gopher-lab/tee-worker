@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/api/args/tiktok/query"
+	"github.com/masa-finance/tee-worker/v2/api/args/tiktok/query"
 )
 
 var _ = Describe("TikTokQueryArguments", func() {

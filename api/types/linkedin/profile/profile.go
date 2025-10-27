@@ -3,7 +3,7 @@ package profile
 import (
 	"time"
 
-	"github.com/masa-finance/tee-worker/pkg/util"
+	"github.com/masa-finance/tee-worker/v2/pkg/util"
 )
 
 type ScraperMode string

@@ -12,9 +12,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
-	"github.com/masa-finance/tee-worker/internal/config"
-	"github.com/masa-finance/tee-worker/internal/jobserver"
-	"github.com/masa-finance/tee-worker/pkg/tee"
+	"github.com/masa-finance/tee-worker/v2/internal/config"
+	"github.com/masa-finance/tee-worker/v2/internal/jobserver"
+	"github.com/masa-finance/tee-worker/v2/pkg/tee"
 )
 
 func Start(ctx context.Context, listenAddress, dataDIR string, standalone bool, jc config.JobConfiguration) error {

@@ -1,7 +1,7 @@
 package web
 
 import (
-	"github.com/masa-finance/tee-worker/api/args/web/scraper"
+	"github.com/masa-finance/tee-worker/v2/api/args/web/scraper"
 )
 
 type ScraperArguments = scraper.Arguments

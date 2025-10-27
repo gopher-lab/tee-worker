@@ -5,12 +5,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/masa-finance/tee-worker/api/args/llm"
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/internal/apify"
-	"github.com/masa-finance/tee-worker/internal/config"
-	"github.com/masa-finance/tee-worker/internal/jobs/stats"
-	"github.com/masa-finance/tee-worker/pkg/client"
+	"github.com/masa-finance/tee-worker/v2/api/args/llm"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/internal/apify"
+	"github.com/masa-finance/tee-worker/v2/internal/config"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/stats"
+	"github.com/masa-finance/tee-worker/v2/pkg/client"
 	"github.com/sirupsen/logrus"
 )
 

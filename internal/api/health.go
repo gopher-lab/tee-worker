@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/masa-finance/tee-worker/internal/jobserver"
+	"github.com/masa-finance/tee-worker/v2/internal/jobserver"
 )
 
 // HealthMetrics tracks health-related metrics for the service

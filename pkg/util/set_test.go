@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/pkg/util"
+	"github.com/masa-finance/tee-worker/v2/pkg/util"
 )
 
 var _ = Describe("Set", func() {

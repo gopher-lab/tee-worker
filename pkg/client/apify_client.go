@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/masa-finance/tee-worker/internal/apify"
+	"github.com/masa-finance/tee-worker/v2/internal/apify"
 	"github.com/sirupsen/logrus"
 )
 

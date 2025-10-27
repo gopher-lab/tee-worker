@@ -1,11 +1,11 @@
 package linkedin
 
 import (
-	"github.com/masa-finance/tee-worker/api/types/linkedin/experiences"
-	"github.com/masa-finance/tee-worker/api/types/linkedin/functions"
-	"github.com/masa-finance/tee-worker/api/types/linkedin/industries"
-	"github.com/masa-finance/tee-worker/api/types/linkedin/profile"
-	"github.com/masa-finance/tee-worker/api/types/linkedin/seniorities"
+	"github.com/masa-finance/tee-worker/v2/api/types/linkedin/experiences"
+	"github.com/masa-finance/tee-worker/v2/api/types/linkedin/functions"
+	"github.com/masa-finance/tee-worker/v2/api/types/linkedin/industries"
+	"github.com/masa-finance/tee-worker/v2/api/types/linkedin/profile"
+	"github.com/masa-finance/tee-worker/v2/api/types/linkedin/seniorities"
 )
 
 type LinkedInConfig struct {

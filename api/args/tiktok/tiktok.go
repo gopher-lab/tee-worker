@@ -1,9 +1,9 @@
 package tiktok
 
 import (
-	"github.com/masa-finance/tee-worker/api/args/tiktok/query"
-	"github.com/masa-finance/tee-worker/api/args/tiktok/transcription"
-	"github.com/masa-finance/tee-worker/api/args/tiktok/trending"
+	"github.com/masa-finance/tee-worker/v2/api/args/tiktok/query"
+	"github.com/masa-finance/tee-worker/v2/api/args/tiktok/transcription"
+	"github.com/masa-finance/tee-worker/v2/api/args/tiktok/trending"
 )
 
 type TranscriptionArguments = transcription.Arguments

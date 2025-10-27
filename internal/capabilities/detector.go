@@ -6,12 +6,12 @@ import (
 
 	"maps"
 
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/internal/apify"
-	"github.com/masa-finance/tee-worker/internal/config"
-	"github.com/masa-finance/tee-worker/internal/jobs/twitter"
-	"github.com/masa-finance/tee-worker/pkg/client"
-	util "github.com/masa-finance/tee-worker/pkg/util"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/internal/apify"
+	"github.com/masa-finance/tee-worker/v2/internal/config"
+	"github.com/masa-finance/tee-worker/v2/internal/jobs/twitter"
+	"github.com/masa-finance/tee-worker/v2/pkg/client"
+	util "github.com/masa-finance/tee-worker/v2/pkg/util"
 	"github.com/sirupsen/logrus"
 )
 

@@ -8,9 +8,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/masa-finance/tee-worker/internal/config"
-	. "github.com/masa-finance/tee-worker/internal/api"
-	"github.com/masa-finance/tee-worker/internal/jobserver"
+	"github.com/masa-finance/tee-worker/v2/internal/config"
+	. "github.com/masa-finance/tee-worker/v2/internal/api"
+	"github.com/masa-finance/tee-worker/v2/internal/jobserver"
 )
 
 var _ = Describe("Health Checks", func() {

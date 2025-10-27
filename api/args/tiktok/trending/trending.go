@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/masa-finance/tee-worker/api/args/base"
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/pkg/util"
+	"github.com/masa-finance/tee-worker/v2/api/args/base"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/pkg/util"
 )
 
 var (

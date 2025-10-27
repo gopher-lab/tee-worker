@@ -1,7 +1,7 @@
 package params
 
 import (
-	"github.com/masa-finance/tee-worker/api/args/tiktok"
+	"github.com/masa-finance/tee-worker/v2/api/args/tiktok"
 )
 
 type TikTokTranscription = Params[*tiktok.TranscriptionArguments]

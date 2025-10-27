@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	. "github.com/masa-finance/tee-worker/internal/api"
+	. "github.com/masa-finance/tee-worker/v2/internal/api"
 )
 
 var _ = Describe("APIKeyAuthMiddleware", func() {

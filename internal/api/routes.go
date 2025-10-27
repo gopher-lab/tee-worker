@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	teejob "github.com/masa-finance/tee-worker/api/tee"
-	"github.com/masa-finance/tee-worker/api/types"
-	"github.com/masa-finance/tee-worker/internal/jobserver"
-	"github.com/masa-finance/tee-worker/pkg/tee"
+	teejob "github.com/masa-finance/tee-worker/v2/api/tee"
+	"github.com/masa-finance/tee-worker/v2/api/types"
+	"github.com/masa-finance/tee-worker/v2/internal/jobserver"
+	"github.com/masa-finance/tee-worker/v2/pkg/tee"
 
 	"github.com/sirupsen/logrus"
 )
