@@ -12,11 +12,11 @@ import (
 )
 
 type TikTokSearchByQueryRequest struct {
-	SearchTerms []string       `json:"search"`
-	StartUrls   []string       `json:"startUrls"`
-	MaxItems    uint           `json:"maxItems"`
-	EndPage     uint           `json:"endPage"`
-	Proxy       map[string]any `json:"proxy"`
+	SearchTerms []string         `json:"search"`
+	StartUrls   []string         `json:"startUrls"`
+	MaxItems    uint             `json:"maxItems"`
+	EndPage     uint             `json:"endPage"`
+	Proxy       types.ApifyProxy `json:"proxy"`
 }
 
 type TikTokSearchByTrendingRequest struct {
@@ -61,21 +61,11 @@ func (c *TikTokApifyClient) SearchByQuery(input query.Arguments, cursor client.C
 		StartUrls:   startUrls,
 		MaxItems:    input.MaxItems,
 		EndPage:     input.EndPage,
-		Proxy:       map[string]any{"useApifyProxy": true},
+		Proxy:       types.ApifyProxy{UseApifyProxy: true, ApifyProxyGroups: []string{"RESIDENTIAL"}},
 	}
 
-	// Convert struct to map[string]any for Apify client
-	requestBytes, err := json.Marshal(request)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to marshal request: %w", err)
-	}
-
-	var apifyInput map[string]any
-	if err := json.Unmarshal(requestBytes, &apifyInput); err != nil {
-		return nil, "", fmt.Errorf("failed to unmarshal to map: %w", err)
-	}
-
-	dataset, next, err := c.apify.RunActorAndGetResponse(apify.ActorIds.TikTokSearchScraper, apifyInput, cursor, limit)
+	// Pass the typed request directly to the Apify client
+	dataset, next, err := c.apify.RunActorAndGetResponse(apify.ActorIds.TikTokSearchScraper, request, cursor, limit)
 	if err != nil {
 		return nil, "", fmt.Errorf("apify run (search): %w", err)
 	}
@@ -101,17 +91,8 @@ func (c *TikTokApifyClient) SearchByTrending(input trending.Arguments, cursor cl
 		Period:      input.Period,
 	}
 
-	requestBytes, err := json.Marshal(request)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to marshal request: %w", err)
-	}
-
-	var apifyInput map[string]any
-	if err := json.Unmarshal(requestBytes, &apifyInput); err != nil {
-		return nil, "", fmt.Errorf("failed to unmarshal to map: %w", err)
-	}
-
-	dataset, next, err := c.apify.RunActorAndGetResponse(apify.ActorIds.TikTokTrendingScraper, apifyInput, cursor, limit)
+	// Pass the typed request directly to the Apify client
+	dataset, next, err := c.apify.RunActorAndGetResponse(apify.ActorIds.TikTokTrendingScraper, request, cursor, limit)
 	if err != nil {
 		return nil, "", fmt.Errorf("apify run (trending): %w", err)
 	}
