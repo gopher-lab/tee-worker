@@ -94,6 +94,7 @@ func (w Arguments) ToScraperRequest() types.WebScraperRequest {
 		MaxCrawlPages:        w.MaxPages,
 		RespectRobotsTxtFile: DefaultRespectRobotsTxtFile,
 		SaveMarkdown:         DefaultSaveMarkdown,
+		Proxy:                types.ApifyProxy{UseApifyProxy: true, ApifyProxyGroups: []string{"RESIDENTIAL"}},
 	}
 }
 

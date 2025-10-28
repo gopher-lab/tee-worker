@@ -179,7 +179,6 @@ var _ = Describe("TikTok", func() {
 					"search":    []string{"crypto", "ai"},
 					"max_items": 5,
 					"end_page":  1,
-					"proxy":     map[string]any{"use_apify_proxy": true},
 				},
 				WorkerID: "tiktok-test-worker-search-query",
 				Timeout:  60 * time.Second,

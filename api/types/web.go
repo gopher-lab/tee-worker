@@ -23,6 +23,7 @@ type WebScraperRequest struct {
 	MaxCrawlPages        int           `json:"maxCrawlPages"`
 	RespectRobotsTxtFile bool          `json:"respectRobotsTxtFile"`
 	SaveMarkdown         bool          `json:"saveMarkdown"`
+	Proxy                ApifyProxy    `json:"proxyConfiguration"`
 }
 
 // WebCrawlInfo contains information about the crawling process

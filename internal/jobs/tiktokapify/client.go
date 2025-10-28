@@ -11,17 +11,12 @@ import (
 	"github.com/masa-finance/tee-worker/v2/pkg/client"
 )
 
-type Proxy struct {
-	UseApifyProxy    bool     `json:"useApifyProxy"`
-	ApifyProxyGroups []string `json:"apifyProxyGroups"`
-}
-
 type TikTokSearchByQueryRequest struct {
-	SearchTerms []string `json:"search"`
-	StartUrls   []string `json:"startUrls"`
-	MaxItems    uint     `json:"maxItems"`
-	EndPage     uint     `json:"endPage"`
-	Proxy       Proxy    `json:"proxy"`
+	SearchTerms []string         `json:"search"`
+	StartUrls   []string         `json:"startUrls"`
+	MaxItems    uint             `json:"maxItems"`
+	EndPage     uint             `json:"endPage"`
+	Proxy       types.ApifyProxy `json:"proxy"`
 }
 
 type TikTokSearchByTrendingRequest struct {
@@ -66,7 +61,7 @@ func (c *TikTokApifyClient) SearchByQuery(input query.Arguments, cursor client.C
 		StartUrls:   startUrls,
 		MaxItems:    input.MaxItems,
 		EndPage:     input.EndPage,
-		Proxy:       Proxy{UseApifyProxy: true, ApifyProxyGroups: []string{"RESIDENTIAL"}},
+		Proxy:       types.ApifyProxy{UseApifyProxy: true, ApifyProxyGroups: []string{"RESIDENTIAL"}},
 	}
 
 	// Pass the typed request directly to the Apify client
