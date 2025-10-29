@@ -698,6 +698,33 @@ var _ = Describe("Twitter Scraper", func() {
 			Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterTweets]).To(BeNumerically("==", uint(len(results))))
 		})
 
+		It("should scrape tweets with query", func() {
+			j := types.Job{
+				Type: types.TwitterJob,
+				Arguments: map[string]interface{}{
+					"type":        types.CapSearchByQuery,
+					"query":       "from:gopher_ai",
+					"max_results": 10,
+				},
+				Timeout: 10 * time.Second,
+			}
+			res, err := twitterScraper.ExecuteJob(j)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(res.Error).To(BeEmpty())
+
+			var results []*types.TweetResult
+			err = res.Unmarshal(&results)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(results).ToNot(BeEmpty())
+
+			// Wait briefly for asynchronous stats processing to complete
+			time.Sleep(100 * time.Millisecond)
+
+			Expect(results[0].Text).ToNot(BeEmpty())
+			Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterScrapes]).To(BeNumerically("==", 1))
+			Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterTweets]).To(BeNumerically("==", uint(len(results))))
+		})
+
 		It("should scrape tweets with a search by full archive", func() {
 			Skip("Needs full archive key (elevated) in TWITTER_API_KEYS to run")
 
