@@ -38,6 +38,7 @@ func (ts *TwitterScraper) convertTwitterScraperTweetToTweetResult(tweet twitters
 		TweetID:        tweet.ID,
 		ConversationID: tweet.ConversationID,
 		UserID:         tweet.UserID,
+		AuthorID:      tweet.UserID, // For scraper tweets, UserID is the author
 		Text:           tweet.Text,
 		CreatedAt:      createdAt,
 		Timestamp:      tweet.Timestamp,
@@ -78,6 +79,15 @@ func (ts *TwitterScraper) convertTwitterScraperTweetToTweetResult(tweet twitters
 		RetweetedStatusID: tweet.RetweetedStatusID,
 		Views:             tweet.Views,
 		SensitiveContent:  tweet.SensitiveContent,
+		PublicMetrics: types.PublicMetrics{
+			LikeCount:      tweet.Likes,
+			ReplyCount:     tweet.Replies,
+			RetweetCount:   tweet.Retweets,
+			QuoteCount:     0, // Not available from scraper
+			BookmarkCount:  0, // Not available from scraper
+			ImpressionCount: tweet.Views, // Views maps to impressions
+		},
+		PossiblySensitive: tweet.SensitiveContent, // Map sensitive content flag
 	}
 }
 
