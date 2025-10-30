@@ -78,6 +78,14 @@ func (ts *TwitterScraper) convertTwitterScraperTweetToTweetResult(tweet twitters
 		RetweetedStatusID: tweet.RetweetedStatusID,
 		Views:             tweet.Views,
 		SensitiveContent:  tweet.SensitiveContent,
+		PublicMetrics: types.PublicMetrics{
+			LikeCount:       tweet.Likes,
+			ReplyCount:      tweet.Replies,
+			RetweetCount:    tweet.Retweets,
+			QuoteCount:      0,           // Not available from scraper
+			BookmarkCount:   0,           // Not available from scraper
+			ImpressionCount: tweet.Views, // Views maps to impressions
+		},
 	}
 }
 
