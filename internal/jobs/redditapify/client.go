@@ -44,6 +44,7 @@ func (args *CommonArgs) ToActorRequest() RedditActorRequest {
 		MaxComments:         args.MaxComments,
 		MaxCommunitiesCount: args.MaxCommunities,
 		MaxUserCount:        args.MaxUsers,
+		Proxy:               types.ApifyProxy{UseApifyProxy: true, ApifyProxyGroups: []string{"RESIDENTIAL"}},
 	}
 }
 
@@ -67,6 +68,7 @@ type RedditActorRequest struct {
 	SearchUsers         bool                   `json:"searchUsers"`
 	SkipUserPosts       bool                   `json:"skipUserPosts"`
 	SkipComments        bool                   `json:"skipComments"`
+	Proxy               types.ApifyProxy       `json:"proxy"`
 }
 
 // RedditApifyClient wraps the generic Apify client for Reddit-specific operations
