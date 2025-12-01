@@ -579,22 +579,6 @@ func (ts *TwitterScraper) getFollowingApify(j types.Job, username string, maxRes
 	return following, nextCursor, nil
 }
 
-func (ts *TwitterScraper) GetSpace(j types.Job, baseDir, spaceID string) (*twitterscraper.Space, error) {
-	scraper, account, err := ts.getCredentialScraper(j, baseDir)
-	if err != nil {
-		return nil, err
-	}
-
-	ts.statsCollector.Add(j.WorkerID, stats.TwitterScrapes, 1)
-	space, err := scraper.GetSpace(spaceID)
-	if err != nil {
-		_ = ts.handleError(j, err, account)
-		return nil, err
-	}
-	ts.statsCollector.Add(j.WorkerID, stats.TwitterOther, 1)
-	return space, nil
-}
-
 type TwitterScraper struct {
 	configuration  config.TwitterScraperConfig
 	accountManager *twitter.TwitterAccountManager
@@ -683,9 +667,6 @@ func (ts *TwitterScraper) executeCapability(j types.Job, jobArgs *twitterargs.Se
 	case types.CapGetTrends:
 		trends, err := ts.GetTrends(j, ts.configuration.DataDir)
 		return processResponse(trends, "", err)
-	case types.CapGetSpace:
-		space, err := ts.GetSpace(j, ts.configuration.DataDir, jobArgs.Query)
-		return processResponse(space, "", err)
 	case types.CapGetProfile:
 		profile, err := ts.SearchByProfile(j, ts.configuration.DataDir, jobArgs.Query)
 		return processResponse(profile, "", err)
@@ -776,12 +757,6 @@ func (ts *TwitterScraper) ExecuteJob(j types.Job) (types.JobResult, error) {
 		if err := jobResult.Unmarshal(&results); err != nil {
 			logrus.Errorf("Error while unmarshalling multiple profile result for job ID %s, type %s: %v", j.UUID, j.Type, err)
 			return types.JobResult{Error: "error unmarshalling multiple profile result for final validation"}, err
-		}
-	case args.IsSingleSpaceOperation():
-		var result *twitterscraper.Space
-		if err := jobResult.Unmarshal(&result); err != nil {
-			logrus.Errorf("Error while unmarshalling single space result for job ID %s, type %s: %v", j.UUID, j.Type, err)
-			return types.JobResult{Error: "error unmarshalling single space result for final validation"}, err
 		}
 	case args.IsTrendsOperation():
 		var results []string

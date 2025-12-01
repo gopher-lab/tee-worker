@@ -16,10 +16,9 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 )
 
-replace github.com/imperatrona/twitter-scraper => github.com/masa-finance/twitter-scraper v1.0.2
+replace github.com/imperatrona/twitter-scraper => github.com/masa-finance/twitter-scraper v1.1.0
 
 require (
-	github.com/AlexEidt/Vidio v1.5.1 // indirect
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
