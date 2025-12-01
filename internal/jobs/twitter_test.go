@@ -622,26 +622,6 @@ var _ = Describe("Twitter Scraper", func() {
 			Expect(profile.Data.PublicMetrics.FollowersCount).To(BeNumerically(">", 200000000)) // Over 200M followers
 		})
 
-		It("should fetch space", func() {
-			Skip("Needs to be constructed to fetch live spaces first - hard to test with hardcoded IDs")
-
-			res, err := twitterScraper.ExecuteJob(types.Job{
-				Type: types.TwitterJob,
-				Arguments: map[string]interface{}{
-					"type":  types.CapGetSpace,
-					"query": "1YpKkZEWlBaxj",
-				},
-				Timeout: 10 * time.Second,
-			})
-			Expect(err).NotTo(HaveOccurred())
-			Expect(res.Error).To(BeEmpty())
-
-			var space *twitterscraper.Space
-			err = res.Unmarshal(&space)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(space.ID).ToNot(BeEmpty())
-		})
-
 		It("should fetch bookmarks", func() {
 			Skip("Returns 'job result is empty' even when account has bookmarks")
 
