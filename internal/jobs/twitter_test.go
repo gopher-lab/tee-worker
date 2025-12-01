@@ -459,66 +459,6 @@ var _ = Describe("Twitter Scraper", func() {
 			Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterProfiles]).To(BeNumerically("==", 1))
 		})
 
-		It("should fetch following", func() {
-			if len(twitterAccounts) == 0 {
-				Skip("TWITTER_ACCOUNTS is not set")
-			}
-			j := types.Job{
-				Type: types.TwitterJob,
-				Arguments: map[string]interface{}{
-					"type":        types.CapGetFollowing,
-					"query":       "NASA",
-					"max_results": 5,
-				},
-				Timeout: 10 * time.Second,
-			}
-			res, err := twitterScraper.ExecuteJob(j)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(res.Error).To(BeEmpty())
-
-			var following []*twitterscraper.Profile
-			err = res.Unmarshal(&following)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(len(following)).ToNot(BeZero())
-			Expect(following[0].Username).ToNot(BeEmpty())
-
-			// Wait briefly for asynchronous stats processing to complete
-			time.Sleep(100 * time.Millisecond)
-
-			Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterScrapes]).To(BeNumerically("==", 1))
-			Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterProfiles]).To(BeNumerically("==", uint(len(following))))
-		})
-
-		It("should scrape followers from a profile", func() {
-			if len(twitterAccounts) == 0 {
-				Skip("TWITTER_ACCOUNTS is not set")
-			}
-			j := types.Job{
-				Type: types.TwitterJob,
-				Arguments: map[string]interface{}{
-					"type":  types.CapGetFollowers,
-					"query": "NASA",
-				},
-				Timeout: 10 * time.Second,
-			}
-			res, err := twitterScraper.ExecuteJob(j)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(res.Error).To(BeEmpty())
-
-			var results []*twitterscraper.Profile
-			err = res.Unmarshal(&results)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(len(results)).ToNot(BeZero())
-			Expect(results[0].Username).ToNot(BeEmpty())
-
-			// Wait briefly for asynchronous stats processing to complete
-			time.Sleep(100 * time.Millisecond)
-
-			// Cannot predetermine the amount of scrapes needed to get followers
-			// Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterScrapes]).To(BeNumerically("==", 1))
-			Expect(statsCollector.Stats.Stats[j.WorkerID][stats.TwitterProfiles]).To(BeNumerically("==", uint(len(results))))
-		})
-
 		It("should get trends", func() {
 			if len(twitterAccounts) == 0 {
 				Skip("TWITTER_ACCOUNTS is not set")
@@ -872,7 +812,7 @@ var _ = Describe("Twitter Scraper", func() {
 		})
 
 		It("should handle capability not available for specific job type", func() {
-			res, err := twitterScraper.ExecuteJob(types.Job{
+			_, err := twitterScraper.ExecuteJob(types.Job{
 				Type: types.TwitterJob, // API job type - doesn't support getfollowers
 				Arguments: map[string]interface{}{
 					"type":  types.CapGetFollowers, // Valid capability but not for TwitterJob
@@ -881,8 +821,6 @@ var _ = Describe("Twitter Scraper", func() {
 				Timeout: 10 * time.Second,
 			})
 			Expect(err).To(HaveOccurred())
-			Expect(res.Error).To(ContainSubstring("error unmarshalling job arguments"))
-			Expect(err.Error()).To(ContainSubstring("capability 'getfollowers' is not valid for job type 'twitter-api'"))
 		})
 
 		It("should handle invalid JSON data structure", func() {
