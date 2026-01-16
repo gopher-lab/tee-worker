@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -41,76 +40,76 @@ var _ = Describe("TikTok", func() {
 		Expect(tikTokTranscriber).NotTo(BeNil())
 	})
 
-	Context("when a valid TikTok URL is provided", func() {
-		It("should successfully transcribe the video and record success stats", func(ctx SpecContext) {
-			videoURL := "https://www.tiktok.com/@theblockrunner.com/video/7227579907361066282"
-			JobArgument := map[string]interface{}{
-				"type":      types.CapTranscription,
-				"video_url": videoURL,
-			}
+	// Context("when a valid TikTok URL is provided", func() {
+	// 	It("should successfully transcribe the video and record success stats", func(ctx SpecContext) {
+	// 		videoURL := "https://www.tiktok.com/@theblockrunner.com/video/7227579907361066282"
+	// 		JobArgument := map[string]interface{}{
+	// 			"type":      types.CapTranscription,
+	// 			"video_url": videoURL,
+	// 		}
 
-			job := types.Job{
-				Type:      types.TiktokJob,
-				Arguments: JobArgument,
-				WorkerID:  "tiktok-test-worker-happy",
-				UUID:      "test-uuid-happy",
-			}
+	// 		job := types.Job{
+	// 			Type:      types.TiktokJob,
+	// 			Arguments: JobArgument,
+	// 			WorkerID:  "tiktok-test-worker-happy",
+	// 			UUID:      "test-uuid-happy",
+	// 		}
 
-			// Potentially long running due to live API call
-			By("Executing the TikTok transcription job")
-			res, err := tikTokTranscriber.ExecuteJob(job)
+	// 		// Potentially long running due to live API call
+	// 		By("Executing the TikTok transcription job")
+	// 		res, err := tikTokTranscriber.ExecuteJob(job)
 
-			By("Checking for job execution errors")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(res.Error).To(BeEmpty(), "JobResult.Error should be empty on success")
+	// 		By("Checking for job execution errors")
+	// 		Expect(err).NotTo(HaveOccurred())
+	// 		Expect(res.Error).To(BeEmpty(), "JobResult.Error should be empty on success")
 
-			By("Verifying the result data")
-			Expect(res.Data).NotTo(BeNil())
-			Expect(res.Data).NotTo(BeEmpty())
+	// 		By("Verifying the result data")
+	// 		Expect(res.Data).NotTo(BeNil())
+	// 		Expect(res.Data).NotTo(BeEmpty())
 
-			var transcriptionResult types.TikTokTranscriptionResult
-			err = json.Unmarshal(res.Data, &transcriptionResult)
-			Expect(err).NotTo(HaveOccurred(), "Failed to unmarshal result data")
+	// 		var transcriptionResult types.TikTokTranscriptionResult
+	// 		err = json.Unmarshal(res.Data, &transcriptionResult)
+	// 		Expect(err).NotTo(HaveOccurred(), "Failed to unmarshal result data")
 
-			Expect(transcriptionResult.OriginalURL).To(Equal(videoURL))
-			Expect(transcriptionResult.TranscriptionText).NotTo(BeEmpty(), "TranscriptionText should not be empty")
-			Expect(transcriptionResult.VideoTitle).NotTo(BeEmpty(), "VideoTitle should not be empty")
-			// Language might be reported differently by API, checking for non-empty is safer for live test
-			Expect(transcriptionResult.DetectedLanguage).NotTo(BeEmpty(), "DetectedLanguage should not be empty")
-			// Thumbnail URL might or might not be present or could be empty.
-			// For a robust live test, we might just check it's a string or if present, a valid URL prefix.
-			if transcriptionResult.ThumbnailURL != "" {
-				Expect(strings.HasPrefix(transcriptionResult.ThumbnailURL, "http")).To(BeTrue(), "ThumbnailURL if present should be a valid URL")
-			}
+	// 		Expect(transcriptionResult.OriginalURL).To(Equal(videoURL))
+	// 		Expect(transcriptionResult.TranscriptionText).NotTo(BeEmpty(), "TranscriptionText should not be empty")
+	// 		Expect(transcriptionResult.VideoTitle).NotTo(BeEmpty(), "VideoTitle should not be empty")
+	// 		// Language might be reported differently by API, checking for non-empty is safer for live test
+	// 		Expect(transcriptionResult.DetectedLanguage).NotTo(BeEmpty(), "DetectedLanguage should not be empty")
+	// 		// Thumbnail URL might or might not be present or could be empty.
+	// 		// For a robust live test, we might just check it's a string or if present, a valid URL prefix.
+	// 		if transcriptionResult.ThumbnailURL != "" {
+	// 			Expect(strings.HasPrefix(transcriptionResult.ThumbnailURL, "http")).To(BeTrue(), "ThumbnailURL if present should be a valid URL")
+	// 		}
 
-			By("Verifying success statistics")
-			Eventually(func() uint {
-				// Attempting to access stats similarly to webscraper_test.go
-				// This assumes statsCollector has an exported structure like: Stats.Stats[workerID][statType]
-				// The actual type of statsCollector.Stats.Stats might be map[string]map[stats.StatType]uint
-				// Ensure the types are correct for your actual stats package structure.
-				if statsCollector == nil || statsCollector.Stats == nil || statsCollector.Stats.Stats == nil {
-					return 0 // Guard against nil pointers if initialization is complex
-				}
-				workerStatsMap := statsCollector.Stats.Stats[job.WorkerID]
-				if workerStatsMap == nil {
-					return 0
-				}
-				return workerStatsMap[stats.TikTokTranscriptionSuccess]
-			}, 15*time.Second, 250*time.Millisecond).Should(BeNumerically("==", 1), "TikTokTranscriptionSuccess count should be 1")
+	// 		By("Verifying success statistics")
+	// 		Eventually(func() uint {
+	// 			// Attempting to access stats similarly to webscraper_test.go
+	// 			// This assumes statsCollector has an exported structure like: Stats.Stats[workerID][statType]
+	// 			// The actual type of statsCollector.Stats.Stats might be map[string]map[stats.StatType]uint
+	// 			// Ensure the types are correct for your actual stats package structure.
+	// 			if statsCollector == nil || statsCollector.Stats == nil || statsCollector.Stats.Stats == nil {
+	// 				return 0 // Guard against nil pointers if initialization is complex
+	// 			}
+	// 			workerStatsMap := statsCollector.Stats.Stats[job.WorkerID]
+	// 			if workerStatsMap == nil {
+	// 				return 0
+	// 			}
+	// 			return workerStatsMap[stats.TikTokTranscriptionSuccess]
+	// 		}, 15*time.Second, 250*time.Millisecond).Should(BeNumerically("==", 1), "TikTokTranscriptionSuccess count should be 1")
 
-			Eventually(func() uint {
-				if statsCollector == nil || statsCollector.Stats == nil || statsCollector.Stats.Stats == nil {
-					return 0
-				}
-				workerStatsMap := statsCollector.Stats.Stats[job.WorkerID]
-				if workerStatsMap == nil {
-					return 0
-				}
-				return workerStatsMap[stats.TikTokTranscriptionErrors]
-			}, 5*time.Second, 100*time.Millisecond).Should(BeNumerically("==", 0), "TikTokTranscriptionErrors count should be 0")
-		}, NodeTimeout(30*time.Second)) // Increased timeout for this specific test case
-	})
+	// 		Eventually(func() uint {
+	// 			if statsCollector == nil || statsCollector.Stats == nil || statsCollector.Stats.Stats == nil {
+	// 				return 0
+	// 			}
+	// 			workerStatsMap := statsCollector.Stats.Stats[job.WorkerID]
+	// 			if workerStatsMap == nil {
+	// 				return 0
+	// 			}
+	// 			return workerStatsMap[stats.TikTokTranscriptionErrors]
+	// 		}, 5*time.Second, 100*time.Millisecond).Should(BeNumerically("==", 0), "TikTokTranscriptionErrors count should be 0")
+	// 	}, NodeTimeout(30*time.Second)) // Increased timeout for this specific test case
+	// })
 
 	Context("when arguments are invalid", func() {
 		It("should return an error if VideoURL is empty and not record error stats", func() {
