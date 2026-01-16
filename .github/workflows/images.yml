@@ -43,10 +43,10 @@
                 PCCS_SERVER="https://pccs.dev.masalabs.ai"
               fi
               # Set output parameters.
-              echo ::set-output name=binary_version::${BINARY_VERSION}
-              echo ::set-output name=tags::${TAGS}
-              echo ::set-output name=docker_image::${DOCKER_IMAGE}
-              echo ::set-output name=pccs_server::${PCCS_SERVER}
+              echo "binary_version=${BINARY_VERSION}" >> "$GITHUB_OUTPUT"
+              echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+              echo "docker_image=${DOCKER_IMAGE}" >> "$GITHUB_OUTPUT"
+              echo "pccs_server=${PCCS_SERVER}" >> "$GITHUB_OUTPUT"
           - name: Set up QEMU
             uses: docker/setup-qemu-action@master
             with:
