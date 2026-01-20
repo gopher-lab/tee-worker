@@ -6,7 +6,14 @@ set -e
 if [ "${USE_AZURE_THIM}" = "true" ] || [ "${USE_AZURE_THIM}" = "1" ]; then
     echo "[entrypoint] Configuring for Azure THIM (DCsv3 mode)..."
     
+    # Verify sgx_default_qcnl.conf exists before attempting modifications
+    if [ ! -f /etc/sgx_default_qcnl.conf ]; then
+        echo "[entrypoint] Error: /etc/sgx_default_qcnl.conf not found"
+        exit 1
+    fi
+    
     # Update sgx_default_qcnl.conf to use Azure Global Attestation Cache
+    # Note: "acccache" is correct - ACC = Azure Confidential Computing
     THIM_URL="${AZURE_THIM_URL:-https://global.acccache.azure.net/sgx/certification/v4/}"
     
     # Update the pccs_url to point to Azure THIM
