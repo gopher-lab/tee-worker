@@ -67,6 +67,26 @@ The tee-worker requires various environment variables for operation. These shoul
 - `OE_SIMULATION`: Set to `1` to run with a TEE simulator instead of a full TEE.
 - `LOG_LEVEL`: Initial log level. The valid values are `debug`, `info`, `warn` and `error`. You can also set the debug level at runtime (e.g. to debug a production issue) by using the `PUT /debug/loglevel?level=<level>` endpoint.
 
+### Azure DCsv3 Support
+
+For running on Azure DCsv3 VMs (Ice Lake processors), you need to configure the worker to use Azure's Trusted Hardware Identity Management (THIM) instead of the default PCCS:
+
+- `USE_AZURE_THIM`: Set to `true` to bypass PCCS and use Azure's Global Attestation Cache directly. Required for DCsv3 VMs.
+- `AZURE_THIM_URL`: (Optional) Custom Azure THIM URL. Defaults to `https://global.acccache.azure.net/sgx/certification/v4/`.
+- `THIM_USE_SECURE_CERT`: (Optional) Set to `true` to enable TLS certificate verification for THIM (default: `false`).
+
+Example for running on DCsv3:
+```bash
+docker run \
+  --device /dev/sgx_enclave \
+  --device /dev/sgx_provision \
+  --net host \
+  --rm \
+  -e USE_AZURE_THIM=true \
+  -v $(pwd)/.masa:/home/masa \
+  masaengineering/tee-worker:main
+```
+
 ## Capabilities
 
 The worker automatically detects and exposes capabilities based on available configuration. Each capability is organized under a **Job Type** with specific **sub-capabilities**.
