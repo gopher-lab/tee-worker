@@ -45,6 +45,10 @@ RUN sed -i 's#"use_secure_cert": true#"use_secure_cert": false#' /etc/sgx_defaul
 
 COPY --from=builder /app/bin/masa-tee-worker /usr/bin/masa-tee-worker
 
+# Copy entrypoint script for runtime PCCS/THIM configuration
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Create the 'masa' user and set up the home directory
 RUN useradd -m -s /bin/bash masa && mkdir -p /home/masa && chown -R masa:masa /home/masa
 
@@ -53,6 +57,9 @@ ENV DATA_DIR=/home/masa
 
 # Expose necessary ports
 EXPOSE 8080
+
+# Use entrypoint to configure PCCS/THIM at runtime
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 # Set default command to start the Go application
 CMD ["ego", "run", "/usr/bin/masa-tee-worker"]
