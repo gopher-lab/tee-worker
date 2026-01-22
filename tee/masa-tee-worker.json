@@ -41,6 +41,7 @@
       {"name": "APIFY_API_KEY", "fromHost":true},
       {"name": "GEMINI_API_KEY", "fromHost":true},
       {"name": "CLAUDE_API_KEY", "fromHost":true},
+      {"name": "DISABLE_HTTP_KEEPALIVE", "fromHost":true},
       {"name": "TWITTER_SKIP_LOGIN_VERIFICATION", "fromHost":true},
       {"name": "WEBSCRAPER_BLACKLIST", "fromHost":true}
     ],
