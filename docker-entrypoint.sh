@@ -31,11 +31,5 @@ else
     echo "[entrypoint] Using default PCCS configuration"
 fi
 
-# Show current configuration for debugging
-if [ "${LOG_LEVEL}" = "debug" ]; then
-    echo "[entrypoint] Current sgx_default_qcnl.conf:"
-    cat /etc/sgx_default_qcnl.conf
-fi
-
 # Execute the main command
 exec "$@"
