@@ -1,6 +1,7 @@
 package capabilities
 
 import (
+	"os"
 	"slices"
 	"strings"
 
@@ -77,7 +78,13 @@ func DetectCapabilities(jc config.JobConfiguration, jobServer JobServerInterface
 
 	if hasApifyKey {
 		// Create an Apify client for probing actors
-		c, err := client.NewApifyClient(apifyApiKey)
+		// Check if keep-alives should be disabled (helps with SGX2/Ice Lake network issues)
+		var clientOpts []client.Option
+		if os.Getenv("DISABLE_HTTP_KEEPALIVE") == "true" || os.Getenv("DISABLE_HTTP_KEEPALIVE") == "1" {
+			logrus.Info("HTTP keep-alives disabled via DISABLE_HTTP_KEEPALIVE")
+			clientOpts = append(clientOpts, client.DisableKeepAlives())
+		}
+		c, err := client.NewApifyClient(apifyApiKey, clientOpts...)
 		if err != nil {
 			logrus.Errorf("Failed to create Apify client for access probes: %v", err)
 		} else {
@@ -151,7 +158,12 @@ func hasValidApifyKey(apifyApiKey string) bool {
 	}
 
 	// Create temporary Apify client and validate the key
-	apifyClient, err := client.NewApifyClient(apifyApiKey)
+	// Check if keep-alives should be disabled (helps with SGX2/Ice Lake network issues)
+	var clientOpts []client.Option
+	if os.Getenv("DISABLE_HTTP_KEEPALIVE") == "true" || os.Getenv("DISABLE_HTTP_KEEPALIVE") == "1" {
+		clientOpts = append(clientOpts, client.DisableKeepAlives())
+	}
+	apifyClient, err := client.NewApifyClient(apifyApiKey, clientOpts...)
 	if err != nil {
 		logrus.Errorf("Failed to create Apify client during capability detection: %v", err)
 		return false

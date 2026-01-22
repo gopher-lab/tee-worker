@@ -74,6 +74,7 @@ For running on Azure DCsv3 VMs (Ice Lake processors), you need to configure the 
 - `USE_AZURE_THIM`: Set to `true` to bypass PCCS and use Azure's Global Attestation Cache directly. Required for DCsv3 VMs.
 - `AZURE_THIM_URL`: (Optional) Custom Azure THIM URL. Defaults to `https://global.acccache.azure.net/sgx/certification/v4/`.
 - `THIM_USE_SECURE_CERT`: (Optional) Set to `true` to enable TLS certificate verification for THIM (default: `false`).
+- `DISABLE_HTTP_KEEPALIVE`: (Optional) Set to `true` to disable HTTP keep-alive connections. This can help resolve connection pooling issues on SGX2/Ice Lake processors where the Go HTTP client may experience timeouts after the first few requests.
 
 Example for running on DCsv3:
 ```bash

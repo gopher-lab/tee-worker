@@ -13,6 +13,7 @@ type Options struct {
 	MaxIdleConnsPerHost int
 	MaxIdleConns        int
 	IdleConnTimeout     time.Duration
+	DisableKeepAlives   bool
 	HttpClient          *http.Client
 }
 
@@ -72,6 +73,15 @@ func IdleConnTimeout(timeout time.Duration) Option {
 	}
 }
 
+// DisableKeepAlives disables HTTP keep-alive connections, forcing a new connection for each request.
+// This can help with connection issues in certain SGX enclave environments.
+func DisableKeepAlives() Option {
+	return func(o *Options) error {
+		o.DisableKeepAlives = true
+		return nil
+	}
+}
+
 // HttpClient specifies the http.Client to use. If provided the rest of the connection options are ignored.
 func HttpClient(c *http.Client) Option {
 	return func(o *Options) error {
@@ -104,6 +114,7 @@ func NewOptions(opts ...Option) (*Options, error) {
 		t.MaxIdleConns = o.MaxIdleConns
 		t.MaxIdleConnsPerHost = o.MaxIdleConnsPerHost
 		t.MaxConnsPerHost = o.MaxConnsPerHost
+		t.DisableKeepAlives = o.DisableKeepAlives
 		t.TLSClientConfig.InsecureSkipVerify = o.ignoreTLSCert
 		c.Transport = t
 
