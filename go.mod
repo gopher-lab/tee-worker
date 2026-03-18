@@ -16,7 +16,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 )
 
-replace github.com/imperatrona/twitter-scraper => github.com/masa-finance/twitter-scraper v1.1.3
+replace github.com/imperatrona/twitter-scraper => github.com/masa-finance/twitter-scraper v1.1.4
 
 require (
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
