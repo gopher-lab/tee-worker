@@ -59,14 +59,12 @@ func LoadWorkerID(dataDir string) (string, error) {
 		return "", fmt.Errorf("failed to read worker ID: %w", err)
 	}
 
-	var workerID string
 	rawID, err := ecrypto.Unseal(encryptedID, []byte{})
 	if err != nil {
 		return "", fmt.Errorf("failed to unseal worker ID: %w", err)
 	}
-	workerID = string(rawID)
-
-	return workerID, nil
+	
+	return string(rawID), nil
 }
 
 // InitializeWorkerID initializes the worker ID.
